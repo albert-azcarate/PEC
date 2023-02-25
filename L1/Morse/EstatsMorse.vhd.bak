@@ -1,8 +1,0 @@
-package MorseStates is
-  subtype OpCode is std_logic_vector(1 downto 0);
-	
-  constant IDLE : control_t := "00";
-  constant START : control_t := "01";
-  constant WORKING : control_t := "10";
-  constant RESET : control_t := "11";
-end MorseStates;
