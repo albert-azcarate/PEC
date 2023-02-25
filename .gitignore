@@ -1,3 +1,4 @@
 # Quartus and ModelSim files
 **/db/
 **/incremental_db/
+*.bak
