@@ -1,0 +1,13 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+USE IEEE.std_logic_arith.all;
+USE ieee.std_logic_unsigned.all;
+ENTITY L1_T9 IS
+ PORT( CLOCK_50 : IN std_logic;
+ HEX0 : OUT std_logic_vector(6 downto 0));
+END L1_T9;
+
+ARCHITECTURE Structure OF L1_T9 IS
+BEGIN
+	
+END Structure;

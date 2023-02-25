@@ -1,0 +1,15 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity Morse is
+    port (
+        clk     : in  std_logic;
+        reset   : in  std_logic;
+        sw      : in  std_logic_vector(2 downto 0);
+        key0    : in  std_logic;
+        key1    : in  std_logic;
+        ledg    : out std_logic;
+        ledr    : out std_logic
+    );
+end entity morse;
