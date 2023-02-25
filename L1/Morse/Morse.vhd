@@ -21,7 +21,7 @@ entity Morse is
 			LEDR		 : OUT STD_LOGIC_VECTOR (0 DOWNTO 0);
 			LEDG		 : OUT STD_LOGIC_VECTOR (0 DOWNTO 0);
 			HEX0 		 : OUT std_logic_vector(6 downto 0));
-		
+		 
 end entity morse;
 
 architecture Structure of morse is
