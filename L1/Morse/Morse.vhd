@@ -88,6 +88,9 @@ begin
 			px_estat <= IDLE;
 			reset_morse <= '0';
 			
+			-- Podem eliminar l'estat RESET si anem directe a idle i posem reset_morse <= '1' aleshores
+			-- Podem eliminar l'estat START si anem directe a working i posem inici_morse <= '1' aleshores
+			
 			if KEY(0) = '1' then -- Si reset
 				px_estat <= RESET ;
 				reset_morse <= '1';
@@ -97,17 +100,18 @@ begin
 				
 			elsif estat = START then -- si estavem al cicle inicial
 				px_estat <= WORKING;
+				inici_morse <= '1';
 				
 			elsif estat = WORKING and ended_morse = '1' then -- si estem a work i hem acabat, idle
 				px_estat <= IDLE;
-				reset_morse <= '1'; -- maybe
+				-- reset_morse <= '1'; -- maybe
 			
 			elsif estat = WORKING then -- si estavem a working i no hem acabat, working
 				px_estat <= WORKING;
 			
 			elsif estat = IDLE and KEY(1) = '1' then -- else si key(1) i estem en idle
 				px_estat <= START;
-				inici_morse <= '1';
+				
 			end if;
 		end if;
 	end process;
