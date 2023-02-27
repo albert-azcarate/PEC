@@ -19,7 +19,7 @@ entity Morse is
 			SW        : IN STD_LOGIC_VECTOR  (2 DOWNTO 0);
 			KEY		 : IN  STD_LOGIC_VECTOR (1 DOWNTO 0);
 			LEDR		 : OUT STD_LOGIC_VECTOR (0 DOWNTO 0);
-			LEDG		 : OUT STD_LOGIC_VECTOR (0 DOWNTO 0);
+			LEDG		 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
 			HEX0 		 : OUT std_logic_vector(6 downto 0));
 		 
 end entity morse;
@@ -63,6 +63,8 @@ signal inici_morse : std_logic := '0';
 signal reset_morse : std_logic := '0';
 signal ended_morse : std_logic;
 
+
+		 
 begin
 	
 	
@@ -81,43 +83,48 @@ begin
 	conv_morse : ConversorMorse port map(lletra => switch, inici => inici_morse, clock => is_second,  reset => reset_morse, ended => ended_morse , puls => LEDR);
 	
 	-- estat
+	
 	process (is_second, KEY) begin
 		if rising_edge(is_second) then
 			-- posada a 0
 			inici_morse <= '0';
 			px_estat <= IDLE;
-			reset_morse <= '0';
-			
+			reset_morse <= '1';
+		
 			-- Podem eliminar l'estat RESET si anem directe a idle i posem reset_morse <= '1' aleshores
 			-- Podem eliminar l'estat START si anem directe a working i posem inici_morse <= '1' aleshores
 			
-			if KEY(0) = '1' then -- Si reset
-				px_estat <= RESET ;
-				reset_morse <= '1';
+			if KEY(0) = not '1' then -- Si reset
+				px_estat <= IDLE ;
 				
-			elsif estat = RESET then -- Si l'anterior cicle estavem en reset
-				px_estat <= IDLE;
+			--elsif estat = RESET then -- Si l'anterior cicle estavem en reset
+			--	px_estat <= IDLE;
 				
-			elsif estat = START then -- si estavem al cicle inicial
-				px_estat <= WORKING;
-				inici_morse <= '1';
+			--elsif estat = START then -- si estavem al cicle inicial
+				--px_estat <= WORKING;
+				--inici_morse <= '1';
+				--reset_morse <= '0';
 				
 			elsif estat = WORKING and ended_morse = '1' then -- si estem a work i hem acabat, idle
 				px_estat <= IDLE;
-				-- reset_morse <= '1'; -- maybe
 			
 			elsif estat = WORKING then -- si estavem a working i no hem acabat, working
 				px_estat <= WORKING;
+				reset_morse <= '0';
 			
-			elsif estat = IDLE and KEY(1) = '1' then -- else si key(1) i estem en idle
-				px_estat <= START;
+			elsif estat = IDLE and KEY(1) = not '1' then -- else si key(1) i estem en idle
+				-- px_estat=START;
+				px_estat <= WORKING;
+				inici_morse <= '1';
+				reset_morse <= '0';
 				
 			end if;
 		end if;
 	end process;
 	
 	estat <= px_estat;
-	LEDG(0) <= not (estat(1) or estat(0)); 
-
+	LEDG(0) <= not estat(0); 
+	-- LEDG(6 downto 5) <= estat;
+	-- LEDG(4) <= ended_morse;
 
 end Structure;
