@@ -16,7 +16,8 @@ ENTITY control_l IS
           wr_m      : OUT STD_LOGIC;
           in_d      : OUT STD_LOGIC;
           immed_x2  : OUT STD_LOGIC;
-          word_byte : OUT STD_LOGIC); 
+          word_byte : OUT STD_LOGIC;
+			 Instruccio: out string(1 to 7)); 
 END control_l;
 
 
@@ -70,5 +71,14 @@ BEGIN
 	addr_b <= ir(11 downto 9);
 	immed_x2 <= '1' when op_code_ir=LD or op_code_ir=ST else '0';
 
+	with op_code_ir select
+		Instruccio <= 	"MOVI-HI" when MOVI,
+							"LD     " when LD,
+							"LDB    " when LDB,
+							"ST     " when ST,
+							"STB    " when STB,
+							"HALT   " when HALT,
+							"Invalid" when others;
 
+	
 END Structure;

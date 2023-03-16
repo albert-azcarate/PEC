@@ -37,7 +37,8 @@ ARCHITECTURE Structure OF unidad_control IS
 				wr_m      : OUT STD_LOGIC;
 				in_d      : OUT STD_LOGIC;
 				immed_x2  : OUT STD_LOGIC;
-				word_byte : OUT STD_LOGIC);
+				word_byte : OUT STD_LOGIC;
+				instruccio:out string(1 to 7));
 	end component;
 	
 	
@@ -67,6 +68,7 @@ signal load_ins: std_LOGIC;
 signal ir_connection: std_logic_vector(15 downto 0);
 signal ir_reg: std_logic_vector(15 downto 0);
 signal new_ir: std_logic_vector(15 downto 0);
+signal instruction : string (1 to 7);
 BEGIN
 	
 
@@ -104,7 +106,7 @@ BEGIN
 		
 	end process;
   	 
-	control_ins : control_l port map(ir => ir_connection, op => op, ldpc=> load_pc_connection, wrd => enable, addr_a => addr_a, addr_b => addr_b, addr_d => addr_d, immed => immed, wr_m => word_mem, in_d => in_d, immed_x2 => immed_x2, word_byte => word_byte_connection);
+	control_ins : control_l port map(ir => ir_connection, op => op, ldpc=> load_pc_connection, wrd => enable, addr_a => addr_a, addr_b => addr_b, addr_d => addr_d, immed => immed, wr_m => word_mem, in_d => in_d, immed_x2 => immed_x2, word_byte => word_byte_connection, Instruccio => Instruction);
 	
 	multi0 : multi port map(clk => clk, boot => boot, ldpc_l => load_pc_connection, wrd_l => enable, wr_m_l => word_mem, w_b => word_byte_connection, ldpc => load_pc_out , wrd => wrd, wr_m => wr_m, ldir => load_ins, ins_dad => ins_dad, word_byte => word_byte);
 	ir_connection <= ir_reg;
