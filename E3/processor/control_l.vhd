@@ -91,7 +91,7 @@ BEGIN
 							 "HALT" when HALT,
 							 "NONE" 	when others;
 							 
-	with ir(5 downto 3)&op_code_ir select
+	with ir(5 downto 3) & op_code_ir select
 		operacio <= "AND   " when "000"&AL,
 						"OR    "	when "001"&AL,
 						"XOR   " when "010"&AL,
@@ -108,6 +108,11 @@ BEGIN
 						"MUL   "	when "000"&MULDIV,
 						"MULH  "	when "001"&MULDIV,
 						"MULHU "	when "010"&MULDIV,
+						"MOVE  "	when "XXX"&MOVE,
+						"LD    "	when "XXX"&LD,
+						"LDB   "	when "XXX"&LDB,
+						"ST    "	when "XXX"&ST,
+						"STB   "	when "XXX"&STB,
 						"-     " when others;
 
 	

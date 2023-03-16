@@ -72,6 +72,7 @@ configure wave -gridperiod 80
 configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
-update
+updateradix -hexadecimal
+echo Running Simulation
 run 12000ns
 WaveRestoreZoom {0 ps} {12000 ns}
