@@ -2,12 +2,16 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 USE ieee.std_logic_unsigned.all;
+use work.all;
+use work.op_code.all;
+use work.f_code.all;
 
 ENTITY unidad_control IS
     PORT (boot      : IN  STD_LOGIC;
           clk       : IN  STD_LOGIC;
           datard_m  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          op        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+          op        : out op_code_t;
+          f         : out  f_code_t;
           wrd       : OUT STD_LOGIC;
           addr_a    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_b    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -27,7 +31,8 @@ ARCHITECTURE Structure OF unidad_control IS
 
 	component control_l IS
 		PORT (ir     	 : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-				op        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+				op        : out  op_code_t;
+				f         : out  f_code_t;
 				ldpc      : OUT STD_LOGIC;
 				wrd       : OUT STD_LOGIC;
 				addr_a    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -38,7 +43,8 @@ ARCHITECTURE Structure OF unidad_control IS
 				in_d      : OUT STD_LOGIC;
 				immed_x2  : OUT STD_LOGIC;
 				word_byte : OUT STD_LOGIC;
-				instruccio:out string(1 to 7));
+				instruccio:out string(1 to 4);
+				operacio	 :out string(1 to 6));
 	end component;
 	
 	
@@ -68,7 +74,8 @@ signal load_ins: std_LOGIC;
 signal ir_connection: std_logic_vector(15 downto 0);
 signal ir_reg: std_logic_vector(15 downto 0);
 signal new_ir: std_logic_vector(15 downto 0);
-signal instruction : string (1 to 7);
+signal instruction : string (1 to 4);
+signal operacio : string (1 to 6);
 BEGIN
 	
 
@@ -106,9 +113,33 @@ BEGIN
 		
 	end process;
   	 
-	control_ins : control_l port map(ir => ir_connection, op => op, ldpc=> load_pc_connection, wrd => enable, addr_a => addr_a, addr_b => addr_b, addr_d => addr_d, immed => immed, wr_m => word_mem, in_d => in_d, immed_x2 => immed_x2, word_byte => word_byte_connection, Instruccio => Instruction);
+	control_ins : control_l port map(ir => ir_connection,
+												op => op,
+												f => f,
+												ldpc=> load_pc_connection,
+												wrd => enable,
+												addr_a => addr_a, 
+												addr_b => addr_b,
+												addr_d => addr_d,
+												immed => immed,
+												wr_m => word_mem,
+												in_d => in_d,
+												immed_x2 => immed_x2,
+												word_byte => word_byte_connection,
+												Instruccio => Instruction);
 	
-	multi0 : multi port map(clk => clk, boot => boot, ldpc_l => load_pc_connection, wrd_l => enable, wr_m_l => word_mem, w_b => word_byte_connection, ldpc => load_pc_out , wrd => wrd, wr_m => wr_m, ldir => load_ins, ins_dad => ins_dad, word_byte => word_byte);
+	multi0 : multi port map(clk => clk, 
+									boot => boot,
+									ldpc_l => load_pc_connection,
+									wrd_l => enable,
+									wr_m_l => word_mem,
+									w_b => word_byte_connection,
+									ldpc => load_pc_out,
+									wrd => wrd, 
+									wr_m => wr_m,
+									ldir => load_ins,
+									ins_dad => ins_dad,
+									word_byte => word_byte);
 	ir_connection <= ir_reg;
 	pc <= regPC;
   

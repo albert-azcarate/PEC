@@ -1,5 +1,8 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
+use work.all;
+use work.op_code.all;
+use work.f_code.all;
 
 ENTITY proc IS
     PORT (clk       : IN  STD_LOGIC;
@@ -17,7 +20,8 @@ ARCHITECTURE Structure OF proc IS
     PORT (boot      : IN  STD_LOGIC;
           clk       : IN  STD_LOGIC;
           datard_m  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          op        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+          op 		  : out  op_code_t;
+          f         : out  f_code_t;
           wrd       : OUT STD_LOGIC;
           addr_a    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_b    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -33,7 +37,8 @@ ARCHITECTURE Structure OF proc IS
 	 
 	 component datapath IS
     PORT (clk      : IN  STD_LOGIC;
-          op       : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+          op 		 : IN  op_code_t;
+          f        : IN  f_code_t;
           wrd      : IN  STD_LOGIC;
           addr_a   : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_b   : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -49,7 +54,8 @@ ARCHITECTURE Structure OF proc IS
 	 end component;
 	 
 	 
- signal	op_conn       :   STD_LOGIC_VECTOR(1 DOWNTO 0);
+ signal	op_conn       :   op_code_t;
+ signal	f_conn        :   f_code_t;
  signal  wrd_conn      :   STD_LOGIC;
  signal  addr_a_conn   :   STD_LOGIC_VECTOR(2 DOWNTO 0);
  signal  addr_b_conn   :   STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -62,8 +68,37 @@ ARCHITECTURE Structure OF proc IS
  
 BEGIN
 	
-	UC: unidad_control port map(boot => boot, clk => clk, datard_m => datard_m, op => op_conn, wrd => wrd_conn, addr_a => addr_a_conn, addr_b => addr_b_conn, addr_d => addr_d_conn, immed => immed_conn, pc => pc_conn, ins_dad => ins_dad_conn, in_d => in_d_conn, immed_x2 => immed_x2_conn, wr_m => wr_m, word_byte => word_byte);
+	UC: unidad_control port map(	boot => boot,
+											clk => clk,
+											datard_m => datard_m,
+											op => op_conn,
+											f => f_conn,
+											wrd => wrd_conn,
+											addr_a => addr_a_conn,
+											addr_b => addr_b_conn,
+											addr_d => addr_d_conn,
+											immed => immed_conn,
+											pc => pc_conn,
+											ins_dad => ins_dad_conn,
+											in_d => in_d_conn,
+											immed_x2 => immed_x2_conn,
+											wr_m => wr_m,
+											word_byte => word_byte);
 	
-	PATH: datapath port map(clk => clk, datard_m => datard_m, op => op_conn, wrd => wrd_conn, addr_a => addr_a_conn, addr_b => addr_b_conn, addr_d => addr_d_conn, immed => immed_conn, pc => pc_conn, ins_dad => ins_dad_conn, in_d => in_d_conn, immed_x2 => immed_x2_conn, data_wr => data_wr, addr_m => addr_m);
+	PATH: datapath port map(clk => clk,
+									datard_m => datard_m,
+									op => op_conn,
+									f => f_conn,
+									wrd => wrd_conn,
+									addr_a => addr_a_conn,
+									addr_b => addr_b_conn,
+									addr_d => addr_d_conn,
+									immed => immed_conn, 
+									pc => pc_conn, 
+									ins_dad => ins_dad_conn, 
+									in_d => in_d_conn, 
+									immed_x2 => immed_x2_conn,
+									data_wr => data_wr, 
+									addr_m => addr_m);
 
 END Structure;

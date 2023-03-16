@@ -1,10 +1,14 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
+use work.all;
+use work.op_code.all;
+use work.f_code.all;
 
 ENTITY datapath IS
     PORT (clk      : IN  STD_LOGIC;
-          op       : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+          op 		 : IN  op_code_t;
+          f        : IN  f_code_t;
           wrd      : IN  STD_LOGIC;
           addr_a   : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_b   : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -25,20 +29,21 @@ ARCHITECTURE Structure OF datapath IS
 
 	component regfile is 
 		PORT (clk    : IN  STD_LOGIC;
-          wrd    : IN  STD_LOGIC;
-          d      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          addr_a : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_b : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_d : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-          a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-          b      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+				wrd    : IN  STD_LOGIC;
+				d      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+				addr_a : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+				addr_b : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+				addr_d : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+				a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+				b      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
 	end component;
 	
 	component alu is
 		PORT (x  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          y  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          op : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
-          w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+				y  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+				op : IN  op_code_t;
+				f  : IN  f_code_t;
+				w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
 	end component;
 		
 
@@ -55,9 +60,20 @@ signal output_alu_or_mem : std_logic_vector(15 downto 0);
 	 
 BEGIN
 
-   register_bank : regfile port map (clk => clk, wrd => wrd, d => input_d, addr_a => addr_a, addr_d => addr_d, a => regbank_to_alu, addr_b => addr_b, b => data_wr );
+   register_bank : regfile port map (	clk => clk,
+													wrd => wrd,
+													d => input_d,
+													addr_a => addr_a,
+													addr_d => addr_d,
+													a => regbank_to_alu,
+													addr_b => addr_b,
+													b => data_wr );
 	
-	alu_unit : alu port map(x => regbank_to_alu, y => input_y, op => op , w => alu_out);
+	alu_unit : alu port map(x => regbank_to_alu,
+									y => input_y,
+									op => op,
+									f => f,
+									w => alu_out);
 	 
 	with immed_x2 select
 		input_y <= 	immed when '0',
