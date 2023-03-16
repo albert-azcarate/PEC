@@ -29,28 +29,49 @@ begin
 
 		process (clk) begin
 			if rising_edge(clk)then
+				SRAM_ADDR <= "000"&address(15 downto 1);--	 when byte_m = '0' else "00"&address(15 downto 0);
+				SRAM_CE_N <= '0';
+				
 				if WR = '0' then -- LECTURA
-					 SRAM_OE_N <= '0';
-					 SRAM_DQ <= (others=>'Z');
+					SRAM_OE_N <= '0';
+					SRAM_DQ <= (others=>'Z');
 				else 				-- ESCRIPTURA	
-					 SRAM_OE_N <= '1';
-						if  byte_m = '0' then										-- WORD
-							SRAM_DQ <= DataToWrite;	
-						elsif address(0) = '0'  then								-- LOW
-							SRAM_DQ <= "ZZZZZZZZ"&DataToWrite(7 downto 0);
-						else 																-- HIGH
-							SRAM_DQ <= DataToWrite(7 downto 0)&"ZZZZZZZZ";
-						end if;
+					SRAM_OE_N <= '1';
+					if  byte_m = '0' then										-- WORD
+						SRAM_DQ <= DataToWrite;	
+					elsif address(0) = '0'  then								-- LOW
+						SRAM_DQ <= "ZZZZZZZZ"&DataToWrite(7 downto 0);
+					else 																-- HIGH
+						SRAM_DQ <= DataToWrite(7 downto 0)&"ZZZZZZZZ";
+					end if;
 				end if;
+				
+				if byte_m = '0' then		-- WORD
+					SRAM_UB_N <= '0';
+					SRAM_LB_N <= '0';
+					dataReaded <= SRAM_DQ(15 downto 0); --extenem signe
+				else 						-- BYTE
+					SRAM_UB_N <= not address(0);
+					SRAM_LB_N <= address(0);
+					if address(0) = '0' then 	-- LOWER
+						dataReaded(15 downto 8) <= (others => SRAM_DQ(7)); --extenem signe
+						dataReaded(7 downto 0) <= SRAM_DQ(7 downto 0);
+					else						-- UPPER
+						dataReaded(15 downto 8) <= (others => SRAM_DQ(15)); --extenem signe
+						dataReaded(7 downto 0) <= SRAM_DQ(15 downto 8);
+					end if;
+				end if;
+				SRAM_WE_N <= not WR;
 			end if;
 	end process;
-	SRAM_ADDR <= "000"&address(15 downto 1);--	 when byte_m = '0' else "00"&address(15 downto 0);
-	SRAM_CE_N <= '0';		 
-   SRAM_UB_N <= '0' when byte_m = '0' else not address(0);
-	SRAM_LB_N <= '0' when byte_m = '0' else address(0);
-	SRAM_WE_N <= not WR;
-	dataReaded(7 downto 0) <= SRAM_DQ(7 downto 0);
-	dataReaded(15 downto 8) <= SRAM_DQ(15 downto 8) when byte_m = '0' else (others => SRAM_DQ(7)); --extenem signe
+	--SRAM_ADDR <= "000"&address(15 downto 1);--	 when byte_m = '0' else "00"&address(15 downto 0);
+	--SRAM_CE_N <= '0';
+	--SRAM_UB_N <= '0' when byte_m = '0' else not address(0);
+	--SRAM_LB_N <= '0' when byte_m = '0' else address(0);
+	--SRAM_WE_N <= not WR;
+	--dataReaded(7 downto 0) <= SRAM_DQ(7 downto 0);
+	--dataReaded(15 downto 8) <= SRAM_DQ(15 downto 8) when byte_m = '0' else (others => SRAM_DQ(7)); --extenem signe
+
 
 
 
