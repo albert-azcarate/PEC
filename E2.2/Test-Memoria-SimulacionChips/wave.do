@@ -56,7 +56,7 @@ add wave -noupdate -label Registres -expand /test_sisa/SoC/processor/PATH/regist
 add wave -noupdate -divider Memoria
 add wave -noupdate -label Memoria {/test_sisa/mem0/mem_array(53 downto 31)}
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {11990000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {12000 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
