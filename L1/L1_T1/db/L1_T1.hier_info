@@ -1,6 +1,0 @@
-|L1_T1
-Led_salida <= inst.DB_MAX_OUTPUT_PORT_TYPE
-Boton_1 => inst1.IN0
-Boton_2 => inst2.IN0
-
-
