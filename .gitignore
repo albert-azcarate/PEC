@@ -1,7 +1,10 @@
 # Quartus and ModelSim files
 **/db/
 **/incremental_db/
+**/work/
 **/output_files/
 **/simulation/
 *.bak
-*.qws
+*.mti
+*.mpf
+*.wlf
