@@ -1,0 +1,36 @@
+MOVI r0, 64	0x40
+MOVI r1, 65	0x41
+MOVI r2, 66	0x42
+MOVI r3, 67	0x43
+MOVI r4, 68	0x44
+MOVI r5, 80	0x50
+STB 2(r0), r1
+STB 4(r3), r2
+STB 0(r5), r3
+STB -12(r5), r4
+STB -2(r0), r5
+MOVI r7, 74	0x4a
+LDB r4, -8(r7)
+LDB r3, 4(r3)
+LDB r2, 14(r2)
+LDB r1, 4(r0)
+MOVI r7, 14	0xe
+MOVHI r7, 192	0xc0xx --
+LDB r6, -1(r7)
+STB 0(r0), r1
+STB 1(r0), r6
+STB 2(r0), r4
+STB 3(r0), r2
+STB 4(r0), r3
+LD r1, -2(r3)	
+LD r2, 0(r3)
+LD r3, 2(r3) 	
+LD r7, -14(r7)	
+MOVI r0, 64	0x40
+ST 32(r0), r1	
+ST 34(r0), r2	
+ST 36(r0), r3	
+ST 38(r0), r4	
+ST 40(r0), r6	
+ST 42(r0), r7	
+HALT/NAI
