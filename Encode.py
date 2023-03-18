@@ -76,14 +76,11 @@ def assemble(instruction):
             rb9 = int(operands[0]) 
             n = int(operands[2])
             ra = int(operands[1])
-        
-        if opcode in (4,3,):
+            
+        if opcode in (4,3,):    #If LD or ST /2 immd
             n = n >> 1
         
         combined_bits = opcode << 12 | (rb9 << 9) | (ra << 6) | (n & 0b111111) 
-        
-        
-        
         
     elif opcode in (0,): # 2-REG        oooo ddd aaaa e nnnnn
         pass
@@ -92,42 +89,6 @@ def assemble(instruction):
 
     hex_str = hex(combined_bits)[2:].zfill(4).upper()
     return hex_str
-
-    #operands, mnemonic = instruction.split(" ")[1:], instruction.split(" ")[0]
-    #operands = [elem.replace('r', '').replace(',', '').replace('(', '').replace(')', '') for elem in operands]
-    #print(operands)
-    #opcode = INSTRUCTIONS[mnemonic][list(INSTRUCTIONS[mnemonic].keys())[0]]
-    #if opcode in (0, 1, 8): # ALU, COMP, MULDIV
-    #    f = INSTRUCTIONS[mnemonic]["f"]
-    #    rd, ra, rb0 = [int(operand[1:]) for operand in operands]
-    #    rb9 = rb0
-    #elif opcode in (2,): # ADDI
-    #    rd, ra = [int(operand[1:]) for operand in operands[0:2]]
-    #    n6 = int(operands[2])
-    #elif opcode in (3, 13): # LD, LDB
-    #    rd, ra = [int(operand[1:]) for operand in operands]
-    #    m = int(operands[2])
-    #elif opcode in (4, 14): # ST, STB
-    #    ra, rb0 = [int(operand[1:]) for operand in operands]
-    #    m = int(operands[2])
-    #elif opcode in (5,): # JMP
-    #    n8 = int(operands[0])
-    #elif opcode in (6,): # BEQZ
-    #    ra, n8 = [int(operand[1:]) for operand in operands]
-    #elif opcode in (7,): # AND
-    #    rd, ra, rb0 = [int(operand[1:]) for operand in operands]
-    #    rb9 = rb0
-    #elif opcode in (9,): # CMP
-    #    ra, rb0 = [int(operand[1:]) for operand in operands]
-    #    rb9 = rb0
-    #elif opcode in (10,): # MOV
-    #    rd, ra = [int(operand[1:]) for operand in operands]
-    #elif opcode in (11,): # RET
-    #    pass
-    #elif opcode in (12,): # SYS
-    #    pass
-    #else:
-    #    raise Exception(f"Invalid opcode: {opcode}")
 
 
 def main():
