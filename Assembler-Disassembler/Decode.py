@@ -1,3 +1,4 @@
+#!/home/albert/mambaforge/bin/python
 import sys
 OPCODES = {
     0: "ALU",
@@ -71,7 +72,10 @@ def decode_instruction(instruction):
     decoded_instruction = ""
     if opcode in (0, 1, 8): #ALU COMP MULDIV
         if opcode == 0:     #ALU
-            decoded_instruction = f"{FCODES_ALU[f]} r{rd}, r{ra}, r{rb0}"
+            if f != 3:
+                decoded_instruction = f"{FCODES_ALU[f]} r{rd}, r{ra}, r{rb0}"
+            else:
+                decoded_instruction = f"{FCODES_ALU[f]} r{rd}, r{ra}"
         elif opcode == 1:     #COMP
             decoded_instruction = f"{FCODES_COMP[f]} r{rd}, r{ra}, r{rb0}"
         elif opcode == 8:     #MULDIV
@@ -79,7 +83,7 @@ def decode_instruction(instruction):
             
     elif opcode in (2, 3, 4): # ADDI LD ST        
         if opcode == 2:     #ADDI
-            decoded_instruction = f"ADDI r{rd}, r{ra}, {n6}"#\t{hex(n6)}"
+            decoded_instruction = f"ADDI r{rd}, r{ra}, {n6}\t ;{hex(n6)}"
         elif opcode == 3:   #LD
             decoded_instruction = f"LD r{rd}, {n6we}(r{ra})"
         elif opcode == 4:   #ST
@@ -87,9 +91,9 @@ def decode_instruction(instruction):
             
     elif opcode == 5: # MOVE        
         if m == 0:  # MOVI
-            decoded_instruction = f"MOVI r{rd}, {n8e}"#\t{hex(n8e)}"
+            decoded_instruction = f"MOVI r{rd}, {n8e}\t ;{hex(n8e)}"
         elif m == 1:# MOVHI
-            decoded_instruction = f"MOVHI r{rd}, {n8}"#\t{hex(n8)}xx"
+            decoded_instruction = f"MOVHI r{rd}, {n8}\t ;{hex(n8)}"
             
     elif opcode in (13, 14):
         if opcode == 13:   #LD

@@ -1,3 +1,4 @@
+#!/home/albert/mambaforge/bin/python
 import sys
 INSTRUCTIONS = {
     "AND":   {"ALU": 0, "f": 0},
@@ -52,12 +53,13 @@ def assemble(instruction):
     mnemonic = mnemonic.upper()
 
     for i, elem in enumerate(operands):
-        if "(" in elem:
+        if "(" in elem:             # Convert N(rX) into ['N', 'rX']
             mem_acces = elem.split("(")
             mem_acces = [mem_elem.replace('(', '').replace(')', '') for mem_elem in mem_acces]
             operands[i:i+1] = mem_acces
+        if elem.startswith("0x"):   #accept 0xNN as parameters
+            operands[i] = int(elem[2:], 16)
     
-    #print(operands)
     #print(mnemonic)
     opcode = INSTRUCTIONS[mnemonic][list(INSTRUCTIONS[mnemonic].keys())[0]]
     #print(opcode)
@@ -91,12 +93,13 @@ def assemble(instruction):
         
         combined_bits = opcode << 12 | (rb9 << 9) | (ra << 6) | (n & 0b111111) 
         
-    elif opcode in (0,): # 2-REG        oooo ddd aaaa e nnnnn
+    elif opcode in (18,): # 2-REG        oooo ddd aaaa e nnnnn
         pass
     elif opcode in (0,1,8,): # 3-REG        oooo ddd aaa ffff bbb
         rd = int(operands[0]) 
         ra = int(operands[1])
-        rb0 = int(operands[2])
+        if(len(operands) > 2):
+            rb0 = int(operands[2])
         f = INSTRUCTIONS[mnemonic][list(INSTRUCTIONS[mnemonic].keys())[1]]
         combined_bits = opcode << 12 | (rd << 9) | (ra << 6) | (f << 3) | rb0
 
