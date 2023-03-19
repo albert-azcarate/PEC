@@ -29,6 +29,12 @@ INSTRUCTIONS = {
     "HALT":  {"SPECIAL": 15, "f": 0},
 }
 
+def sign_extend(value, length):
+    # Convert value to 2's complement if necessary
+    if value & (1 << (length - 1)):
+        value = value - (1 << length)
+    return value
+
 def assemble(instruction):
     opcode = 0
     rd = 0
@@ -61,7 +67,7 @@ def assemble(instruction):
     #print(instruction)
     if opcode in (5,):   # 1-REG        oooo ddd e nnnnnnnn MOVI, MOVHI
         rd = int(operands[0]) 
-        n8 = int(operands[1])
+        n8 = sign_extend(int(operands[1]),8)
         m = INSTRUCTIONS[mnemonic][list(INSTRUCTIONS[mnemonic].keys())[1]]
             
         combined_bits = opcode << 12 | (rd << 9) | (m << 8) | (n8 & 0b111111111) 
@@ -77,7 +83,7 @@ def assemble(instruction):
             ra = int(operands[2])
         elif opcode in (2,):    #ADDI
             rb9 = int(operands[0]) 
-            n = int(operands[2])
+            n = sign_extend(int(operands[2]),6)
             ra = int(operands[1])
             
         if opcode in (4,3,):    #If LD or ST /2 immd
