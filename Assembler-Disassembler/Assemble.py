@@ -67,21 +67,21 @@ def assemble(instruction):
     combined_bits=65535
     #print(operands)
     #print(instruction)
-    if opcode in (5,):   # 1-REG        oooo ddd e nnnnnnnn MOVI, MOVHI
+    if opcode in (5,):   # 1-REG        oooo ddd e nnnnnnnn MOVI, MOVHI, (BZ, BNZ) 
         rd = int(operands[0]) 
         n8 = sign_extend(int(operands[1]),8)
         m = INSTRUCTIONS[mnemonic][list(INSTRUCTIONS[mnemonic].keys())[1]]
             
         combined_bits = opcode << 12 | (rd << 9) | (m << 8) | (n8 & 0b111111111) 
             
-    elif opcode in (14, 13, 3, 4, 2,): # 2-REG-MEM    oooo ddd aaaa nnnnnn
+    elif opcode in (14, 13, 3, 4, 2,): # 2-REG-MEM    oooo ddd aaaa nnnnnn STs, LDs, ADDI, (JUMPS)
         if opcode in (14,4,):    #STORES
             rb9 = int(operands[2]) 
-            n = int(operands[0])
+            n = sign_extend(int(operands[0]),6)
             ra = int(operands[1])
         elif opcode in (3,13,):  #LOADS
             rb9 = int(operands[0]) 
-            n = int(operands[1])
+            n = sign_extend(int(operands[1]),6)
             ra = int(operands[2])
         elif opcode in (2,):    #ADDI
             rb9 = int(operands[0]) 
@@ -95,7 +95,7 @@ def assemble(instruction):
         
     elif opcode in (18,): # 2-REG        oooo ddd aaaa e nnnnn
         pass
-    elif opcode in (0,1,8,): # 3-REG        oooo ddd aaa ffff bbb
+    elif opcode in (0,1,8,): # 3-REG        oooo ddd aaa ffff bbb ALU, COMP, MULDIV
         rd = int(operands[0]) 
         ra = int(operands[1])
         if(len(operands) > 2):

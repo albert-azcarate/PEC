@@ -68,53 +68,55 @@ def decode_instruction(instruction):
     n8e = sign_extend(instruction & 0b11111111, 8)
     n8 = instruction & 0b11111111
     m = (instruction >> 8) & 0b1
-    
-    decoded_instruction = ""
-    if opcode in (0, 1, 8): #ALU COMP MULDIV
-        if opcode == 0:     #ALU
-            if f != 3:
-                decoded_instruction = f"{FCODES_ALU[f]} r{rd}, r{ra}, r{rb0}"
-            else:
-                decoded_instruction = f"{FCODES_ALU[f]} r{rd}, r{ra}"
-        elif opcode == 1:     #COMP
-            decoded_instruction = f"{FCODES_COMP[f]} r{rd}, r{ra}, r{rb0}"
-        elif opcode == 8:     #MULDIV
-            decoded_instruction = f"{FCODES_MULDIV[f]} r{rd}, r{ra}, r{rb0}"
-            
-    elif opcode in (2, 3, 4): # ADDI LD ST        
-        if opcode == 2:     #ADDI
-            decoded_instruction = f"ADDI r{rd}, r{ra}, {n6}\t ;{hex(n6)}"
-        elif opcode == 3:   #LD
-            decoded_instruction = f"LD r{rd}, {n6we}(r{ra})"
-        elif opcode == 4:   #ST
-            decoded_instruction = f"ST {n6w}(r{ra}), r{rd}"
-            
-    elif opcode == 5: # MOVE        
-        if m == 0:  # MOVI
-            decoded_instruction = f"MOVI r{rd}, {n8e}\t ;{hex(n8e)}"
-        elif m == 1:# MOVHI
-            decoded_instruction = f"MOVHI r{rd}, {n8}\t ;{hex(n8)}"
-            
-    elif opcode in (13, 14):
-        if opcode == 13:   #LD
-            decoded_instruction = f"LDB r{rd}, {n6}(r{ra})"
-        elif opcode == 14:     #ST
-            decoded_instruction = f"STB {n6}(r{ra}), r{rd}"
-    else :
-        decoded_instruction = f"halt"
-    #elif opcode in (6, 7, 8, 9, 10):
-    #    decoded_instruction = f"{OPCODES[opcode]} r{rd}, r{rs}, {imm}"
-    #elif opcode in (11, 12):
-    #    decoded_instruction = f"{OPCODES[opcode]} r{rs}, r{rt}, {imm}"
-    #elif opcode == 14:
-    #    decoded_instruction = f"{OPCODES[opcode]} r{rd}, {imm}"
-    #elif opcode == 15:
-    #    func = instruction & 0b111
-    #    decoded_instruction = f"{OPCODES[opcode]} r{rd}, r{rs}, {imm}, {func}"
-    #elif opcode == 16:
-    #    decoded_instruction = f"{OPCODES[opcode]} r{rd}, {imm}"
-    decoded_instruction = decoded_instruction[:decoded_instruction.find(' ')].lower() + decoded_instruction[decoded_instruction.find(' '):]
-    return decoded_instruction
+    try:
+        decoded_instruction = ""
+        if opcode in (0, 1, 8): #ALU COMP MULDIV
+            if opcode == 0:     #ALU
+                if f != 3:
+                    decoded_instruction = f"{FCODES_ALU[f]} r{rd}, r{ra}, r{rb0}"
+                else:
+                    decoded_instruction = f"{FCODES_ALU[f]} r{rd}, r{ra}"
+            elif opcode == 1:     #COMP
+                decoded_instruction = f"{FCODES_COMP[f]} r{rd}, r{ra}, r{rb0}"
+            elif opcode == 8:     #MULDIV
+                decoded_instruction = f"{FCODES_MULDIV[f]} r{rd}, r{ra}, r{rb0}"
+                
+        elif opcode in (2, 3, 4): # ADDI LD ST        
+            if opcode == 2:     #ADDI
+                decoded_instruction = f"ADDI r{rd}, r{ra}, {n6}\t ;{hex(n6)}"
+            elif opcode == 3:   #LD
+                decoded_instruction = f"LD r{rd}, {n6we}(r{ra})"
+            elif opcode == 4:   #ST
+                decoded_instruction = f"ST {n6w}(r{ra}), r{rd}"
+                
+        elif opcode == 5: # MOVE        
+            if m == 0:  # MOVI
+                decoded_instruction = f"MOVI r{rd}, {n8e}\t ;{hex(n8e)}"
+            elif m == 1:# MOVHI
+                decoded_instruction = f"MOVHI r{rd}, {n8}\t ;{hex(n8)}"
+                
+        elif opcode in (13, 14):
+            if opcode == 13:   #LD
+                decoded_instruction = f"LDB r{rd}, {n6}(r{ra})"
+            elif opcode == 14:     #ST
+                decoded_instruction = f"STB {n6}(r{ra}), r{rd}"
+        else :
+            decoded_instruction = f"halt"
+        #elif opcode in (6, 7, 8, 9, 10):
+        #    decoded_instruction = f"{OPCODES[opcode]} r{rd}, r{rs}, {imm}"
+        #elif opcode in (11, 12):
+        #    decoded_instruction = f"{OPCODES[opcode]} r{rs}, r{rt}, {imm}"
+        #elif opcode == 14:
+        #    decoded_instruction = f"{OPCODES[opcode]} r{rd}, {imm}"
+        #elif opcode == 15:
+        #    func = instruction & 0b111
+        #    decoded_instruction = f"{OPCODES[opcode]} r{rd}, r{rs}, {imm}, {func}"
+        #elif opcode == 16:
+        #    decoded_instruction = f"{OPCODES[opcode]} r{rd}, {imm}"
+        decoded_instruction = decoded_instruction[:decoded_instruction.find(' ')].lower() + decoded_instruction[decoded_instruction.find(' '):]
+        return decoded_instruction
+    except:
+        return "halt"
 
 
 
