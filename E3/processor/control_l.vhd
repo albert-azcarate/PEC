@@ -71,13 +71,11 @@ BEGIN
 	
 	immed_or_reg <= '0' when op_code_ir = LD or op_code_ir = ST or op_code_ir = LDB or op_code_ir = STB or op_code_ir = ADDI or op_code_ir = MOVE else '1';
 
-	--FAlta?
-	immed(15 downto 8) <= (others => ir(7)) when op_code_ir = ADDI or op_code_ir = MOVE else  (others => ir(5)); -- extenem singe
-	immed(7 downto 0)  <= ir(7 downto 0)  when op_code_ir = ADDI or op_code_ir = MOVE else ir(5)&ir(5)&ir(5 downto 0); -- copiem
-
-
+	--Faltaran Branch jumps
+	immed(15 downto 8) <= (others => ir(7)) when op_code_ir = MOVE else (others => ir(4)) when op_code_ir = ADDI else (others => ir(5)); -- extenem singe
+	immed(7 downto 0)  <= ir(7 downto 0)  when op_code_ir = MOVE else ir(4)&ir(4)&ir(4)&ir(4 downto 0) when op_code_ir = ADDI else ir(5)&ir(5)&ir(5 downto 0); -- copiem
 	
-	
+	--immed(15 downto 8) <= (others => ir(7)) when op_code_ir = MOVE else (others => ir(5)); -- extenem singe
 	
 	
 -- MODELSIM SIGNALS

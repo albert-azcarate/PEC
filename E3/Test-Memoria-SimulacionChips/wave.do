@@ -1,4 +1,5 @@
 delete wave *
+restart -f
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -label Clock /test_sisa/SoC/clk(2)
@@ -29,6 +30,7 @@ add wave -noupdate -group Control /test_sisa/SoC/processor/UC/control_ins/immed_
 add wave -noupdate -group Control /test_sisa/SoC/processor/UC/control_ins/Instruccio
 add wave -noupdate -group Control /test_sisa/SoC/processor/UC/control_ins/op_code_ir
 add wave -noupdate -group Control /test_sisa/SoC/processor/UC/control_ins/f
+add wave -noupdate -group Control /test_sisa/SoC/processor/UC/control_ins/immed_or_reg
 add wave -noupdate -group Multi /test_sisa/SoC/processor/UC/multi0/boot
 add wave -noupdate -group Multi /test_sisa/SoC/processor/UC/multi0/ldpc_l
 add wave -noupdate -group Multi /test_sisa/SoC/processor/UC/multi0/wrd_l
@@ -57,7 +59,7 @@ add wave -noupdate -group Reg_Bank /test_sisa/SoC/processor/PATH/register_bank/b
 add wave -noupdate -divider Registres
 add wave -noupdate -label Registres -expand /test_sisa/SoC/processor/PATH/register_bank/reg_vector
 add wave -noupdate -divider Memoria
-add wave -noupdate -label Memoria {/test_sisa/mem0/mem_array(53 downto 31)}
+add wave -noupdate -label Memoria {/test_sisa/mem0/mem_array(28 downto 0)}
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {12000 ns} 0}
 quietly wave cursor active 1
@@ -74,7 +76,7 @@ configure wave -gridperiod 80
 configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
-updateradix -hexadecimal
+radix -hexadecimal
 echo Running Simulation
-run 12000ns
-WaveRestoreZoom {0 ps} {12000 ns}
+run 48070ns
+WaveRestoreZoom {0 ps} {14950 ns}

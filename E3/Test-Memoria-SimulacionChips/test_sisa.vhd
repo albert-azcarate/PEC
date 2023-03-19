@@ -6,7 +6,7 @@ entity test_sisa is
 end test_sisa;
 
 architecture comportament of test_sisa is
-   component async_64Kx16_comp is
+   component async_64Kx16 is
 		generic
 			(ADDR_BITS		: integer := 16;
 			DATA_BITS		: integer := 16;
@@ -79,7 +79,7 @@ begin
 			SRAM_WE_N 	=> we_m
       );
 
-   mem0 : async_64Kx16_comp
+   mem0 : async_64Kx16
       port map (
 				A 	 => addr_mem,
 				DQ  => data_mem,
