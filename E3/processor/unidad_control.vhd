@@ -22,7 +22,8 @@ ENTITY unidad_control IS
           in_d      : OUT STD_LOGIC;
           immed_x2  : OUT STD_LOGIC;
           wr_m      : OUT STD_LOGIC;
-          word_byte : OUT STD_LOGIC);
+          word_byte : OUT STD_LOGIC;
+			 immed_or_reg : OUT STD_LOGIC);
 END unidad_control;
 
 
@@ -43,6 +44,7 @@ ARCHITECTURE Structure OF unidad_control IS
 				in_d      : OUT STD_LOGIC;
 				immed_x2  : OUT STD_LOGIC;
 				word_byte : OUT STD_LOGIC;
+				immed_or_reg : OUT STD_LOGIC;
 				instruccio:out string(1 to 4);
 				operacio	 :out string(1 to 6));
 	end component;
@@ -126,7 +128,8 @@ BEGIN
 												in_d => in_d,
 												immed_x2 => immed_x2,
 												word_byte => word_byte_connection,
-												Instruccio => Instruction);
+												Instruccio => Instruction,
+												immed_or_reg => immed_or_reg);
 	
 	multi0 : multi port map(clk => clk, 
 									boot => boot,

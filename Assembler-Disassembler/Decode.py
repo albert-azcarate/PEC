@@ -32,9 +32,9 @@ FCODES_ALU = {
 FCODES_COMP = {
     0: "CMPLT",
     1: "CMPLE",
-    2: "CMPEQ",
-    3: "CMPLTU",
-    4: "CMPLEU"
+    3: "CMPEQ",
+    4: "CMPLTU",
+    5: "CMPLEU"
 }
 FCODES_MULDIV = {
     0: "MUL",

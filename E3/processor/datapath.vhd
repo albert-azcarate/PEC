@@ -19,6 +19,7 @@ ENTITY datapath IS
           ins_dad  : IN  STD_LOGIC;
           pc       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
           in_d     : IN  STD_LOGIC;
+		  immed_or_reg : IN STD_LOGIC;
           addr_m   : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           data_wr  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
 END datapath;
@@ -52,10 +53,12 @@ ARCHITECTURE Structure OF datapath IS
     -- Tambien crearemos los cables/buses (signals) necesarios para unir las entidades
 	 
 signal alu_out : std_logic_vector(15 downto 0);
-signal regbank_to_alu : std_logic_vector(15 downto 0);
+signal regbank_to_alu_a : std_logic_vector(15 downto 0);
 signal input_y : std_logic_vector(15 downto 0);
+signal immed_y : std_logic_vector(15 downto 0);
 signal input_d : std_logic_vector(15 downto 0);
 signal output_alu_or_mem : std_logic_vector(15 downto 0);
+signal regbank_to_alu_b : std_logic_vector(15 downto 0);
 	 
 	 
 BEGIN
@@ -65,19 +68,25 @@ BEGIN
 													d => input_d,
 													addr_a => addr_a,
 													addr_d => addr_d,
-													a => regbank_to_alu,
+													a => regbank_to_alu_a,
 													addr_b => addr_b,
-													b => data_wr );
+													b => regbank_to_alu_b );
 	
-	alu_unit : alu port map(x => regbank_to_alu,
+	alu_unit : alu port map(x => regbank_to_alu_a,
 									y => input_y,
 									op => op,
 									f => f,
 									w => alu_out);
 	 
+	 
+	
 	with immed_x2 select
-		input_y <= 	immed when '0',
-						immed(14 downto 0)&'0' when others;
+		immed_y <= 	immed when '0',
+					immed(14 downto 0)&'0' when others;
+		
+	with immed_or_reg select
+		input_y <=	immed_y when '0',
+					regbank_to_alu_b when others;
 			
 	with in_d select
 		input_d <= 	alu_out when '0',
@@ -86,5 +95,7 @@ BEGIN
 	with ins_dad select
 		addr_m <= 	alu_out when '1',
 						pc when others;
+						
+	data_wr <= regbank_to_alu_b;
 	 
 END Structure;

@@ -19,6 +19,7 @@ ENTITY control_l IS
           in_d      : OUT STD_LOGIC;
           immed_x2  : OUT STD_LOGIC;
           word_byte : OUT STD_LOGIC;
+		  immed_or_reg : OUT STD_LOGIC;
 			 Instruccio: out string(1 to 4); 
 			 operacio: out string(1 to 6));
 END control_l;
@@ -29,7 +30,7 @@ ARCHITECTURE Structure OF control_l IS
 BEGIN
 	op_code_ir <= ir(15 downto 12);
 	op <= op_code_ir;
-	f 	<= ir(5 downto 3);
+	f 	<= ir(5 downto 3) when op_code_ir /= MOVE else MOVHI when (op_code_ir = MOVE and ir(8) = '1') else MOVI when (op_code_ir = MOVE and ir(8) = '0') ;
 
 	with op_code_ir select		-- Load next Pc or not (Fetch / Decode)
 		ldpc <= 	'0' when HALT, 
@@ -67,10 +68,12 @@ BEGIN
 
 					
 	immed_x2 <= '1' when op_code_ir=LD or op_code_ir=ST else '0'; -- Immediate x2 to access words in Loads or Stores
+	
+	immed_or_reg <= '0' when op_code_ir = LD or op_code_ir = ST or op_code_ir = LDB or op_code_ir = STB or op_code_ir = ADDI or op_code_ir = MOVE else '1';
 
-	--FAlta
-	immed(15 downto 8) <= (others => ir(7)) when op_code_ir=MOVE else (others => ir(5)); -- extenem singe
-	immed(7 downto 0)  <= ir(7 downto 0) when op_code_ir=MOVE else ir(5)&ir(5)&ir(5 downto 0); -- copiem
+	--FAlta?
+	immed(15 downto 8) <= (others => ir(7)) when op_code_ir = ADDI or op_code_ir = MOVE else  (others => ir(5)); -- extenem singe
+	immed(7 downto 0)  <= ir(7 downto 0)  when op_code_ir = ADDI or op_code_ir = MOVE else ir(5)&ir(5)&ir(5 downto 0); -- copiem
 
 
 	
