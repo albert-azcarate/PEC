@@ -19,42 +19,48 @@ end entity;
 
 architecture Structure of multi is
 
-    -- Aqui iria la declaracion de las los estados de la maquina de estados
-
 signal estat : std_logic := '0';
 	 
 begin
-
+	-- Actualitzacio de l'estat
 	process (clk) begin
-		if rising_edge(clk) then
-			if boot = '0' then
+		if rising_edge(clk) then 
+			if boot = '0' then			-- Si estem a RUN
 				estat <= not estat;
-			else 
-				if halt_cont = '1' then	
-					estat <= '1';
-				else
+			else 						-- Si estem a BOOT
+				if halt_cont = '1' then	-- REVISAR aixo
+					estat <= '1';		
+				else					
 					estat <= '0';
 				end if;
 			end if;
 		end if;
 	end process;
 	
-	ldpc <= "11" when estat = '0' and halt_cont = '1' else ldpc_l when estat = '1' else "00"; 
+	-- HALT quan ens diuen de parar, ldpc_l quan estem a DECODE, else RUN
+	ldpc <= "11" when estat = '0' and halt_cont = '1' else 
+			ldpc_l when estat = '1' else
+			"00"; 
 
-					
+	-- 	En DECODE pasem la dada
 	with estat select
 		word_byte <=  	'0' when '0',
-							w_b when others;
-	
+						w_b when others;
+						
+	-- 	En DECODE pasem la dada
 	with estat select
 		wr_m <=  '0' when '0',
 					wr_m_l when others;
 					
+	-- 	En DECODE pasem la dada				
 	with estat select
-		wrd <=  '0' when '0', --,
+		wrd <=  '0' when '0',
 				wrd_l when others;
-					
+	
+	-- ldir indica si carreguem el Instruction register amb la dad de memoria (carreguem en estat fetch)
 	ldir <= not estat;
+	
+	-- inc_dad indica que posem al bus, si instruccions(0) o dades(1)
 	ins_dad <= estat;
 	 
 end Structure;

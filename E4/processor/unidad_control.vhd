@@ -92,75 +92,82 @@ signal operacio : string (1 to 6);	--modelsim
 
 BEGIN
 	
-
 	process (boot, load_pc_out, clk) begin
 		if rising_edge(clk) then
-			old_2_Pc <= regPC + 2;
-			if boot = '1' then 				--BOOT
+			old_2_Pc <= regPC + 2;	-- Ens guardem el PC + 2 pels JALS
+			
+			if boot = '1' then 				-- BOOT
 				regPC <= x"C000";
 			else
-				if load_pc_out = "11" then  --HALT
+				if load_pc_out = "11" then  -- HALT
 					regPC <= regPC;
-				else
-					if load_pc_out = "00" and ins_dad_conn = '1' then
-						regPC <= regPC + 2;		-- RUN
-						
-					elsif load_pc_out = "01" then	-- JMP's
-						if f_out = JMP_OP then --JMP
+				else						-- RUN
+				
+					if load_pc_out = "00" and ins_dad_conn = '1' then		-- RUN
+							
+					elsif load_pc_out = "01" then							-- Cas JMP's
+						if f_out = JMP_OP then 								-- JMP
+							regPC <= alu_out;	
+						elsif z = '0' and f_out = JZ_OP then 				-- JZ
+							regPC <= alu_out;	
+						elsif z = '1' and f_out = JNZ_OP then 				-- JNZ
+							regPC <= alu_out;	
+						elsif f_out = JAL_OP then							-- JAL
 							regPC <= alu_out;
-						elsif z = '0' and f_out = JZ_OP then -- JZ
-							regPC <= alu_out;
-						elsif z = '1' and f_out = JNZ_OP then --JNZ
-							regPC <= alu_out;
-						elsif f_out = JAL_OP then--JAL
-							regPC <= alu_out;
-						else	
+						else												-- REVISAR de que serveix aquest else, ja que saltem sempre
 							regPC <= regPC + 2;	
 						end if;
 						
-					elsif load_pc_out = "10" then	-- BZ's
-						if z = '0' and f_out = BZ_OP then --BZ
+					elsif load_pc_out = "10" then							-- Cas BZ's
+						if z = '0' and f_out = BZ_OP then 					-- BZ i saltem
 							regPC <= regPC + 2 + (datard_m(7 downto 0)&'0');
-						elsif z = '1' and f_out = BNZ_OP then --BNZ
+						elsif z = '1' and f_out = BNZ_OP then 				-- BNZ i saltem
 							regPC <= regPC + 2 + (datard_m(7 downto 0)&'0');
-						else 
+						else 												-- Else no saltem (pc <= pc + 2)
 							regPC <= regPC + 2;
 						end if;
-						
-					else 
-						regPC <= regPC; --Sha de cnaviar per el CALLS
+							
+					else 													-- REVISAR de que serveix aquest else, ja que no entrem aqui mai
+						regPC <= regPC;
 					end if;
 				end if;
 			end if;
 			
-
 		end if;
 	end process;
 	
 	
 
 	process (clk, load_ins, boot) begin		
-		if boot = '1' then 				--BOOT
+		if boot = '1' then 										--BOOT
 			new_ir <= x"C000";
 		else
-			if load_pc_out /= "11" then
-				if load_ins = '1' or load_pc_out = "01"  then  	--DECODE or JMP
+			if load_pc_out /= "11" then							-- Cas RUN
+				if load_ins = '1' or load_pc_out = "01"  then  	-- DECODE or JMP carreguem a ir el que ens ve de memoria
 					new_ir <= datard_m ;
-				else
-					new_ir <= ir_reg;			--FETCH
+				else											-- Cas FETCH
+					new_ir <= ir_reg;							-- Ens quedem igual
 				end if;
 			else 
-				new_ir <= x"FFFF";
+				new_ir <= x"FFFF";								-- Cas HALT, ens quedem a HALT
 			end if;
 		end if;
-			
+		
+		
+		-- Actualitzem if rising edge
 		if rising_edge(clk) then
 			ir_reg <= new_ir;
 			z_reg <= z; 
 		end if;
-		
-		
 	end process;
+	
+	-- Pasem les conexions de control a multi o asignem les sortides com toqui
+	ins_dad <= ins_dad_conn;
+	ir_connection <= ir_reg;
+	f <=  f_out;
+	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JALl; REVISAR si no pot ser asignat normal ja que nomes fem servir pc quan es JAL
+	pc <= old_2_Pc when load_pc_out = "01" and f_out = JAL_OP else regPC;
+	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
   	 
 	control_ins : control_l port map(ir => ir_connection,
 												op => op,
@@ -192,10 +199,4 @@ BEGIN
 									ins_dad => ins_dad_conn,
 									word_byte => word_byte,
 									halt_cont => halt_conn);
-	ins_dad <= ins_dad_conn;
-	ir_connection <= ir_reg;
-	pc <= old_2_Pc when load_pc_out = "01" and f_out = JAL_OP else regPC;
-	f <=  f_out;
-	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
-  
 END Structure;

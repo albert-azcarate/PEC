@@ -77,6 +77,7 @@ BEGIN
 		wr_m => wr_m_to_mem,
 		word_byte => word_byte_to_mem);
 		
+	
 	process (CLOCK_50) BEGIN
 		if rising_edge(CLOCK_50) then
 			clk <= clk + 1;

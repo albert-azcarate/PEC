@@ -30,61 +30,86 @@ ARCHITECTURE Structure OF control_l IS
 	signal op_code_ir : op_code_t;
 	signal f_temp : f_code_t;
 BEGIN
+
+	-- Pasem l'input a un signal per mes easy of use; MOD?
 	op_code_ir <= ir(15 downto 12);
+	-- Assignem directament aquest singal a la sortida OP, que indica la operacio a fer
 	op <= op_code_ir;
 	
-	f_temp 	<= ir(5 downto 3) when op_code_ir /= MOVE and op_code_ir /= BZ and op_code_ir /= JMP else
-			MOVHI when (op_code_ir = MOVE and ir(8) = '1') else 
+	-- Signal Funcio_temporal ens permet definir dins de cada tipus de operacio general quina vole en concret
+	f_temp 	<= ir(5 downto 3) when op_code_ir /= MOVE and op_code_ir /= BZ and op_code_ir /= JMP else	-- Cas base: F esta als bits 5-3
+			MOVHI when (op_code_ir = MOVE and ir(8) = '1') else 										-- Cas MOVE: F depen del bit 8
 			MOVI when (op_code_ir = MOVE and ir(8) = '0') else 
-			BZ_OP when (op_code_ir = BZ and ir(8) = '0') else
+			BZ_OP when (op_code_ir = BZ and ir(8) = '0') else											-- Cas BN: F depen del bit 8 
 			BNZ_OP when (op_code_ir = BZ and ir(8) = '1') else
-			JZ_OP when (op_code_ir = JMP and ir(2 downto 0) = "000") else
+			JZ_OP when (op_code_ir = JMP and ir(2 downto 0) = "000") else								-- Cas JMP: F depen dels bits 2-0
 			JNZ_OP when (op_code_ir = JMP and ir(2 downto 0) =  "001") else
 			JMP_OP when (op_code_ir = JMP and ir(2 downto 0) =  "011") else
 			JAL_OP when (op_code_ir = JMP and ir(2 downto 0) =  "100") else
-			(others => '0');
+			(others => '0');																			-- Else 0
+	
+	-- Assignem f
+	f <= f_temp;
 
-	with op_code_ir select		-- Load next Pc or not (Fetch / Decode)
-		ldpc <= 	"11" when HALT, 
-					"10" when BZ,
-					"01" when JMP,
-					"00" when others; --falta CALLS
-					
-	-- Enable register write; We always write to reg_d excepto on HALT or STORES
+	-- ldpc ens indica si d'on carregar el nou PC
+	with op_code_ir select					-- Load next Pc or not (Fetch / Decode)
+		ldpc <= 	"11" when HALT, 		-- 11 HALT
+					"10" when BZ,			-- 10 BRANCH
+					"01" when JMP,			-- 01 JUMPS
+					"00" when others; 		-- 00 RUN; falta CALLS
+	
+	-- wrd habilita l'escriptura al banc de registres
+	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL) i BRANCHES
 	wrd <= '0' when op_code_ir = HALT or op_code_ir = ST or op_code_ir = STB or (op_code_ir = JMP and f_temp /= JAL_OP)  or op_code_ir = BZ else '1';
-					
-	word_byte <= '1' when op_code_ir = LDB or op_code_ir = STB else '0' ;	-- Notify the memory to use byte access
 	
-	with op_code_ir select 		-- Addres A
-		addr_a <=	ir(11 downto 9) when MOVE, -- MOVI & MOVHI
+	-- word_byte indica a la memora si accedim a nivell de word o byte; Sempre accedim a words excepte LDB i STB
+	word_byte <= '1' when op_code_ir = LDB or op_code_ir = STB else '0';
+	
+	-- addr_a adreca A al banc de registres
+	-- Sempre esta als 8-6 excepte als MOVE
+	with op_code_ir select
+		addr_a <=	ir(11 downto 9) when MOVE,
 					ir(8 downto 6) when others;
+					
+	-- addr_b adreca B al banc de registres
+	with op_code_ir select
+		addr_b <=	ir(2 downto 0) when MULDIV,		-- Cas Multiplicacions o Divisions: addr_b esta als bits 2-0
+					ir(2 downto 0) when COMP,		-- Cas Comparacions: addr_b esta als bits 2-0
+					ir(2 downto 0) when AL,			-- Cas ALU: addr_b esta als bits 2-0
+					ir(11 downto 9) when others;	-- else addr_b als bits 11-9
+
+	-- addr_d adreca D al banc de registres;				
+	addr_d <= ir(11 downto 9);
 	
-	with op_code_ir select 		-- Addres B
-		addr_b <=	ir(2 downto 0) when MULDIV,
-					ir(2 downto 0) when COMP,
-					ir(2 downto 0) when AL,
-					ir(11 downto 9) when others;
-						
-	addr_d <= ir(11 downto 9);	-- Adress D
-						
-	with op_code_ir select		-- Write data to memory(1)
+	-- wr_m indica si escribim a memoria o no (1 si)
+	with op_code_ir select
 		wr_m <=	'1' when ST,
 				'1' when STB,
 				'0' when others;
 					
-	-- Read data from memory(01) or ALU(00) or PC(10)
+	-- in_d indica des d'on venen les dades que es guardaran a addr_d
+	-- Desde memoria a LD i LDB, desde el PCup a JAL i la resta desde la ALU
 	in_d <= "01" when op_code_ir = LD or op_code_ir = LDB else "10" when (op_code_ir = JMP and f_temp = JAL_OP) else "00";
 
+	-- halt_cont indica si estem en HALT; REVISAR US
 	halt_cont <= '1' when op_code_ir = HALT else '0';
 	
-	immed_x2 <= '1' when op_code_ir=LD or op_code_ir=ST else '0'; -- Immediate x2 to access words in Loads or Stores
+	-- immed_x2 indica si hem de multiplicar l'immediar x2 per accedir a memoria; Ho fem en ST i LB
+	immed_x2 <= '1' when op_code_ir=LD or op_code_ir=ST else '0';
 	
+	-- immed_or_reg indica si entra a la Y l'immediat(0) o la sortida del banc de registres(1)
+	-- Immediat en ST, STB, LD, LDB, ADDI o MOVES
 	immed_or_reg <= '0' when op_code_ir = LD or op_code_ir = ST or op_code_ir = LDB or op_code_ir = STB or op_code_ir = ADDI or op_code_ir = MOVE else '1';
 
-	--Faltaran Branch jumps
-	immed(15 downto 8) <= (others => ir(7)) when op_code_ir = MOVE or op_code_ir = BZ else (others => ir(4)) when op_code_ir = ADDI else (others => ir(5)); -- extenem singe --revisar LD and ST neg
-	immed(7 downto 0)  <= ir(7 downto 0) when op_code_ir = MOVE or op_code_ir = BZ else ir(4)&ir(4)&ir(4)&ir(4 downto 0) when op_code_ir = ADDI else ir(5)&ir(5)&ir(5 downto 0); -- copiem
-	f <= f_temp;
+	--immed depen de quina instruccio es esta codificat a llocs i tamanys diferents; Les dos seguents asignacions juguen amb com estan codificades
+	immed(15 downto 8) <= 	(others => ir(7)) when op_code_ir = MOVE or op_code_ir = BZ else	-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes (extenem el signe)
+							(others => ir(4)) when op_code_ir = ADDI else						-- Cas ADDI: immed als 5 bits de menor pes (extenem el signe)
+							(others => ir(5)); 													-- Else: immed als 6 bits de menor pes (extenem el signe)
+							
+	immed(7 downto 0)  <= 	ir(7 downto 0) when op_code_ir = MOVE or op_code_ir = BZ else 		-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes
+							ir(4)&ir(4)&ir(4)&ir(4 downto 0) when op_code_ir = ADDI else        -- Cas ADDI: immed als 5 bits de menor pes
+							ir(5)&ir(5)&ir(5 downto 0); -- copiem                               -- Else: immed als 6 bits de menor pes 
+	
 	
 -- MODELSIM SIGNALS
 	with op_code_ir select
