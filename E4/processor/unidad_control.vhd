@@ -133,11 +133,7 @@ BEGIN
 				end if;
 			end if;
 			
-			--	if load_pc_out = "01" then
-			--		regPC <= regPC; --estem asignant un registre a un registre empalmantlos? REVISAR
-			--	elsif load_pc_out = "00" and ins_dad_conn = '1' then
-			--		regPC <= regPC;
-			--	end if;
+
 		end if;
 	end process;
 	

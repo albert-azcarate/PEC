@@ -39,7 +39,7 @@ begin
 		end if;
 	end process;
 	
-	ldpc <= "11" when estat = '0' and halt_cont = '1' else ldpc_l; 
+	ldpc <= "11" when estat = '0' and halt_cont = '1' else ldpc_l when estat = '1' else "00"; 
 
 					
 	with estat select

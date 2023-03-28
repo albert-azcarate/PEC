@@ -39,9 +39,8 @@ BEGIN
 	
 	mul <= std_logic_vector(signed(x) * signed(y));
 	mulu <= std_logic_vector(unsigned(x * y));
-	z <= '1' when y/= "0" else
-			'0' when y = "0" else
-			'Z';
+	z <= '0' when y = "0" else '1';
+	
 	w_temporal <= 	x and y 	when op = AL and f = AND_OP else		--AND
 				x or y 	when op = AL and f = OR_OP else		--OR
 				x xor y 	when op = AL and f = XOR_OP else		--XOR

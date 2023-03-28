@@ -32,6 +32,7 @@ ARCHITECTURE Structure OF control_l IS
 BEGIN
 	op_code_ir <= ir(15 downto 12);
 	op <= op_code_ir;
+	
 	f_temp 	<= ir(5 downto 3) when op_code_ir /= MOVE and op_code_ir /= BZ and op_code_ir /= JMP else
 			MOVHI when (op_code_ir = MOVE and ir(8) = '1') else 
 			MOVI when (op_code_ir = MOVE and ir(8) = '0') else 
@@ -50,7 +51,7 @@ BEGIN
 					"00" when others; --falta CALLS
 					
 	-- Enable register write; We always write to reg_d excepto on HALT or STORES
-	wrd <= '0' when op_code_ir = HALT or op_code_ir = ST or op_code_ir = STB or (op_code_ir = JMP and f_temp /= JAL_OP) else '1';
+	wrd <= '0' when op_code_ir = HALT or op_code_ir = ST or op_code_ir = STB or (op_code_ir = JMP and f_temp /= JAL_OP)  or op_code_ir = BZ else '1';
 					
 	word_byte <= '1' when op_code_ir = LDB or op_code_ir = STB else '0' ;	-- Notify the memory to use byte access
 	
@@ -78,7 +79,7 @@ BEGIN
 	
 	immed_x2 <= '1' when op_code_ir=LD or op_code_ir=ST else '0'; -- Immediate x2 to access words in Loads or Stores
 	
-	immed_or_reg <= '0' when op_code_ir = LD or op_code_ir = ST or op_code_ir = LDB or op_code_ir = STB or op_code_ir = ADDI or op_code_ir = MOVE or op_code_ir = BZ else '1';
+	immed_or_reg <= '0' when op_code_ir = LD or op_code_ir = ST or op_code_ir = LDB or op_code_ir = STB or op_code_ir = ADDI or op_code_ir = MOVE else '1';
 
 	--Faltaran Branch jumps
 	immed(15 downto 8) <= (others => ir(7)) when op_code_ir = MOVE or op_code_ir = BZ else (others => ir(4)) when op_code_ir = ADDI else (others => ir(5)); -- extenem singe --revisar LD and ST neg
