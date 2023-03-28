@@ -60,7 +60,7 @@ ARCHITECTURE Structure OF unidad_control IS
 				wrd_l     : IN  STD_LOGIC;
 				wr_m_l    : IN  STD_LOGIC;
 				w_b       : IN  STD_LOGIC;
-				halt_cont 		 : IN  STD_LOGIC;
+				halt_cont : IN  STD_LOGIC;
 				ldpc      : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 				wrd       : OUT STD_LOGIC;
 				wr_m      : OUT STD_LOGIC;
@@ -84,6 +84,8 @@ signal new_ir: std_logic_vector(15 downto 0);
 signal z_reg: std_LOGIC;
 signal f_out : f_code_t;
 signal halt_conn : std_logic;
+signal ins_dad_conn : std_LOGIC;
+
 signal instruction : string (1 to 4); --modelsim
 signal operacio : string (1 to 6);	--modelsim
 
@@ -94,45 +96,51 @@ BEGIN
 		if rising_edge(clk) then
 			old_2_Pc <= regPC + 2;
 			if boot = '1' then 				--BOOT
-				new_Pc <= x"C000";
+				regPC <= x"C000";
 			else
 				if load_pc_out = "11" then  --HALT
-					new_Pc <= regPC;
+					regPC <= regPC;
 				else
-					if load_pc_out = "00" then
-						new_Pc <= regPC + 2;		-- RUN
+					if load_pc_out = "00" and ins_dad_conn = '1' then
+						regPC <= regPC + 2;		-- RUN
 						
 					elsif load_pc_out = "01" then	-- JMP's
 						if f_out = JMP_OP then --JMP
-							new_Pc <= alu_out;
+							regPC <= alu_out;
 						elsif z = '0' and f_out = JZ_OP then -- JZ
-							new_Pc <= alu_out;
+							regPC <= alu_out;
 						elsif z = '1' and f_out = JNZ_OP then --JNZ
-							new_Pc <= alu_out;
+							regPC <= alu_out;
 						elsif f_out = JAL_OP then--JAL
-							new_Pc <= alu_out;
+							regPC <= alu_out;
 						else	
-							new_Pc <= regPC + 2;	
+							regPC <= regPC + 2;	
 						end if;
 						
 					elsif load_pc_out = "10" then	-- BZ's
 						if z = '0' and f_out = BZ_OP then --BZ
-							new_Pc <= regPC + 2 + (datard_m(7 downto 0)&'0');
+							regPC <= regPC + 2 + (datard_m(7 downto 0)&'0');
 						elsif z = '1' and f_out = BNZ_OP then --BNZ
-							new_Pc <= regPC + 2 + (datard_m(7 downto 0)&'0');
+							regPC <= regPC + 2 + (datard_m(7 downto 0)&'0');
 						else 
-							new_Pc <= regPC + 2;
+							regPC <= regPC + 2;
 						end if;
 						
 					else 
-						new_Pc <= regPC; --Sha de cnaviar per el CALLS
+						regPC <= regPC; --Sha de cnaviar per el CALLS
 					end if;
 				end if;
 			end if;
-				
-				regPC <= new_Pc; --estem asignant un registre a un registre empalmantlos? REVISAR
+			
+			--	if load_pc_out = "01" then
+			--		regPC <= regPC; --estem asignant un registre a un registre empalmantlos? REVISAR
+			--	elsif load_pc_out = "00" and ins_dad_conn = '1' then
+			--		regPC <= regPC;
+			--	end if;
 		end if;
 	end process;
+	
+	
 
 	process (clk, load_ins, boot, load_pc_out) begin		
 		if boot = '1' then 				--BOOT
@@ -184,9 +192,10 @@ BEGIN
 									wrd => wrd, 
 									wr_m => wr_m,
 									ldir => load_ins,
-									ins_dad => ins_dad,
+									ins_dad => ins_dad_conn,
 									word_byte => word_byte,
 									halt_cont => halt_conn);
+	ins_dad <= ins_dad_conn;
 	ir_connection <= ir_reg;
 	pc <= old_2_Pc when load_pc_out = "01" and f_out = JAL_OP else regPC;
 	f <=  f_out;
