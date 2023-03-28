@@ -40,9 +40,7 @@ begin
 	end process;
 	
 	ldpc <= "11" when estat = '0' and halt_cont = '1' else ldpc_l; 
---   with estatselect
---		ldpc <=  "00" when '0',
---					ldpc_l when others;
+
 					
 	with estat select
 		word_byte <=  	'0' when '0',
@@ -54,7 +52,7 @@ begin
 					
 	with estat select
 		wrd <=  '0' when '0', --,
-					wrd_l when others;
+				wrd_l when others;
 					
 	ldir <= not estat;
 	ins_dad <= estat;

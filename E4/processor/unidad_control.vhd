@@ -8,24 +8,24 @@ use work.f_code.all;
 
 ENTITY unidad_control IS
     PORT (boot      : IN  STD_LOGIC;
-          clk       : IN  STD_LOGIC;
-          datard_m  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 alu_out   : IN  STD_LOGIC_VECTOR(15 downto 0);
-			 z			  : IN std_LOGIC;
-          op        : out op_code_t;
-          f         : out  f_code_t;
-          wrd       : OUT STD_LOGIC;
-          addr_a    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_b    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_d    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-          immed     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-          pc        : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-          ins_dad   : OUT STD_LOGIC;
-          in_d      : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-          immed_x2  : OUT STD_LOGIC;
-          wr_m      : OUT STD_LOGIC;
-          word_byte : OUT STD_LOGIC;
-			 immed_or_reg : OUT STD_LOGIC);
+			clk       		: IN  STD_LOGIC;
+			datard_m  		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			alu_out   		: IN  STD_LOGIC_VECTOR(15 downto 0);
+			z		  		: IN std_LOGIC;
+			op        		: out op_code_t;
+			f         		: out  f_code_t;
+			wrd       		: OUT STD_LOGIC;
+			addr_a    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_b    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_d    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			immed     		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			pc        		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			ins_dad   		: OUT STD_LOGIC;
+			in_d      		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			immed_x2  		: OUT STD_LOGIC;
+			wr_m      		: OUT STD_LOGIC;
+			word_byte 		: OUT STD_LOGIC;
+			 immed_or_reg 	: OUT STD_LOGIC);
 END unidad_control;
 
 
@@ -72,6 +72,7 @@ ARCHITECTURE Structure OF unidad_control IS
 signal regPC : std_logic_vector(15 downto 0) := x"C000";
 signal new_Pc : std_logic_vector(15 downto 0) := x"0000";
 signal old_2_Pc : std_logic_vector(15 downto 0);
+signal pc_mem : std_logic_vector(15 downto 0);
 signal load_pc_connection : std_logic_vector(1 downto 0);   
 signal enable: std_LOGIC;
 signal word_mem: std_LOGIC;
@@ -142,12 +143,12 @@ BEGIN
 	
 	
 
-	process (clk, load_ins, boot, load_pc_out) begin		
+	process (clk, load_ins, boot) begin		
 		if boot = '1' then 				--BOOT
 			new_ir <= x"C000";
 		else
 			if load_pc_out /= "11" then
-				if load_ins = '1' then  	--DECODE
+				if load_ins = '1' or load_pc_out = "01"  then  	--DECODE or JMP
 					new_ir <= datard_m ;
 				else
 					new_ir <= ir_reg;			--FETCH
@@ -199,5 +200,6 @@ BEGIN
 	ir_connection <= ir_reg;
 	pc <= old_2_Pc when load_pc_out = "01" and f_out = JAL_OP else regPC;
 	f <=  f_out;
+	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
   
 END Structure;

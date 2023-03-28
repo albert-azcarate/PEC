@@ -78,7 +78,7 @@ BEGIN
 	
 	immed_x2 <= '1' when op_code_ir=LD or op_code_ir=ST else '0'; -- Immediate x2 to access words in Loads or Stores
 	
-	immed_or_reg <= '0' when op_code_ir = LD or op_code_ir = ST or op_code_ir = LDB or op_code_ir = STB or op_code_ir = ADDI or op_code_ir = MOVE or op_code_ir = BZ or op_code_ir = JMP else '1';
+	immed_or_reg <= '0' when op_code_ir = LD or op_code_ir = ST or op_code_ir = LDB or op_code_ir = STB or op_code_ir = ADDI or op_code_ir = MOVE or op_code_ir = BZ else '1';
 
 	--Faltaran Branch jumps
 	immed(15 downto 8) <= (others => ir(7)) when op_code_ir = MOVE or op_code_ir = BZ else (others => ir(4)) when op_code_ir = ADDI else (others => ir(5)); -- extenem singe --revisar LD and ST neg
