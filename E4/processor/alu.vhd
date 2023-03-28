@@ -32,7 +32,7 @@ BEGIN
 	shift <= conv_integer( not(y(4 downto 0)) + 1);
 	
 	-- signals per fer movi
-	ext_signe(15 downto 8) <= (others => y(7))
+	ext_signe(15 downto 8) <= (others => y(7));
 	ext_signe(7 downto 0) <= y(7 downto 0);
 	
 	-- signals per fer movhi
