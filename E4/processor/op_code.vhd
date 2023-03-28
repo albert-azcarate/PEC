@@ -14,6 +14,8 @@ package op_code is
   constant LDB 		: op_code_t := "1101";
   constant ST 			: op_code_t := "0100";
   constant STB 		: op_code_t := "1110";
+  constant BZ	 		: op_code_t := "0110";
+  constant JMP	 		: op_code_t := "1010";
   constant HALT 		: op_code_t := "1111";
   
 end package op_code;
@@ -46,6 +48,16 @@ package f_code is
   
   constant MOVI 	: f_code_t := "000";
   constant MOVHI 	: f_code_t := "001";
+  
+ constant BZ_OP 	: f_code_t := "000";
+ constant BNZ_OP 	: f_code_t := "001";
+ 
+ constant JZ_OP 	: f_code_t := "000";
+ constant JNZ_OP 	: f_code_t := "001";
+ constant JMP_OP 	: f_code_t := "011";
+ constant JAL_OP 	: f_code_t := "100";
+ --constant CALLS_OP 	: f_code_t := "111";
+ 
 
 end package f_code;
 
