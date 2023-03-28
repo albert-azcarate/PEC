@@ -39,8 +39,7 @@ begin
 	
 	-- HALT quan ens diuen de parar, ldpc_l quan estem a DECODE, else RUN
 	ldpc <= "11" when estat = '0' and halt_cont = '1' else 
-			ldpc_l when estat = '1' else
-			"00"; 
+			ldpc_l when estat = '1' else "00"; 
 
 	-- 	En DECODE pasem la dada
 	with estat select

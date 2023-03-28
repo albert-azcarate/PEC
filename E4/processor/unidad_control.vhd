@@ -104,7 +104,7 @@ BEGIN
 				else						-- RUN
 				
 					if load_pc_out = "00" and ins_dad_conn = '1' then		-- RUN
-							
+						regPC <= regPC + 2;
 					elsif load_pc_out = "01" then							-- Cas JMP's
 						if f_out = JMP_OP then 								-- JMP
 							regPC <= alu_out;	

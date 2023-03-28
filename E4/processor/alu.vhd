@@ -83,6 +83,7 @@ BEGIN
 					false when op = COMP and f = CMPLEU_OP and unsigned(x) > unsigned(y) else   -- false
 					
 					-- REVISAR
+					
 					(others => 'X') when op = BZ else 	--BZ's son saltos relativos de [-256,255]--por lo que entiendo la dirección de salto viene de la ram
 					x when op = JMP else 				--JMP's son salto absolutos de 16bits
 					

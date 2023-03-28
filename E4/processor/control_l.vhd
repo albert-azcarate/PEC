@@ -108,7 +108,7 @@ BEGIN
 							
 	immed(7 downto 0)  <= 	ir(7 downto 0) when op_code_ir = MOVE or op_code_ir = BZ else 		-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes
 							ir(4)&ir(4)&ir(4)&ir(4 downto 0) when op_code_ir = ADDI else        -- Cas ADDI: immed als 5 bits de menor pes
-							ir(5)&ir(5)&ir(5 downto 0); -- copiem                               -- Else: immed als 6 bits de menor pes 
+							ir(5)&ir(5)&ir(5 downto 0);			                               	-- Else: immed als 6 bits de menor pes 
 	
 	
 -- MODELSIM SIGNALS
