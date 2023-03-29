@@ -86,14 +86,18 @@ signal z_reg: std_LOGIC;
 signal f_out : f_code_t;
 signal halt_conn : std_logic;
 signal ins_dad_conn : std_LOGIC;
+signal despla : std_LOGIC_vector(15 downto 0);
 
 signal instruction : string (1 to 4); --modelsim
 signal operacio : string (1 to 6);	--modelsim
 
 BEGIN
-	
+
 	process (boot, load_pc_out, clk) begin
 		if rising_edge(clk) then
+			
+			despla(15 downto 9) <= (others => datard_m(7));
+			despla(8 downto 0) <= datard_m(7 downto 0)&'0';
 			old_2_Pc <= regPC + 2;	-- Ens guardem el PC + 2 pels JALS
 			
 			if boot = '1' then 				-- BOOT
@@ -120,9 +124,9 @@ BEGIN
 						
 					elsif load_pc_out = "10" then							-- Cas BZ's
 						if z = '0' and f_out = BZ_OP then 					-- BZ i saltem
-							regPC <= regPC + 2 + (datard_m(7 downto 0)&'0');
+							regPC <= regPC + 2 + despla;
 						elsif z = '1' and f_out = BNZ_OP then 				-- BNZ i saltem
-							regPC <= regPC + 2 + (datard_m(7 downto 0)&'0');
+							regPC <= regPC + 2 +  despla;
 						else 												-- Else no saltem (pc <= pc + 2)
 							regPC <= regPC + 2;
 						end if;
