@@ -36,19 +36,19 @@ BEGIN
 	op_code_ir_pre <= ir(15 downto 12);
 	
 	-- Assignem directament aquest singal a la sortida OP, que indica la operacio a fer
-	op_code_ir <= 	NOP when op_code_ir_pre = IO 			-- I/O
-						or op_code_ir_pre = FLOAT 			-- FLOAT
-						or op_code_ir_pre = STF  			-- STF
-						or op_code_ir_pre = LDF 			-- LDF
-						or (op_code_ir_pre = HALT and ir(11 downto 0) /= x"fff") -- NOP(ADDI ro,0) when I/O, FLOAT, STF, LDF and SPECIAL(not HALT)
-						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "011") 
-						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "110") 
-						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "111") 
-						or (op_code_ir_pre = COMP and ir(5 downto 3) = "010")
-						or (op_code_ir_pre = COMP and ir(5 downto 3) = "110")
-						or (op_code_ir_pre = COMP and ir(5 downto 3) = "111")
-						or (op_code_ir_pre = JMP and ir(2 downto 0) = "110") 
-						or (op_code_ir_pre = JMP and ir(2 downto 0) = "010") 
+	op_code_ir <= 	NOP when op_code_ir_pre = IO 									-- I/O
+						or op_code_ir_pre = FLOAT 									-- FLOAT
+						or op_code_ir_pre = STF  									-- STF
+						or op_code_ir_pre = LDF 									-- LDF
+						or (op_code_ir_pre = HALT and ir(11 downto 0) /= x"fff") 	-- SPECIAL(not HALT)
+						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "011") 	-- NOP en operaciones MULDIV pero F_CODE no implementado
+						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "110")      
+						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "111")      
+						or (op_code_ir_pre = COMP and ir(5 downto 3) = "010")       -- NOP en operaciones COMP pero F_CODE no implementado
+						or (op_code_ir_pre = COMP and ir(5 downto 3) = "110")        
+						or (op_code_ir_pre = COMP and ir(5 downto 3) = "111")        
+						or (op_code_ir_pre = JMP and ir(2 downto 0) = "110")        -- NOP en operaciones JMP pero F_CODE no implementado
+						or (op_code_ir_pre = JMP and ir(2 downto 0) = "010")         
 						or (op_code_ir_pre = JMP and ir(2 downto 0) = "101") else
 					op_code_ir_pre;
 	op <= op_code_ir;
