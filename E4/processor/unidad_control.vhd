@@ -112,13 +112,13 @@ BEGIN
 					elsif load_pc_out = "01" then							-- Cas JMP's
 						if f_out = JMP_OP then 								-- JMP
 							regPC <= alu_out;	
-						elsif z = '0' and f_out = JZ_OP then 				-- JZ
+						elsif z = '0' and f_out = JZ_OP then 				-- JZ i saltem
 							regPC <= alu_out;	
-						elsif z = '1' and f_out = JNZ_OP then 				-- JNZ
+						elsif z = '1' and f_out = JNZ_OP then 				-- JNZ i saltem
 							regPC <= alu_out;	
 						elsif f_out = JAL_OP then							-- JAL
 							regPC <= alu_out;
-						else												-- REVISAR de que serveix aquest else, ja que saltem sempre
+						else												-- Else no saltem (pc <= pc + 2)
 							regPC <= regPC + 2;	
 						end if;
 						
@@ -169,7 +169,8 @@ BEGIN
 	ins_dad <= ins_dad_conn;
 	ir_connection <= ir_reg;
 	f <=  f_out;
-	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JALl; REVISAR si no pot ser asignat normal ja que nomes fem servir pc quan es JAL
+	
+	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL; REVISAR si no pot ser asignat normal ja que nomes fem servir pc quan es JAL
 	pc <= old_2_Pc when load_pc_out = "01" and f_out = JAL_OP else regPC;
 	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
   	 

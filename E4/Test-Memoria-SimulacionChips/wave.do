@@ -6,7 +6,7 @@ add wave -noupdate -label Clock /test_sisa/SoC/clk(2)
 add wave -noupdate -label F/D /test_sisa/SoC/processor/UC/multi0/estat
 add wave -noupdate -label PC /test_sisa/SoC/processor/UC/regPC
 add wave -noupdate -label PC /test_sisa/SoC/processor/UC/newPC
-add wave -noupdate -label Instruccion /test_sisa/SoC/processor/UC/control_ins/ir
+add wave -noupdate -label Instruccion /test_sisa/SoC/processor/UC/control_ins/ir_interna
 add wave -noupdate -label Operacio /test_sisa/SoC/processor/UC/control_ins/Instruccio
 add wave -noupdate -label Funcio /test_sisa/SoC/processor/UC/control_ins/operacio
 add wave -noupdate -divider SoC

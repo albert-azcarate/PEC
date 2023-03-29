@@ -43,21 +43,22 @@ BEGIN
 
 	-- Pasem l'input a un signal per mes easy of use per mirar els NOPS
 	op_code_ir_pre <= ir_interna(15 downto 12);	
+	
 	-- Revisio per aplicar NOPS en operacions ilegals
-	op_code_ir <= NOP when	op_code_ir_pre = IO 									-- I/O
-							or op_code_ir_pre = FLOAT 									-- FLOAT
-							or op_code_ir_pre = STF  									-- STF
-							or op_code_ir_pre = LDF 									-- LDF
+	op_code_ir <= 	NOP when	op_code_ir_pre = IO 											-- I/O
+							or op_code_ir_pre = FLOAT 											-- FLOAT
+							or op_code_ir_pre = STF  											-- STF
+							or op_code_ir_pre = LDF 											-- LDF
 							or (op_code_ir_pre = HALT and ir_interna(11 downto 0) /= x"fff") 	-- SPECIAL(not HALT)
-							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "011") 	-- NOP en operaciones MULDIV pero F_CODE no implementado
-							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "110")      
-							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "111")      
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "010")       -- NOP en operaciones COMP pero F_CODE no implementado
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "110")        
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "111")        
-							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "110")        -- NOP en operaciones JMP pero F_CODE no implementado
-							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "010")         
-							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "101") else
+							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "011") 	-- NOP en operaciones MULDIV pero F_CODE no implementado
+							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "110")      
+							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "111")      
+							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "010")        -- NOP en operaciones JMP pero F_CODE no implementado 
+							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "101") 
+							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "110") else   
 					op_code_ir_pre;
 					
 	-- Assignem a la sortida de OP
@@ -74,17 +75,17 @@ BEGIN
 				JMP_OP when (op_code_ir = JMP and ir_interna(2 downto 0) =  "011") else
 				JAL_OP when (op_code_ir = JMP and ir_interna(2 downto 0) =  "100") else
 				NOP_OP when op_code_ir = NOP else
-				NOP_OP;																											-- Else 0
+				NOP_OP;																												-- Else 0
 	
 	-- Assignem f
 	f <= f_temp;
 
-	-- ldpc ens indica si d'on carregar el nou PC
+	-- ldpc ens indica d'on carregar el nou PC
 	-- Load next Pc or not (Fetch / Decode)
 	ldpc <= 	"11" when op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" else	-- 11 HALT
-				"10" when op_code_ir = BZ else									-- 10 BRANCH
-				"01" when op_code_ir = JMP else									-- 01 JUMPS
-				"00" ; 			 												-- 00 RUN; falta CALLS
+				"10" when op_code_ir = BZ else											-- 10 BRANCH
+				"01" when op_code_ir = JMP else											-- 01 JUMPS
+				"00" ; 			 														-- 00 RUN; falta CALLS
 
 	-- wrd habilita l'escriptura al banc de registres
 	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL) i BRANCHES 
@@ -94,15 +95,14 @@ BEGIN
 					or (op_code_ir = JMP and f_temp /= JAL_OP)
 					or op_code_ir = BZ 
 					or (op_code_ir = NOP and op_code_ir_pre /= ADDI) else
-		   '1' when op_code_ir >= "0000" and op_code_ir <= "1111" else		-- Si hi han Xs no fem enable
-		   '0' ;
+		   '1';
 	
 	-- word_byte indica a la memora si accedim a nivell de word o byte; Sempre accedim a words excepte LDB i STB
 	word_byte <= '1' when op_code_ir = LDB or op_code_ir = STB else '0';
 	
 	-- addr_a adreca A al banc de registres
 	-- Sempre esta als 8-6 excepte als MOVE
-	addr_a <=	"000" when 	(op_code_ir = NOP and op_code_ir_pre /= ADDI) else
+	addr_a <=	"000" when 	(op_code_ir = NOP and op_code_ir_pre /= ADDI) else	-- Si es un NOP i el prefiltrat no era ADDI addr_a = 0; NOP i ADDI comparteixen OP_CODE aixi que ho detectem aixi
 				ir_interna(11 downto 9) when op_code_ir = MOVE else
 				ir_interna(8 downto 6);
 				
@@ -111,11 +111,11 @@ BEGIN
 		addr_b <=	ir_interna(2 downto 0) when MULDIV,		-- Cas Multiplicacions o Divisions: addr_b esta als bits 2-0
 					ir_interna(2 downto 0) when COMP,		-- Cas Comparacions: addr_b esta als bits 2-0
 					ir_interna(2 downto 0) when AL,			-- Cas ALU: addr_b esta als bits 2-0
-					"000" when NOP,
+					"000" when NOP,							-- No cal posar lo de ADDI perque ADDI despres seleccionaria immed en comptes de reg
 					ir_interna(11 downto 9) when others;	-- else addr_b als bits 11-9
 
 	-- addr_d adreca D al banc de registres;				
-	addr_d <= 	"000" when 	(op_code_ir = NOP and op_code_ir_pre /= ADDI) else
+	addr_d <= 	"000" when 	(op_code_ir = NOP and op_code_ir_pre /= ADDI) else -- Si es un NOP i el prefiltrat no era ADDI addr_d = 0; NOP i ADDI comparteixen OP_CODE aixi que ho detectem aixi
 				ir_interna(11 downto 9);
 	
 	-- wr_m indica si escribim a memoria o no (1 si)
@@ -127,13 +127,16 @@ BEGIN
 	-- in_d indica des d'on venen les dades que es guardaran a addr_d
 	-- Desde memoria a LD i LDB, desde el PCup a JAL i la resta desde la ALU
 	in_d <= "01" when op_code_ir = LD or op_code_ir = LDB else 
-			"10" when (op_code_ir = JMP and f_temp = JAL_OP) else "00";
+			"10" when (op_code_ir = JMP and f_temp = JAL_OP) else 
+			"00";
 
 	-- halt_cont indica si estem en HALT; REVISAR US
-	halt_cont <= '1' when op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" else '0';
+	halt_cont <= '1' when op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" else 
+				 '0';
 	
-	-- immed_x2 indica si hem de multiplicar l'immediar x2 per accedir a memoria; Ho fem en ST i LB
-	immed_x2 <= '1' when op_code_ir = LD or op_code_ir = ST else '0';
+	-- immed_x2 indica si hem de multiplicar l'immediar x2 per accedir a memoria
+	immed_x2 <= '1' when op_code_ir = LD or op_code_ir = ST else 
+				'0';
 	
 	-- immed_or_reg indica si entra a la Y l'immediat(0) o la sortida del banc de registres(1)
 	-- Immediat en ST, STB, LD, LDB, ADDI o MOVES
@@ -143,7 +146,7 @@ BEGIN
 								or op_code_ir = STB 
 								or op_code_ir = ADDI 
 								or op_code_ir = MOVE else 
-					'1' when (op_code_ir = NOP and op_code_ir_pre /= ADDI) else
+					'1' when (op_code_ir = NOP and op_code_ir_pre /= ADDI) else -- En cas de NOP entra a la ALU B, pero es indiferent perque el enable estara a 0
 					'1';
 
 	--immed depen de quina instruccio es esta codificat a llocs i tamanys diferents; Les dos seguents asignacions juguen amb com estan codificades
@@ -151,12 +154,11 @@ BEGIN
 							(others => ir_interna(4)) when op_code_ir = ADDI else						-- Cas ADDI: immed als 5 bits de menor pes (extenem el signe)
 							(others => ir_interna(5)); 													-- Else: immed als 6 bits de menor pes (extenem el signe)
 
-	immed(7 downto 0)  <= 	ir_interna(7 downto 0) when op_code_ir = MOVE or op_code_ir = BZ else 		-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes
-							ir_interna(4)&ir_interna(4)&ir_interna(4)&ir_interna(4 downto 0) when op_code_ir = ADDI else        -- Cas ADDI: immed als 5 bits de menor pes
-							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0);			                               	-- Else: immed als 6 bits de menor pes 
+	immed(7 downto 0)  <= 	ir_interna(7 downto 0) when op_code_ir = MOVE or op_code_ir = BZ else 							-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes
+							ir_interna(4)&ir_interna(4)&ir_interna(4)&ir_interna(4 downto 0) when op_code_ir = ADDI else    -- Cas ADDI: immed als 5 bits de menor pes; No pasa res si tambe es un NOP, perque els NOP pillen reg d'entrada a la alu
+							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0);			                               		-- Else: immed als 6 bits de menor pes 
 
--- MODELSIM SIGNALS
-	
+-- MODELSIM SIGNALS	
 	Instruccio <=   "ALU " when op_code_ir = AL else 
 					"COMP" when op_code_ir = COMP else 
 					"ADDI" when op_code_ir_pre = ADDI else 
@@ -205,6 +207,6 @@ BEGIN
 				"ADDI  " when op_code_ir_pre = ADDI else
 				"NOP   " when f_temp = NOP_OP and op_code_ir = NOP else
 				"-     ";
-
+-- END MODELSIM SIGNALS
 	
 END Structure;
