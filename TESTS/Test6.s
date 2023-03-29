@@ -14,8 +14,8 @@ divu r6, r2, r1 ; 0002
 st 4(r0), r5
 st 6(r0), r6
 
-div r5, r0, r0 ; 0000?XXXX
-divu r6, r0, r0 ; 0000?XXXX
+div r5, r0, r0 ; XXXX
+divu r6, r0, r0 ; XXXX
 st 8(r0), r5
 st 10(r0), r6
 
@@ -46,7 +46,7 @@ st 30(r0), r6
 
 movi r4, 0x00
 movhi r4, 0x80
-div r5, r4, r3 ; XXXX
+div r5, r4, r3 ; XXXX? 8000
 divu r6, r4, r3 ; 0000
 st 32(r0), r5
 st 34(r0), r6
