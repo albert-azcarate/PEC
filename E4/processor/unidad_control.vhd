@@ -108,27 +108,37 @@ BEGIN
 				else						-- RUN
 				
 					if load_pc_out = "00" and ins_dad_conn = '1' then		-- RUN
-						regPC <= regPC + 2;
+						if regPC < x"FFFE" then
+							regPC <= regPC + 2;
+						else 
+							regPC <= regPC;
+						end if;
 					elsif load_pc_out = "01" then							-- Cas JMP's
 						if f_out = JMP_OP then 								-- JMP
 							regPC <= alu_out;	
-						elsif z = '0' and f_out = JZ_OP then 				-- JZ i saltem
+						elsif z = '0' and f_out = JZ_OP and alu_out >= x"C000" and alu_out <= x"FFFE" then 		-- JZ i saltem
 							regPC <= alu_out;	
-						elsif z = '1' and f_out = JNZ_OP then 				-- JNZ i saltem
+						elsif z = '1' and f_out = JNZ_OP and alu_out >= x"C000" and alu_out <= x"FFFE" then 	-- JNZ i saltem
 							regPC <= alu_out;	
-						elsif f_out = JAL_OP then							-- JAL
+						elsif f_out = JAL_OP and alu_out >= x"C000" and alu_out <= x"FFFE" then							-- JAL
 							regPC <= alu_out;
 						else												-- Else no saltem (pc <= pc + 2)
-							regPC <= regPC + 2;	
+							if regPC < x"FFFE" then
+								regPC <= regPC + 2;
+							else 
+								regPC <= regPC;
+							end if;
 						end if;
 						
 					elsif load_pc_out = "10" then							-- Cas BZ's
-						if z = '0' and f_out = BZ_OP then 					-- BZ i saltem
+						if z = '0' and f_out = BZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) <= x"FFFE" then 					-- BZ i saltem
 							regPC <= regPC + 2 + despla;
-						elsif z = '1' and f_out = BNZ_OP then 				-- BNZ i saltem
+						elsif z = '1' and f_out = BNZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) <= x"FFFE" then 				-- BNZ i saltem
 							regPC <= regPC + 2 +  despla;
-						else 												-- Else no saltem (pc <= pc + 2)
+						elsif regPC + 2 < x"FFFE" then																									-- Else no saltem (pc <= pc + 2)
 							regPC <= regPC + 2;
+						else
+							regPC <= regPC;
 						end if;
 							
 					else 													-- REVISAR de que serveix aquest else, ja que no entrem aqui mai
