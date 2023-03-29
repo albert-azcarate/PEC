@@ -8,15 +8,20 @@ package op_code is
   constant AL 			: op_code_t := "0000";
   constant COMP 		: op_code_t := "0001";
   constant ADDI 		: op_code_t := "0010";
-  constant MULDIV 	: op_code_t := "1000";
-  constant MOVE 		: op_code_t := "0101";
   constant LD 			: op_code_t := "0011";
-  constant LDB 		: op_code_t := "1101";
   constant ST 			: op_code_t := "0100";
-  constant STB 		: op_code_t := "1110";
+  constant MOVE 		: op_code_t := "0101";
   constant BZ	 		: op_code_t := "0110";
+  constant IO			: op_code_t := "0111";
+  constant MULDIV 		: op_code_t := "1000";
+  constant FLOAT		: op_code_t := "1001";
   constant JMP	 		: op_code_t := "1010";
+  constant LDF			: op_code_t := "1011";
+  constant STF			: op_code_t := "1100";
+  constant LDB 			: op_code_t := "1101";
+  constant STB 			: op_code_t := "1110";
   constant HALT 		: op_code_t := "1111";
+  constant NOP			: op_code_t := "0010"; -- NOP = ADDI R0 0
   
 end package op_code;
 
@@ -57,6 +62,7 @@ package f_code is
  constant JMP_OP 	: f_code_t := "011";
  constant JAL_OP 	: f_code_t := "100";
  --constant CALLS_OP 	: f_code_t := "111";
+ constant NOP_OP 	: f_code_t := "100";
  
 
 end package f_code;
