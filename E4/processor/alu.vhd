@@ -58,8 +58,10 @@ BEGIN
 					mul(31 downto 16) when op = MULDIV and f = MULH_OP else		--MULH
 					mulu(31 downto 16) when op = MULDIV and f = MULHU_OP else	--MULHU
 					
-					std_logic_vector(signed(x) / signed(y)) 	when op = MULDIV and f = DIV_OP else	-- DIV
-					std_logic_vector(unsigned(x) / unsigned(y))	when op = MULDIV and f = DIVU_OP else	-- DIVU
+					std_logic_vector(signed(x) / signed(y)) 	when op = MULDIV and f = DIV_OP and y /= "0" else	-- DIV
+					(others => 'X') 							when op = MULDIV and f = DIV_OP and y = "0" else	-- DIV ERROR /0
+					std_logic_vector(unsigned(x) / unsigned(y))	when op = MULDIV and f = DIVU_OP and y /= "0" else	-- DIVU
+					(others => 'X')								when op = MULDIV and f = DIVU_OP and y = "0" else	-- DIVU ERROR /0
 				
 					std_logic_vector(shift_left(signed(x), conv_integer(y(4 downto 0)) )) when op = AL and f = SHA_OP and conv_integer(y(4 downto 0)) <= 15  else 	--SHA  >= 0 
 					std_logic_vector(shift_left(unsigned(x), conv_integer(y(4 downto 0)) )) when op = AL and f = SHL_OP and conv_integer(y(4 downto 0)) <= 15 else 	--SHL  >= 0

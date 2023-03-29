@@ -188,6 +188,8 @@ BEGIN
 				"MUL   " when f_temp = MUL_OP and op_code_ir = MULDIV else 
 				"MULH  " when f_temp = MULH_OP and op_code_ir = MULDIV else 
 				"MULHU " when f_temp = MULHU_OP and op_code_ir = MULDIV else 
+				"DIV   " when f_temp = DIV_OP and op_code_ir = MULDIV else 
+				"DIVU  " when f_temp = DIVU_OP and op_code_ir = MULDIV else 
 				"BZ    " when f_temp = BZ_OP and op_code_ir = BZ else 
 				"BNZ   " when f_temp = BNZ_OP and op_code_ir = BZ else 
 				"JZ    " when f_temp = JZ_OP and op_code_ir = JMP else 
