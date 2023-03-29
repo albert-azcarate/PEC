@@ -1,4 +1,4 @@
-# PEC | 32-bit CPU Design in VHDL
+# PEC | 16-bit CPU Design in VHDL
 
 This Git repository contains the source code and design files for a 16-bit CPU implemented in VHDL. The project aims to create a fully-functional CPU that can execute basic instructions of SISA instruction set and support memory access, with a focus on simplicity and ease of understanding.
 
