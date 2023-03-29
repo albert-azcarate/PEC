@@ -36,11 +36,20 @@ BEGIN
 	op_code_ir_pre <= ir(15 downto 12);
 	
 	-- Assignem directament aquest singal a la sortida OP, que indica la operacio a fer
-	op_code_ir <= 	NOP when op_code_ir_pre = IO 	-- I/O
-						or op_code_ir_pre = FLOAT 	-- FLOAT
-						or op_code_ir_pre = STF  -- STF
-						or op_code_ir_pre = LDF 	-- LDF
-						or (op_code_ir_pre = HALT and ir(11 downto 0) /= x"fff") else -- NOP(ADDI ro,0) when I/O, FLOAT, STF, LDF and SPECIAL(not HALT)
+	op_code_ir <= 	NOP when op_code_ir_pre = IO 			-- I/O
+						or op_code_ir_pre = FLOAT 			-- FLOAT
+						or op_code_ir_pre = STF  			-- STF
+						or op_code_ir_pre = LDF 			-- LDF
+						or (op_code_ir_pre = HALT and ir(11 downto 0) /= x"fff") -- NOP(ADDI ro,0) when I/O, FLOAT, STF, LDF and SPECIAL(not HALT)
+						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "011") 
+						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "110") 
+						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "111") 
+						or (op_code_ir_pre = COMP and ir(5 downto 3) = "010")
+						or (op_code_ir_pre = COMP and ir(5 downto 3) = "110")
+						or (op_code_ir_pre = COMP and ir(5 downto 3) = "111")
+						or (op_code_ir_pre = JMP and ir(2 downto 0) = "110") 
+						or (op_code_ir_pre = JMP and ir(2 downto 0) = "010") 
+						or (op_code_ir_pre = JMP and ir(2 downto 0) = "101") else
 					op_code_ir_pre;
 	op <= op_code_ir;
 	
@@ -146,37 +155,38 @@ BEGIN
 					"HALT" when (op_code_ir = HALT and ir(11 downto 0) = x"fff") else 
 					"NOP ";
 							 
-	with f_temp & op_code_ir select
-		operacio <= "AND   " when AND_OP&AL,
-					"OR    " when OR_OP&AL,
-					"XOR   " when XOR_OP&AL,
-					"NOT   " when NOT_OP&AL,
-					"ADD   " when ADD_OP&AL,
-					"SUB   " when SUB_OP&AL,
-					"SHA   " when SHA_OP&AL,
-					"SHL   " when SHL_OP&AL,			
-					"CMPLT " when CMPLT_OP&COMP,
-					"CMPLE " when CMPLE_OP&COMP,
-					"CMPEQ " when CMPEQ_OP&COMP,
-					"CMPLTU" when CMPLTU_OP&COMP,
-					"CMPLEU" when CMPLEU_OP&COMP,
-					"MUL   " when MUL_OP&MULDIV,
-					"MULH  " when MULH_OP&MULDIV,
-					"MULHU " when MULHU_OP&MULDIV,
-					"BZ    " when BZ_OP&BZ,
-					"BNZ   " when BNZ_OP&BZ,
-					"JZ    " when JZ_OP&JMP,
-					"JNZ   " when JNZ_OP&JMP,
-					"JMP   " when JMP_OP&JMP,
-					"JAL   " when JAL_OP&JMP,
-					"MOVHI " when MOVHI&MOVE,
-					"MOVI  " when MOVI&MOVE,
-					"LD    " when "XXX"&LD,
-					"LDB   " when "XXX"&LDB,
-					"ST    " when "XXX"&ST,
-					"STB   " when "XXX"&STB,
-					"NOP   " when NOP_OP&NOP,
-					"-     " when others;
+
+	operacio <= "AND   " when f_temp = AND_OP and op_code_ir = AL else 
+				"OR    " when f_temp = OR_OP and op_code_ir = AL else 
+				"XOR   " when f_temp = XOR_OP and op_code_ir = AL else 
+				"NOT   " when f_temp = NOT_OP and op_code_ir = AL else 
+				"ADD   " when f_temp = ADD_OP and op_code_ir = AL else 
+				"SUB   " when f_temp = SUB_OP and op_code_ir = AL else 
+				"SHA   " when f_temp = SHA_OP and op_code_ir = AL else 
+				"SHL   " when f_temp = SHL_OP and op_code_ir = AL else 			
+				"CMPLT " when f_temp = CMPLT_OP and op_code_ir = COMP else 
+				"CMPLE " when f_temp = CMPLE_OP and op_code_ir = COMP else 
+				"CMPEQ " when f_temp = CMPEQ_OP and op_code_ir = COMP else 
+				"CMPLTU" when f_temp = CMPLTU_OP and op_code_ir = COMP else 
+				"CMPLEU" when f_temp = CMPLEU_OP and op_code_ir = COMP else 
+				"MUL   " when f_temp = MUL_OP and op_code_ir = MULDIV else 
+				"MULH  " when f_temp = MULH_OP and op_code_ir = MULDIV else 
+				"MULHU " when f_temp = MULHU_OP and op_code_ir = MULDIV else 
+				"BZ    " when f_temp = BZ_OP and op_code_ir = BZ else 
+				"BNZ   " when f_temp = BNZ_OP and op_code_ir = BZ else 
+				"JZ    " when f_temp = JZ_OP and op_code_ir = JMP else 
+				"JNZ   " when f_temp = JNZ_OP and op_code_ir = JMP else 
+				"JMP   " when f_temp = JMP_OP and op_code_ir = JMP else 
+				"JAL   " when f_temp = JAL_OP and op_code_ir = JMP else 
+				"MOVHI " when f_temp = MOVHI and op_code_ir = MOVE else 
+				"MOVI  " when f_temp = MOVI and op_code_ir = MOVE else 
+				"LD    " when op_code_ir = LD else 
+				"LDB   " when op_code_ir = LDB else 
+				"ST    " when op_code_ir = ST else 
+				"STB   " when op_code_ir = STB else 
+				"ADDI  " when op_code_ir_pre = ADDI else
+				"NOP   " when f_temp = NOP_OP and op_code_ir = NOP else
+				"-     ";
 
 	
 END Structure;
