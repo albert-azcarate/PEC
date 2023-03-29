@@ -6,23 +6,23 @@ use work.f_code.all;
 
 
 ENTITY control_l IS
-    PORT (ir        : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          op 		  : out  op_code_t;
-          f         : out  f_code_t;
-          ldpc      : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-          wrd       : OUT STD_LOGIC;
-          addr_a    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_b    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_d    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-          immed     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-          wr_m      : OUT STD_LOGIC;
-          in_d      : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-          immed_x2  : OUT STD_LOGIC;
-          word_byte : OUT STD_LOGIC;
-			 immed_or_reg : OUT STD_LOGIC;
-			 halt_cont	 : out  STD_LOGIC;
-			 Instruccio: out string(1 to 4); -- modELSIM
-			 operacio: out string(1 to 6));	--modELSIM
+    PORT(	ir        		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			op 		  		: out op_code_t;
+			f         		: out f_code_t;
+			ldpc      		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			wrd       		: OUT STD_LOGIC;
+			addr_a    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_b    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_d    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			immed     		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			wr_m      		: OUT STD_LOGIC;
+			in_d      		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			immed_x2  		: OUT STD_LOGIC;
+			word_byte 		: OUT STD_LOGIC;
+			immed_or_reg 	: OUT STD_LOGIC;
+			halt_cont	 	: out STD_LOGIC;
+			Instruccio		: out string(1 to 4); -- modELSIM
+			operacio		: out string(1 to 6));	--modELSIM
 END control_l;
 
 
@@ -32,39 +32,41 @@ ARCHITECTURE Structure OF control_l IS
 	signal f_temp : f_code_t;
 BEGIN
 
-	-- Pasem l'input a un signal per mes easy of use; REVISAR?
+	-- Pasem l'input a un signal per mes easy of use per mirar els NOPS
 	op_code_ir_pre <= ir(15 downto 12);
 	
-	-- Assignem directament aquest singal a la sortida OP, que indica la operacio a fer
-	op_code_ir <= 	NOP when op_code_ir_pre = IO 									-- I/O
-						or op_code_ir_pre = FLOAT 									-- FLOAT
-						or op_code_ir_pre = STF  									-- STF
-						or op_code_ir_pre = LDF 									-- LDF
-						or (op_code_ir_pre = HALT and ir(11 downto 0) /= x"fff") 	-- SPECIAL(not HALT)
-						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "011") 	-- NOP en operaciones MULDIV pero F_CODE no implementado
-						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "110")      
-						or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "111")      
-						or (op_code_ir_pre = COMP and ir(5 downto 3) = "010")       -- NOP en operaciones COMP pero F_CODE no implementado
-						or (op_code_ir_pre = COMP and ir(5 downto 3) = "110")        
-						or (op_code_ir_pre = COMP and ir(5 downto 3) = "111")        
-						or (op_code_ir_pre = JMP and ir(2 downto 0) = "110")        -- NOP en operaciones JMP pero F_CODE no implementado
-						or (op_code_ir_pre = JMP and ir(2 downto 0) = "010")         
-						or (op_code_ir_pre = JMP and ir(2 downto 0) = "101") else
+	-- Revisio per aplicar NOPS en operacions ilegals
+	op_code_ir <= NOP when	op_code_ir_pre = IO 									-- I/O
+							or op_code_ir_pre = FLOAT 									-- FLOAT
+							or op_code_ir_pre = STF  									-- STF
+							or op_code_ir_pre = LDF 									-- LDF
+							or (op_code_ir_pre = HALT and ir(11 downto 0) /= x"fff") 	-- SPECIAL(not HALT)
+							or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "011") 	-- NOP en operaciones MULDIV pero F_CODE no implementado
+							or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "110")      
+							or (op_code_ir_pre = MULDIV and ir(5 downto 3) = "111")      
+							or (op_code_ir_pre = COMP and ir(5 downto 3) = "010")       -- NOP en operaciones COMP pero F_CODE no implementado
+							or (op_code_ir_pre = COMP and ir(5 downto 3) = "110")        
+							or (op_code_ir_pre = COMP and ir(5 downto 3) = "111")        
+							or (op_code_ir_pre = JMP and ir(2 downto 0) = "110")        -- NOP en operaciones JMP pero F_CODE no implementado
+							or (op_code_ir_pre = JMP and ir(2 downto 0) = "010")         
+							or (op_code_ir_pre = JMP and ir(2 downto 0) = "101") else
 					op_code_ir_pre;
+					
+	-- Assignem a la sortida de OP
 	op <= op_code_ir;
 	
 	-- Signal Funcio_temporal ens permet definir dins de cada tipus de operacio general quina vole en concret
-	f_temp 	<= ir(5 downto 3) when op_code_ir /= MOVE and op_code_ir /= BZ and op_code_ir /= JMP and op_code_ir /= NOP else	-- Cas base: F esta als bits 5-3
-			MOVHI when (op_code_ir = MOVE and ir(8) = '1') else 										-- Cas MOVE: F depen del bit 8
-			MOVI when (op_code_ir = MOVE and ir(8) = '0') else 
-			BZ_OP when (op_code_ir = BZ and ir(8) = '0') else											-- Cas BN: F depen del bit 8 
-			BNZ_OP when (op_code_ir = BZ and ir(8) = '1') else
-			JZ_OP when (op_code_ir = JMP and ir(2 downto 0) = "000") else								-- Cas JMP: F depen dels bits 2-0
-			JNZ_OP when (op_code_ir = JMP and ir(2 downto 0) =  "001") else
-			JMP_OP when (op_code_ir = JMP and ir(2 downto 0) =  "011") else
-			JAL_OP when (op_code_ir = JMP and ir(2 downto 0) =  "100") else
-			NOP_OP when op_code_ir = NOP else
-			NOP_OP;																			-- Else 0
+	f_temp 	<= 	ir(5 downto 3) when op_code_ir /= MOVE and op_code_ir /= BZ and op_code_ir /= JMP and op_code_ir /= NOP else	-- Cas base: F esta als bits 5-3
+				MOVHI when (op_code_ir = MOVE and ir(8) = '1') else 															-- Cas MOVE: F depen del bit 8
+				MOVI when (op_code_ir = MOVE and ir(8) = '0') else 					
+				BZ_OP when (op_code_ir = BZ and ir(8) = '0') else																-- Cas BN: F depen del bit 8 
+				BNZ_OP when (op_code_ir = BZ and ir(8) = '1') else					
+				JZ_OP when (op_code_ir = JMP and ir(2 downto 0) = "000") else													-- Cas JMP: F depen dels bits 2-0
+				JNZ_OP when (op_code_ir = JMP and ir(2 downto 0) =  "001") else
+				JMP_OP when (op_code_ir = JMP and ir(2 downto 0) =  "011") else
+				JAL_OP when (op_code_ir = JMP and ir(2 downto 0) =  "100") else
+				NOP_OP when op_code_ir = NOP else
+				NOP_OP;																											-- Else 0
 	
 	-- Assignem f
 	f <= f_temp;
@@ -74,7 +76,7 @@ BEGIN
 	ldpc <= 	"11" when op_code_ir = HALT and ir(11 downto 0) = x"fff" else	-- 11 HALT
 				"10" when op_code_ir = BZ else									-- 10 BRANCH
 				"01" when op_code_ir = JMP else									-- 01 JUMPS
-				"00";			 									-- 00 RUN; falta CALLS
+				"00";			 												-- 00 RUN; falta CALLS
 
 	-- wrd habilita l'escriptura al banc de registres
 	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL) i BRANCHES 
@@ -133,12 +135,11 @@ BEGIN
 	immed(15 downto 8) <= 	(others => ir(7)) when op_code_ir = MOVE or op_code_ir = BZ else	-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes (extenem el signe)
 							(others => ir(4)) when op_code_ir = ADDI else						-- Cas ADDI: immed als 5 bits de menor pes (extenem el signe)
 							(others => ir(5)); 													-- Else: immed als 6 bits de menor pes (extenem el signe)
-							
+
 	immed(7 downto 0)  <= 	ir(7 downto 0) when op_code_ir = MOVE or op_code_ir = BZ else 		-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes
 							ir(4)&ir(4)&ir(4)&ir(4 downto 0) when op_code_ir = ADDI else        -- Cas ADDI: immed als 5 bits de menor pes
 							ir(5)&ir(5)&ir(5 downto 0);			                               	-- Else: immed als 6 bits de menor pes 
-	
-	
+
 -- MODELSIM SIGNALS
 	
 	Instruccio <=   "ALU " when op_code_ir = AL else 

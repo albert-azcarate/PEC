@@ -33,40 +33,40 @@ ARCHITECTURE Structure OF unidad_control IS
 
 
 	component control_l IS
-		PORT (ir     	 : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-				op        : out  op_code_t;
-				f         : out  f_code_t;
-				ldpc      : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-				wrd       : OUT STD_LOGIC;
-				addr_a    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-				addr_b    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-				addr_d    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-				immed     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-				wr_m      : OUT STD_LOGIC;
-				in_d      : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-				immed_x2  : OUT STD_LOGIC;
-				word_byte : OUT STD_LOGIC;
-				immed_or_reg : OUT STD_LOGIC;
-				halt_cont 		 : OUT  STD_LOGIC;
-				instruccio:out string(1 to 4); --modelsim
-				operacio	 :out string(1 to 6)); --modelsim
+		PORT(	ir     	 		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+				op        		: out op_code_t;
+				f         		: out f_code_t;
+				ldpc      		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+				wrd       		: OUT STD_LOGIC;
+				addr_a    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+				addr_b    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+				addr_d    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+				immed     		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+				wr_m      		: OUT STD_LOGIC;
+				in_d      		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+				immed_x2  		: OUT STD_LOGIC;
+				word_byte 		: OUT STD_LOGIC;
+				immed_or_reg	: OUT STD_LOGIC;
+				halt_cont 		: OUT STD_LOGIC;
+				instruccio		: out string(1 to 4); --modelsim
+				operacio	 	: out string(1 to 6)); --modelsim
 	end component;
 	
 	
 	component multi is
-		port	(clk      : IN  STD_LOGIC;
-				boot      : IN  STD_LOGIC;
-				ldpc_l    : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
-				wrd_l     : IN  STD_LOGIC;
-				wr_m_l    : IN  STD_LOGIC;
-				w_b       : IN  STD_LOGIC;
-				halt_cont : IN  STD_LOGIC;
-				ldpc      : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-				wrd       : OUT STD_LOGIC;
-				wr_m      : OUT STD_LOGIC;
-				ldir      : OUT STD_LOGIC;
-				ins_dad   : OUT STD_LOGIC;
-				word_byte : OUT STD_LOGIC);
+		port(	clk      	: IN  STD_LOGIC;
+				boot      	: IN  STD_LOGIC;
+				ldpc_l    	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+				wrd_l     	: IN  STD_LOGIC;
+				wr_m_l    	: IN  STD_LOGIC;
+				w_b       	: IN  STD_LOGIC;
+				halt_cont 	: IN  STD_LOGIC;
+				ldpc      	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+				wrd       	: OUT STD_LOGIC;
+				wr_m      	: OUT STD_LOGIC;
+				ldir      	: OUT STD_LOGIC;
+				ins_dad   	: OUT STD_LOGIC;
+				word_byte 	: OUT STD_LOGIC);
 	end component;
 
 signal regPC : std_logic_vector(15 downto 0) := x"C000";
