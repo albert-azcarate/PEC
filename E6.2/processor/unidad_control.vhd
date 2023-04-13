@@ -51,8 +51,8 @@ ARCHITECTURE Structure OF unidad_control IS
 			word_byte 		: OUT STD_LOGIC;
 			immed_or_reg 	: OUT STD_LOGIC;
 			halt_cont	 	: out STD_LOGIC;
-			Instruccio		: out string(1 to 4); -- modELSIM
-			operacio		: out string(1 to 6);	--modELSIM
+			Instruccio		: out string(1 to 4); 	-- modelsim
+			operacio		: out string(1 to 6);	-- modelsim
 			addr_io : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			rd_in : OUT STD_LOGIC;
 			wr_out : OUT STD_LOGIC
@@ -97,8 +97,8 @@ signal halt_conn : std_logic;
 signal ins_dad_conn : std_LOGIC;
 signal despla : std_LOGIC_vector(15 downto 0);
 
-signal instruction : string (1 to 4); --modelsim
-signal operacio : string (1 to 6);	--modelsim
+signal instruction : string (1 to 4); 	-- modelsim
+signal operacio : string (1 to 6);		-- modelsim
 
 BEGIN
 
@@ -147,7 +147,7 @@ BEGIN
 						elsif regPC + 2 < x"FFFE" then																									-- Else no saltem (pc <= pc + 2)
 							regPC <= regPC + 2;
 						else
-							regPC <= regPC; 	-- aixo ha de ser un HALT
+							regPC <= regPC; 	-- aixo ha de ser un HALT REVISAR
 						end if;
 							
 					else 													-- REVISAR de que serveix aquest else, ja que no entrem aqui mai

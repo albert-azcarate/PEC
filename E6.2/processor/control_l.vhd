@@ -61,7 +61,8 @@ BEGIN
 							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "111")      
 							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "010")        -- NOP en operaciones JMP pero F_CODE no implementado 
 							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "101") 
-							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "110") else   
+							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "110") 
+							or (op_code_ir_pre = IO and ir_interna(5 downto 0) < x"20") else   	-- NOP en operaciones IO pero con puerto no accesible
 					op_code_ir_pre;
 					
 	-- Assignem a la sortida de OP

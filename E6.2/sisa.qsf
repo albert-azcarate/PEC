@@ -748,6 +748,7 @@ set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK_LE
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SEGMENT_SIZE=512" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_CRC_HIWORD=63921" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SAMPLE_DEPTH=512" -section_id auto_signaltap_0
+set_global_assignment -name SIGNALTAP_FILE stp2.stp
 set_global_assignment -name VHDL_FILE io/ps2_keyboard.vhd
 set_global_assignment -name VHDL_FILE io/ControladorIO.vhd
 set_global_assignment -name VHDL_FILE io/keyboard_controller.vhd
@@ -768,6 +769,5 @@ set_global_assignment -name VHDL_FILE processor/control_l.vhd
 set_global_assignment -name VHDL_FILE processor/alu.vhd
 set_global_assignment -name VHDL_FILE memory/SRAMController.vhd
 set_global_assignment -name VHDL_FILE memory/MemoryController.vhd
-set_global_assignment -name SIGNALTAP_FILE stp2.stp
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
-set_global_assignment -name SLD_FILE "C:/Users/pec05/Desktop/E6.2/stp2_auto_stripped.stp"
+set_global_assignment -name SLD_FILE "C:/PEC/E6.2/stp2_auto_stripped.stp"
