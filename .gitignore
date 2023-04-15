@@ -5,7 +5,10 @@
 **/output_files/
 **/simulation/
 **/eines-sisa/
+**/DE1/
 *.bak
 *.mti
 *.mpf
 *.stp
+DE1_Control_Panel.exe.lnk
+DE1_Control_Panel.exe
