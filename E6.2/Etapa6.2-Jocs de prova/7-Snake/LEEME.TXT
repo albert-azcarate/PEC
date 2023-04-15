@@ -1,0 +1,47 @@
+Para compiliar, ensamblar, linkar y generar los ficheros necesarios para
+probar el programa en la placa simplemente hay que ejecutar el siguiente
+comando
+
+> generarTodo.sh
+
+
+==== system.lds ====
+
+El fichero "system.lds" es el que contiene las definiciones de las secciones
+para adecuarlo a la arquitectura.  El codigo de sistema se compila a partir
+de la direccion 0xC000 y la seccion de datos de sistema a partir de la
+direccion 0x8000 ya que se supone que el codigo esta en una ROM/flash en la
+que no puede escribirse y por tanto las variables que no sean registros o no
+esten en la pila deben guardarse en la seccion de datos
+
+
+==== entrada.s ====
+
+El fichero "entrada.s" es lo primero que se ejecuta y es lo que se pone en
+la direccion 0xC000. Define los registros necesarios para compilar en c. 
+
+Define el registro R7 como el puntero a la pila y lo pone en la direccion
+0x8200.
+
+Define el registro R5 como la direccion de retorno de la rutina principal.
+Simplementa una rutina que hace un halt
+
+Finalmente salta a la rutina principal (main)
+
+
+==== limpiar.pl ====
+
+Fichero de utilidades que a partir del codigo generado por el script
+"generarTodo.sh" genera los ficheros finales para poder programar la placa
+
+El fichero "*.dis" contiene el codigo desensamblado de las secciones de codigo y de datos
+
+El fichero "*.code.txt.rom.DE1.hex" contiene bytecode necesario para
+programar la seccion de codigo del programa en la placa DE1 a partir de la
+direccion 0xC000 (o sea programandolo a partir de la 0x6000 debido al
+entrelazado del controlador de memoria del proyecto)
+
+El fichero "*.data.txt.rom.DE1.hex" contiene bytecode necesario para
+programar la seccion de datos del programa en la placa DE1 a partir de la
+direccion 0x8000 (o sea programandolo a partir de la 0x4000 debido al
+entrelazado del controlador de memoria del proyecto)

@@ -1,0 +1,291 @@
+
+temp_HelloWorld.o:     file format elf32-sisa
+temp_HelloWorld.o
+architecture: sisa:3, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x00000000
+
+Program Header:
+    LOAD off    0x00000000 vaddr 0x0000bfac paddr 0x0000bfac align 2**0
+         filesz 0x000001ea memsz 0x000001ea flags r-x
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn  Flags
+  0 .sistema      00000196  0000c000  0000c000  00000054  2**1  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .stab         00000330  00008000  00008000  000001ec  2**2  CONTENTS, READONLY, DEBUGGING
+  2 .stabstr      0000032f  00008330  00008330  0000051c  2**0  CONTENTS, READONLY, DEBUGGING
+SYMBOL TABLE:
+0000c000 l    d  .sistema	00000000 .sistema
+00008000 l    d  .stab	00000000 .stab
+00008330 l    d  .stabstr	00000000 .stabstr
+00000000 l    d  *ABS*	00000000 .shstrtab
+00000000 l    d  *ABS*	00000000 .symtab
+00000000 l    d  *ABS*	00000000 .strtab
+0000c00e l       .sistema	00000000 __exit
+0000c000 g       .sistema	00000000 __entry_point
+0000c196 g       *ABS*	00000000 __user_end
+0000c010 g     F .sistema	00000044 write_one
+0000c054 g     F .sistema	00000142 main
+0000c196 g       *ABS*	00000000 __user_start
+
+
+Disassembly of section .sistema:
+
+0000c000 <__entry_point>:
+    c000:	5e00 	movi	r7, 0
+    c002:	5f82 	movhi	r7, -126
+    c004:	5a0e 	movi	r5, 14
+    c006:	5bc0 	movhi	r5, -64
+    c008:	5c54 	movi	r6, 84
+    c00a:	5dc0 	movhi	r6, -64
+    c00c:	a183 	jmp	r6
+
+0000c00e <__exit>:
+    c00e:	ffff 	halt	
+
+0000c010 <write_one>:
+
+int write_one(int fila, int col, int c)
+{
+    c010:	2ff4 	addi	r7, r7, -12
+    c012:	4bc5 	st	10(r7), r5
+    c014:	4dc4 	st	8(r7), r6
+    c016:	2dc8 	addi	r6, r7, 8
+    c018:	41c1 	st	2(r7), r0
+    c01a:	45c0 	st	0(r7), r2
+  int res;
+  int pos;
+
+  pos=(80*fila+col)*2;    // cada caracter ocupa 2 bytes de memoria de video
+    c01c:	3382 	ld	r1, 4(r6)
+    c01e:	2440 	addi	r2, r1, 0
+    c020:	5204 	movi	r1, 4
+    c022:	04b1 	sha	r2, r2, r1
+    c024:	5202 	movi	r1, 2
+    c026:	02b1 	sha	r1, r2, r1
+    c028:	04a1 	add	r2, r2, r1
+    c02a:	3383 	ld	r1, 6(r6)
+    c02c:	02a1 	add	r1, r2, r1
+    c02e:	0261 	add	r1, r1, r1
+    c030:	43bf 	st	-2(r6), r1
+  pos = pos + 0xA000;	  // la memoria de video empieza en la direccion 0xA000 (40960)
+    c032:	33bf 	ld	r1, -2(r6)
+    c034:	5400 	movi	r2, 0
+    c036:	55a0 	movhi	r2, -96
+    c038:	0262 	add	r1, r1, r2
+    c03a:	43bf 	st	-2(r6), r1
+
+  __asm__ (
+    c03c:	31bf 	ld	r0, -2(r6)
+    c03e:	3384 	ld	r1, 8(r6)
+    c040:	4200 	st	0(r0), r1
+      "st 0(%0), %1"      // %0 corresponde a la variable "pos" que habra sido cargada en un registro
+                          // %1 corresponde a la variable "c" que habra sido cargada en otro registro
+      : /* sin salidas */
+      : "a" (pos), "b" (c));  
+
+  res=1;
+    c042:	5201 	movi	r1, 1
+    c044:	43be 	st	-4(r6), r1
+  return res;
+    c046:	33be 	ld	r1, -4(r6)
+}
+    c048:	31c1 	ld	r0, 2(r7)
+    c04a:	35c0 	ld	r2, 0(r7)
+    c04c:	3dc4 	ld	r6, 8(r7)
+    c04e:	3bc5 	ld	r5, 10(r7)
+    c050:	2fcc 	addi	r7, r7, 12
+    c052:	a143 	jmp	r5
+
+0000c054 <main>:
+                        
+
+int main () {
+    c054:	2ff8 	addi	r7, r7, -8
+    c056:	4bc3 	st	6(r7), r5
+    c058:	4dc2 	st	4(r7), r6
+    c05a:	2dc4 	addi	r6, r7, 4
+    c05c:	45c0 	st	0(r7), r2
+    int valor;
+
+    valor=0x3F48;     		/* H mayuscula en blanco */
+    c05e:	5248 	movi	r1, 72
+    c060:	533f 	movhi	r1, 63
+    c062:	43bf 	st	-2(r6), r1
+    write_one(1,5,valor); 	/* escribe el caracter en la posicion fila=1,columna=5 */
+    c064:	2ffa 	addi	r7, r7, -6
+    c066:	25c0 	addi	r2, r7, 0
+    c068:	5201 	movi	r1, 1
+    c06a:	4280 	st	0(r2), r1
+    c06c:	5205 	movi	r1, 5
+    c06e:	4281 	st	2(r2), r1
+    c070:	33bf 	ld	r1, -2(r6)
+    c072:	4282 	st	4(r2), r1
+    c074:	5210 	movi	r1, 16
+    c076:	53c0 	movhi	r1, -64
+    c078:	aa44 	jal	r5, r1
+    c07a:	2fc6 	addi	r7, r7, 6
+    valor=0x0365;     		/* e minuscula en rojo */
+    c07c:	5265 	movi	r1, 101
+    c07e:	5303 	movhi	r1, 3
+    c080:	43bf 	st	-2(r6), r1
+    write_one(1,6,valor); 	/* escribe el caracter en la posicion fila=1,columna=6 */
+    c082:	2ffa 	addi	r7, r7, -6
+    c084:	25c0 	addi	r2, r7, 0
+    c086:	5201 	movi	r1, 1
+    c088:	4280 	st	0(r2), r1
+    c08a:	5206 	movi	r1, 6
+    c08c:	4281 	st	2(r2), r1
+    c08e:	33bf 	ld	r1, -2(r6)
+    c090:	4282 	st	4(r2), r1
+    c092:	5210 	movi	r1, 16
+    c094:	53c0 	movhi	r1, -64
+    c096:	aa44 	jal	r5, r1
+    c098:	2fc6 	addi	r7, r7, 6
+    valor=0x0C6C;     		/* l minuscula en verde */
+    c09a:	526c 	movi	r1, 108
+    c09c:	530c 	movhi	r1, 12
+    c09e:	43bf 	st	-2(r6), r1
+    write_one(1,7,valor); 	/* escribe el caracter en la posicion fila=1,columna=7 */
+    c0a0:	2ffa 	addi	r7, r7, -6
+    c0a2:	25c0 	addi	r2, r7, 0
+    c0a4:	5201 	movi	r1, 1
+    c0a6:	4280 	st	0(r2), r1
+    c0a8:	5207 	movi	r1, 7
+    c0aa:	4281 	st	2(r2), r1
+    c0ac:	33bf 	ld	r1, -2(r6)
+    c0ae:	4282 	st	4(r2), r1
+    c0b0:	5210 	movi	r1, 16
+    c0b2:	53c0 	movhi	r1, -64
+    c0b4:	aa44 	jal	r5, r1
+    c0b6:	2fc6 	addi	r7, r7, 6
+    valor=0x306C;     		/* l minuscula en azul */
+    c0b8:	526c 	movi	r1, 108
+    c0ba:	5330 	movhi	r1, 48
+    c0bc:	43bf 	st	-2(r6), r1
+    write_one(1,8,valor); 	/* escribe el caracter en la posicion fila=1,columna=8 */
+    c0be:	2ffa 	addi	r7, r7, -6
+    c0c0:	25c0 	addi	r2, r7, 0
+    c0c2:	5201 	movi	r1, 1
+    c0c4:	4280 	st	0(r2), r1
+    c0c6:	5208 	movi	r1, 8
+    c0c8:	4281 	st	2(r2), r1
+    c0ca:	33bf 	ld	r1, -2(r6)
+    c0cc:	4282 	st	4(r2), r1
+    c0ce:	5210 	movi	r1, 16
+    c0d0:	53c0 	movhi	r1, -64
+    c0d2:	aa44 	jal	r5, r1
+    c0d4:	2fc6 	addi	r7, r7, 6
+    valor=0x156F;     		/* o minuscula en gris oscuro */
+    c0d6:	526f 	movi	r1, 111
+    c0d8:	5315 	movhi	r1, 21
+    c0da:	43bf 	st	-2(r6), r1
+    write_one(1,9,valor); 	/* escribe el caracter en la posicion fila=1,columna=9 */
+    c0dc:	2ffa 	addi	r7, r7, -6
+    c0de:	25c0 	addi	r2, r7, 0
+    c0e0:	5201 	movi	r1, 1
+    c0e2:	4280 	st	0(r2), r1
+    c0e4:	5209 	movi	r1, 9
+    c0e6:	4281 	st	2(r2), r1
+    c0e8:	33bf 	ld	r1, -2(r6)
+    c0ea:	4282 	st	4(r2), r1
+    c0ec:	5210 	movi	r1, 16
+    c0ee:	53c0 	movhi	r1, -64
+    c0f0:	aa44 	jal	r5, r1
+    c0f2:	2fc6 	addi	r7, r7, 6
+
+
+    valor=0x3C57;     		/* W mayuscula en azul cielo */
+    c0f4:	5257 	movi	r1, 87
+    c0f6:	533c 	movhi	r1, 60
+    c0f8:	43bf 	st	-2(r6), r1
+    write_one(1,11,valor); 	/* escribe el caracter en la posicion fila=1,columna=11 */
+    c0fa:	2ffa 	addi	r7, r7, -6
+    c0fc:	25c0 	addi	r2, r7, 0
+    c0fe:	5201 	movi	r1, 1
+    c100:	4280 	st	0(r2), r1
+    c102:	520b 	movi	r1, 11
+    c104:	4281 	st	2(r2), r1
+    c106:	33bf 	ld	r1, -2(r6)
+    c108:	4282 	st	4(r2), r1
+    c10a:	5210 	movi	r1, 16
+    c10c:	53c0 	movhi	r1, -64
+    c10e:	aa44 	jal	r5, r1
+    c110:	2fc6 	addi	r7, r7, 6
+    valor=0x0F6F;     		/* o minuscula en amarillo */
+    c112:	526f 	movi	r1, 111
+    c114:	530f 	movhi	r1, 15
+    c116:	43bf 	st	-2(r6), r1
+    write_one(1,12,valor); 	/* escribe el caracter en la posicion fila=1,columna=12 */
+    c118:	2ffa 	addi	r7, r7, -6
+    c11a:	25c0 	addi	r2, r7, 0
+    c11c:	5201 	movi	r1, 1
+    c11e:	4280 	st	0(r2), r1
+    c120:	520c 	movi	r1, 12
+    c122:	4281 	st	2(r2), r1
+    c124:	33bf 	ld	r1, -2(r6)
+    c126:	4282 	st	4(r2), r1
+    c128:	5210 	movi	r1, 16
+    c12a:	53c0 	movhi	r1, -64
+    c12c:	aa44 	jal	r5, r1
+    c12e:	2fc6 	addi	r7, r7, 6
+    valor=0x3372;     		/* r minuscula en lila */
+    c130:	5272 	movi	r1, 114
+    c132:	5333 	movhi	r1, 51
+    c134:	43bf 	st	-2(r6), r1
+    write_one(1,13,valor); 	/* escribe el caracter en la posicion fila=1,columna=13 */
+    c136:	2ffa 	addi	r7, r7, -6
+    c138:	25c0 	addi	r2, r7, 0
+    c13a:	5201 	movi	r1, 1
+    c13c:	4280 	st	0(r2), r1
+    c13e:	520d 	movi	r1, 13
+    c140:	4281 	st	2(r2), r1
+    c142:	33bf 	ld	r1, -2(r6)
+    c144:	4282 	st	4(r2), r1
+    c146:	5210 	movi	r1, 16
+    c148:	53c0 	movhi	r1, -64
+    c14a:	aa44 	jal	r5, r1
+    c14c:	2fc6 	addi	r7, r7, 6
+    valor=0x2A6C;     		/* l minuscula en gris claro */
+    c14e:	526c 	movi	r1, 108
+    c150:	532a 	movhi	r1, 42
+    c152:	43bf 	st	-2(r6), r1
+    write_one(1,14,valor); 	/* escribe el caracter en la posicion fila=1,columna=14 */
+    c154:	2ffa 	addi	r7, r7, -6
+    c156:	25c0 	addi	r2, r7, 0
+    c158:	5201 	movi	r1, 1
+    c15a:	4280 	st	0(r2), r1
+    c15c:	520e 	movi	r1, 14
+    c15e:	4281 	st	2(r2), r1
+    c160:	33bf 	ld	r1, -2(r6)
+    c162:	4282 	st	4(r2), r1
+    c164:	5210 	movi	r1, 16
+    c166:	53c0 	movhi	r1, -64
+    c168:	aa44 	jal	r5, r1
+    c16a:	2fc6 	addi	r7, r7, 6
+    valor=0x3F64;     		/* d minuscula en blanco */
+    c16c:	5264 	movi	r1, 100
+    c16e:	533f 	movhi	r1, 63
+    c170:	43bf 	st	-2(r6), r1
+    write_one(1,15,valor); 	/* escribe el caracter en la posicion fila=1,columna=15 */
+    c172:	2ffa 	addi	r7, r7, -6
+    c174:	25c0 	addi	r2, r7, 0
+    c176:	5201 	movi	r1, 1
+    c178:	4280 	st	0(r2), r1
+    c17a:	520f 	movi	r1, 15
+    c17c:	4281 	st	2(r2), r1
+    c17e:	33bf 	ld	r1, -2(r6)
+    c180:	4282 	st	4(r2), r1
+    c182:	5210 	movi	r1, 16
+    c184:	53c0 	movhi	r1, -64
+    c186:	aa44 	jal	r5, r1
+    c188:	2fc6 	addi	r7, r7, 6
+
+    return valor;
+    c18a:	33bf 	ld	r1, -2(r6)
+}
+    c18c:	35c0 	ld	r2, 0(r7)
+    c18e:	3dc2 	ld	r6, 4(r7)
+    c190:	3bc3 	ld	r5, 6(r7)
+    c192:	2fc8 	addi	r7, r7, 8
+    c194:	a143 	jmp	r5

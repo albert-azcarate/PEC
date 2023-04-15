@@ -1,0 +1,109 @@
+
+test_vga_mini.o:     file format elf32-sisa
+test_vga_mini.o
+architecture: sisa:3, flags 0x00000010:
+HAS_SYMS
+start address 0x00000000
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn  Flags
+  0 .text         000000aa  00000000  00000000  00000034  2**0  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00000000  00000000  000000de  2**0  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000000  00000000  00000000  000000de  2**0  ALLOC
+SYMBOL TABLE:
+00000000 l    d  .text	00000000 .text
+00000000 l    d  .data	00000000 .data
+00000000 l    d  .bss	00000000 .bss
+
+
+
+test_vga_mini.o:     file format elf32-sisa
+
+Disassembly of section .text:
+
+00000000 <.text>:
+   0:	5000 	movi	r0, 0
+   2:	51a0 	movhi	r0, -96
+   4:	5241 	movi	r1, 65
+   6:	e200 	stb	0(r0), r1
+   8:	5242 	movi	r1, 66
+   a:	e201 	stb	1(r0), r1
+   c:	5243 	movi	r1, 67
+   e:	e202 	stb	2(r0), r1
+  10:	5244 	movi	r1, 68
+  12:	e203 	stb	3(r0), r1
+  14:	5245 	movi	r1, 69
+  16:	e204 	stb	4(r0), r1
+  18:	5246 	movi	r1, 70
+  1a:	e205 	stb	5(r0), r1
+  1c:	200a 	addi	r0, r0, 10
+  1e:	5241 	movi	r1, 65
+  20:	e200 	stb	0(r0), r1
+  22:	52ff 	movi	r1, -1
+  24:	e201 	stb	1(r0), r1
+  26:	5242 	movi	r1, 66
+  28:	e202 	stb	2(r0), r1
+  2a:	5200 	movi	r1, 0
+  2c:	e203 	stb	3(r0), r1
+  2e:	5243 	movi	r1, 67
+  30:	e204 	stb	4(r0), r1
+  32:	5203 	movi	r1, 3
+  34:	e205 	stb	5(r0), r1
+  36:	5244 	movi	r1, 68
+  38:	e206 	stb	6(r0), r1
+  3a:	520c 	movi	r1, 12
+  3c:	e207 	stb	7(r0), r1
+  3e:	5245 	movi	r1, 69
+  40:	e208 	stb	8(r0), r1
+  42:	5230 	movi	r1, 48
+  44:	e209 	stb	9(r0), r1
+  46:	200a 	addi	r0, r0, 10
+  48:	5246 	movi	r1, 70
+  4a:	53ff 	movhi	r1, -1
+  4c:	4200 	st	0(r0), r1
+  4e:	5247 	movi	r1, 71
+  50:	5300 	movhi	r1, 0
+  52:	4201 	st	2(r0), r1
+  54:	5248 	movi	r1, 72
+  56:	5303 	movhi	r1, 3
+  58:	4202 	st	4(r0), r1
+  5a:	5249 	movi	r1, 73
+  5c:	530c 	movhi	r1, 12
+  5e:	4203 	st	6(r0), r1
+  60:	524a 	movi	r1, 74
+  62:	5330 	movhi	r1, 48
+  64:	4204 	st	8(r0), r1
+  66:	200a 	addi	r0, r0, 10
+  68:	5230 	movi	r1, 48
+  6a:	5300 	movhi	r1, 0
+  6c:	4200 	st	0(r0), r1
+  6e:	2002 	addi	r0, r0, 2
+  70:	5230 	movi	r1, 48
+  72:	533f 	movhi	r1, 63
+  74:	4200 	st	0(r0), r1
+  76:	2002 	addi	r0, r0, 2
+  78:	5200 	movi	r1, 0
+  7a:	5330 	movhi	r1, 48
+  7c:	4200 	st	0(r0), r1
+  7e:	2002 	addi	r0, r0, 2
+  80:	523f 	movi	r1, 63
+  82:	5330 	movhi	r1, 48
+  84:	4200 	st	0(r0), r1
+  86:	2002 	addi	r0, r0, 2
+  88:	5241 	movi	r1, 65
+  8a:	5335 	movhi	r1, 53
+  8c:	4200 	st	0(r0), r1
+  8e:	2002 	addi	r0, r0, 2
+  90:	5241 	movi	r1, 65
+  92:	533a 	movhi	r1, 58
+  94:	4200 	st	0(r0), r1
+  96:	2002 	addi	r0, r0, 2
+  98:	5235 	movi	r1, 53
+  9a:	5341 	movhi	r1, 65
+  9c:	4200 	st	0(r0), r1
+  9e:	2002 	addi	r0, r0, 2
+  a0:	523a 	movi	r1, 58
+  a2:	5341 	movhi	r1, 65
+  a4:	4200 	st	0(r0), r1
+  a6:	2002 	addi	r0, r0, 2
+  a8:	ffff 	halt	

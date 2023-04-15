@@ -39,15 +39,17 @@ ENTITY controladores_IO IS
 END controladores_IO;
 
 -- Special Ports:
--- 		5  : 8 green LEDs
--- 		6  : 8 red LEDs
--- 		7  : 4 push buttons
--- 		8  : 8 switches
--- 		9  : On/Off 7-segment
--- 		10 : 7-segment hexadecimal display
--- 		15 : PS/2 data (keyboard)
--- 		16 : Keyboard status
---		21 : CountDown
+-- 		 5 - IN/OUT - los 8 leds VERDES mapeados en los 8 bits de menor peso del puerto5  : 8 green LEDs
+-- 		 6 - IN/OUT - los 8 leds ROJOS mapeados en los 8 bits de menor peso del puerto6  : 8 red LEDs
+-- 		 7 - IN     - los 4 pulsadores (KEY) de la placa estan constantemente mapeados en los 4 bits de menor peso del registro del puerto7  : 4 push buttons
+-- 		 8 - IN     - los 8 interruptores (SW) de la placa estan constantemente mapeados en los 8 bits de menor peso del registro del puerto8  : 8 switches
+-- 		 9 - IN/OUT - los 4 bits de menor peso del registro indica si el visor correspondiente debe estar encendido o apagado.9  : On/Off 7-segment
+-- 		10 - IN/OUT - el valor de los 16 bits del puerto se muestran mediante caracteres hexadecimales el los 4 visores de la placa (HEX3...HEX0)10 : 7-segment hexadecimal display
+-- 		11 - OUT    - posicion del cursor en la pantalla de texto (en caso de que lo implemente el controlador de VGA)15 : PS/2 data (keyboard)
+-- 		15 - IN     - Valor del caracter ASCII correspondiente a la tecla pulsada16 : Keyboard status
+-- 		16 - IN/OUT - Registro de Status para saber si hay una tecla nueva. El controlador del teclado lo pone a 1 para indicar que hay una tecla nueva y nosotros lo ponemos a 0 cuando ya la hemos leido
+-- 		20 - OUT    - Random Numbers
+-- 		21 - IN/OUT	- CountDown
 
 ARCHITECTURE Structure OF controladores_IO IS
 	
@@ -109,9 +111,11 @@ BEGIN
 					if adress_reg = 16 then										-- Si escribim el port 16 avisem al teclat que ja hem llegit el caracter
 						clear <= '1';
 					end if;
-					if adress_reg /= 21 then									-- Si no escribim al port 21, posem el comptador actualitzat
-						io_registers(21) <= contador_milisegundos;
-					end if;					
+					
+					if adress_reg = 21 then									
+						contador_milisegundos <= io_registers(21);
+					end if;
+
 				elsif rd_in = '1' then											-- IN
 				
 					rd_io <=  io_registers(adress_reg);
@@ -134,10 +138,16 @@ BEGIN
 				if contador_milisegundos > x"0000" then
 					contador_milisegundos <= contador_milisegundos - '1';
 				end if;
+				
+				-- Si no escribim al port 21, posem el comptador actualitzat
+				if adress_reg /= 21 then									
+					io_registers(21) <= contador_milisegundos;
+				end if;	
 			else
-				contador_ciclos <= contador_ciclos-1;
+				contador_ciclos <= contador_ciclos - '1';
 			end if;
 			
+
 			-- Random numbers Port 20
 			io_registers(20) <= contador_ciclos;
 			

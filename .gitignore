@@ -4,6 +4,7 @@
 **/work/
 **/output_files/
 **/simulation/
+**/eines-sisa/
 *.bak
 *.mti
 *.mpf

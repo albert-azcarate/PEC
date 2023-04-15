@@ -1,0 +1,566 @@
+
+temp_HelloWorld2.o:     file format elf32-sisa
+temp_HelloWorld2.o
+architecture: sisa:3, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x00000000
+
+Program Header:
+    LOAD off    0x00000000 vaddr 0x00007f8c paddr 0x00007f8c align 2**0
+         filesz 0x00000112 memsz 0x00000112 flags rw-
+    LOAD off    0x00000112 vaddr 0x0000c000 paddr 0x0000c000 align 2**0
+         filesz 0x000002f4 memsz 0x000002f4 flags r-x
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn  Flags
+  0 .sistema      000002f4  0000c000  0000c000  00000112  2**1  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .sysdata      0000009e  00008000  00008000  00000074  2**0  CONTENTS, ALLOC, LOAD, DATA
+  2 .stab         000005c4  000080a0  000080a0  00000408  2**2  CONTENTS, READONLY, DEBUGGING
+  3 .stabstr      000004bb  00008664  00008664  000009cc  2**0  CONTENTS, READONLY, DEBUGGING
+SYMBOL TABLE:
+0000c000 l    d  .sistema	00000000 .sistema
+0000c00e l       .sistema	00000000 __exit
+0000c000 g       .sistema	00000000 __entry_point
+0000c010 g     F .sistema	00000044 write_one
+0000c090 g     F .sistema	000000a8 write
+0000c054 g     F .sistema	0000003c write_one_char
+0000c170 g     F .sistema	00000184 main
+0000c138 g     F .sistema	00000038 strlen_s
+
+
+Disassembly of section .sistema:
+
+0000c000 <__entry_point>:
+    c000:	5e00 	movi	r7, 0
+    c002:	5f82 	movhi	r7, -126
+    c004:	5a0e 	movi	r5, 14
+    c006:	5bc0 	movhi	r5, -64
+    c008:	5c70 	movi	r6, 112
+    c00a:	5dc1 	movhi	r6, -63
+    c00c:	a183 	jmp	r6
+
+0000c00e <__exit>:
+    c00e:	ffff 	halt	
+
+0000c010 <write_one>:
+
+int write_one(int fila, int col, int c)
+{
+    c010:	2ff4 	addi	r7, r7, -12
+    c012:	4bc5 	st	10(r7), r5
+    c014:	4dc4 	st	8(r7), r6
+    c016:	2dc8 	addi	r6, r7, 8
+    c018:	41c1 	st	2(r7), r0
+    c01a:	45c0 	st	0(r7), r2
+  int res;
+  int pos;
+
+  pos=(80*fila+col)*2;    // cada caracter ocupa 2 bytes de memoria de video
+    c01c:	3382 	ld	r1, 4(r6)
+    c01e:	2440 	addi	r2, r1, 0
+    c020:	5204 	movi	r1, 4
+    c022:	04b1 	sha	r2, r2, r1
+    c024:	5202 	movi	r1, 2
+    c026:	02b1 	sha	r1, r2, r1
+    c028:	04a1 	add	r2, r2, r1
+    c02a:	3383 	ld	r1, 6(r6)
+    c02c:	02a1 	add	r1, r2, r1
+    c02e:	0261 	add	r1, r1, r1
+    c030:	43bf 	st	-2(r6), r1
+  pos = pos + 0xA000;	  // la memoria de video empieza en la direccion 0xA000 (40960)
+    c032:	33bf 	ld	r1, -2(r6)
+    c034:	5400 	movi	r2, 0
+    c036:	55a0 	movhi	r2, -96
+    c038:	0262 	add	r1, r1, r2
+    c03a:	43bf 	st	-2(r6), r1
+
+  __asm__ (
+    c03c:	31bf 	ld	r0, -2(r6)
+    c03e:	3384 	ld	r1, 8(r6)
+    c040:	4200 	st	0(r0), r1
+      "st 0(%0), %1"      // %0 corresponde a la variable "pos" que habra sido cargada en un registro
+                          // %1 corresponde a la variable "c" que habra sido cargada en otro registro
+      : /* sin salidas */
+      : "a" (pos), "b" (c));  
+
+  res=1;
+    c042:	5201 	movi	r1, 1
+    c044:	43be 	st	-4(r6), r1
+  return res;
+    c046:	33be 	ld	r1, -4(r6)
+}
+    c048:	31c1 	ld	r0, 2(r7)
+    c04a:	35c0 	ld	r2, 0(r7)
+    c04c:	3dc4 	ld	r6, 8(r7)
+    c04e:	3bc5 	ld	r5, 10(r7)
+    c050:	2fcc 	addi	r7, r7, 12
+    c052:	a143 	jmp	r5
+
+0000c054 <write_one_char>:
+                        
+
+int write_one_char(int fila, int col, char c, char color)
+{
+    c054:	2ff6 	addi	r7, r7, -10
+    c056:	4bc4 	st	8(r7), r5
+    c058:	4dc3 	st	6(r7), r6
+    c05a:	2dc6 	addi	r6, r7, 6
+    c05c:	45c0 	st	0(r7), r2
+  int res;
+  int caracter_compuesto;
+
+  caracter_compuesto=color*256+c;
+    c05e:	d589 	ldb	r2, 9(r6)
+    c060:	5208 	movi	r1, 8
+    c062:	04b1 	sha	r2, r2, r1
+    c064:	d388 	ldb	r1, 8(r6)
+    c066:	02a1 	add	r1, r2, r1
+    c068:	43bf 	st	-2(r6), r1
+  res=write_one(fila, col, caracter_compuesto);
+    c06a:	2ffa 	addi	r7, r7, -6
+    c06c:	25c0 	addi	r2, r7, 0
+    c06e:	3382 	ld	r1, 4(r6)
+    c070:	4280 	st	0(r2), r1
+    c072:	3383 	ld	r1, 6(r6)
+    c074:	4281 	st	2(r2), r1
+    c076:	33bf 	ld	r1, -2(r6)
+    c078:	4282 	st	4(r2), r1
+    c07a:	5210 	movi	r1, 16
+    c07c:	53c0 	movhi	r1, -64
+    c07e:	aa44 	jal	r5, r1
+    c080:	2fc6 	addi	r7, r7, 6
+    c082:	43be 	st	-4(r6), r1
+
+  return res;
+    c084:	33be 	ld	r1, -4(r6)
+}
+    c086:	35c0 	ld	r2, 0(r7)
+    c088:	3dc3 	ld	r6, 6(r7)
+    c08a:	3bc4 	ld	r5, 8(r7)
+    c08c:	2fca 	addi	r7, r7, 10
+    c08e:	a143 	jmp	r5
+
+0000c090 <write>:
+                        
+
+int write(int fila, int col, char *buf, int size, char color)
+{
+    c090:	2fec 	addi	r7, r7, -20
+    c092:	4bc9 	st	18(r7), r5
+    c094:	4dc8 	st	16(r7), r6
+    c096:	2dd0 	addi	r6, r7, 16
+    c098:	45c1 	st	2(r7), r2
+    c09a:	47c0 	st	0(r7), r3
+  int i, r, t;
+  int f, c, car;
+  t = 0; f = fila; c = col;
+    c09c:	5200 	movi	r1, 0
+    c09e:	43bc 	st	-8(r6), r1
+    c0a0:	3382 	ld	r1, 4(r6)
+    c0a2:	43bd 	st	-6(r6), r1
+    c0a4:	3383 	ld	r1, 6(r6)
+    c0a6:	43be 	st	-4(r6), r1
+  for (i=0; i<size; i++)   
+    c0a8:	5200 	movi	r1, 0
+    c0aa:	43ba 	st	-12(r6), r1
+    c0ac:	5a1e 	movi	r5, 30
+    c0ae:	5bc1 	movhi	r5, -63
+    c0b0:	a143 	jmp	r5
+    {
+      car = buf[i];
+    c0b2:	35ba 	ld	r2, -12(r6)
+    c0b4:	3384 	ld	r1, 8(r6)
+    c0b6:	02a1 	add	r1, r2, r1
+    c0b8:	d240 	ldb	r1, 0(r1)
+    c0ba:	43bf 	st	-2(r6), r1
+      do
+        {
+          r=write_one_char(f, c, car, color);
+    c0bc:	33bf 	ld	r1, -2(r6)
+    c0be:	2640 	addi	r3, r1, 0
+    c0c0:	2ffa 	addi	r7, r7, -6
+    c0c2:	25c0 	addi	r2, r7, 0
+    c0c4:	33bd 	ld	r1, -6(r6)
+    c0c6:	4280 	st	0(r2), r1
+    c0c8:	33be 	ld	r1, -4(r6)
+    c0ca:	4281 	st	2(r2), r1
+    c0cc:	e684 	stb	4(r2), r3
+    c0ce:	d38c 	ldb	r1, 12(r6)
+    c0d0:	e285 	stb	5(r2), r1
+    c0d2:	5254 	movi	r1, 84
+    c0d4:	53c0 	movhi	r1, -64
+    c0d6:	aa44 	jal	r5, r1
+    c0d8:	2fc6 	addi	r7, r7, 6
+    c0da:	43bb 	st	-10(r6), r1
+        }
+      /* Un altre procés està enviant */
+      while (r!=1); t+=r;
+    c0dc:	35bb 	ld	r2, -10(r6)
+    c0de:	5201 	movi	r1, 1
+    c0e0:	1299 	cmpeq	r1, r2, r1
+    c0e2:	62ec 	bz	r1, -38
+    c0e4:	35bc 	ld	r2, -8(r6)
+    c0e6:	33bb 	ld	r1, -10(r6)
+    c0e8:	02a1 	add	r1, r2, r1
+    c0ea:	43bc 	st	-8(r6), r1
+      if (car=='\n') f++;
+    c0ec:	35bf 	ld	r2, -2(r6)
+    c0ee:	520a 	movi	r1, 10
+    c0f0:	1299 	cmpeq	r1, r2, r1
+    c0f2:	6205 	bz	r1, 12
+    c0f4:	33bd 	ld	r1, -6(r6)
+    c0f6:	2241 	addi	r1, r1, 1
+    c0f8:	43bd 	st	-6(r6), r1
+    c0fa:	5a00 	movi	r5, 0
+    c0fc:	6a0d 	bz	r5, 28
+      else if (car=='\r') c=1;
+    c0fe:	33bf 	ld	r1, -2(r6)
+    c100:	540d 	movi	r2, 13
+    c102:	125a 	cmpeq	r1, r1, r2
+    c104:	6204 	bz	r1, 10
+    c106:	5201 	movi	r1, 1
+    c108:	43be 	st	-4(r6), r1
+    c10a:	5a00 	movi	r5, 0
+    c10c:	6a05 	bz	r5, 12
+      else if (car!=0) c++;   
+    c10e:	33bf 	ld	r1, -2(r6)
+    c110:	6203 	bz	r1, 8
+    c112:	33be 	ld	r1, -4(r6)
+    c114:	2241 	addi	r1, r1, 1
+    c116:	43be 	st	-4(r6), r1
+    c118:	33ba 	ld	r1, -12(r6)
+    c11a:	2241 	addi	r1, r1, 1
+    c11c:	43ba 	st	-12(r6), r1
+    c11e:	33ba 	ld	r1, -12(r6)
+    c120:	3585 	ld	r2, 10(r6)
+    c122:	1242 	cmplt	r1, r1, r2
+    c124:	5ab2 	movi	r5, -78
+    c126:	5bc0 	movhi	r5, -64
+    c128:	a341 	jnz	r1, r5
+    }
+
+  return t;
+    c12a:	33bc 	ld	r1, -8(r6)
+}
+    c12c:	35c1 	ld	r2, 2(r7)
+    c12e:	37c0 	ld	r3, 0(r7)
+    c130:	3dc8 	ld	r6, 16(r7)
+    c132:	3bc9 	ld	r5, 18(r7)
+    c134:	2fd4 	addi	r7, r7, 20
+    c136:	a143 	jmp	r5
+
+0000c138 <strlen_s>:
+
+
+int strlen_s(char *str)
+{
+    c138:	2ff8 	addi	r7, r7, -8
+    c13a:	4bc3 	st	6(r7), r5
+    c13c:	4dc2 	st	4(r7), r6
+    c13e:	2dc4 	addi	r6, r7, 4
+    c140:	45c0 	st	0(r7), r2
+  int len;
+  for (len = 0; *str++; len++);
+    c142:	5200 	movi	r1, 0
+    c144:	43bf 	st	-2(r6), r1
+    c146:	5a00 	movi	r5, 0
+    c148:	6a03 	bz	r5, 8
+    c14a:	33bf 	ld	r1, -2(r6)
+    c14c:	2241 	addi	r1, r1, 1
+    c14e:	43bf 	st	-2(r6), r1
+    c150:	3382 	ld	r1, 4(r6)
+    c152:	d440 	ldb	r2, 0(r1)
+    c154:	5200 	movi	r1, 0
+    c156:	1299 	cmpeq	r1, r2, r1
+    c158:	0258 	not	r1, r1
+    c15a:	2242 	addi	r1, r1, 2
+    c15c:	3382 	ld	r1, 4(r6)
+    c15e:	2241 	addi	r1, r1, 1
+    c160:	4382 	st	4(r6), r1
+    c162:	65f3 	bnz	r2, -24
+  return len;
+    c164:	33bf 	ld	r1, -2(r6)
+}
+    c166:	35c0 	ld	r2, 0(r7)
+    c168:	3dc2 	ld	r6, 4(r7)
+    c16a:	3bc3 	ld	r5, 6(r7)
+    c16c:	2fc8 	addi	r7, r7, 8
+    c16e:	a143 	jmp	r5
+
+0000c170 <main>:
+
+
+#define BLANCO 		0x3F
+#define ROJO		0x03
+#define VERDE		0x0C
+#define AZUL		0x30
+#define GRIS_OSCURO	0x15
+#define AZUL_CIELO	0x3C
+#define AMARILLO	0x0F
+#define LILA		0x2A
+#define GRIS_CLARO	0x3F
+
+
+char mensaje1[] = "Hello World.";
+char mensaje2[] = "Hola Mon. Benvinguts al primer programa en C que te seccio de dades.";
+char mensaje3[] = "Hola Mundo. Bienvenidos al primer programa en C que tiene seccion de datos.";
+
+int main () {
+    c170:	2ff4 	addi	r7, r7, -12
+    c172:	4bc5 	st	10(r7), r5
+    c174:	4dc4 	st	8(r7), r6
+    c176:	2dc8 	addi	r6, r7, 8
+    c178:	45c0 	st	0(r7), r2
+  int long_mensaje1;
+  int long_mensaje2;
+  int long_mensaje3;
+
+  long_mensaje1 = strlen_s(mensaje1);
+    c17a:	2ffe 	addi	r7, r7, -2
+    c17c:	25c0 	addi	r2, r7, 0
+    c17e:	5200 	movi	r1, 0
+    c180:	5380 	movhi	r1, -128
+    c182:	4280 	st	0(r2), r1
+    c184:	5238 	movi	r1, 56
+    c186:	53c1 	movhi	r1, -63
+    c188:	aa44 	jal	r5, r1
+    c18a:	2fc2 	addi	r7, r7, 2
+    c18c:	43bd 	st	-6(r6), r1
+  long_mensaje2 = strlen_s(mensaje2);
+    c18e:	2ffe 	addi	r7, r7, -2
+    c190:	25c0 	addi	r2, r7, 0
+    c192:	520d 	movi	r1, 13
+    c194:	5380 	movhi	r1, -128
+    c196:	4280 	st	0(r2), r1
+    c198:	5238 	movi	r1, 56
+    c19a:	53c1 	movhi	r1, -63
+    c19c:	aa44 	jal	r5, r1
+    c19e:	2fc2 	addi	r7, r7, 2
+    c1a0:	43be 	st	-4(r6), r1
+  long_mensaje3 = strlen_s(mensaje3);
+    c1a2:	2ffe 	addi	r7, r7, -2
+    c1a4:	25c0 	addi	r2, r7, 0
+    c1a6:	5252 	movi	r1, 82
+    c1a8:	5380 	movhi	r1, -128
+    c1aa:	4280 	st	0(r2), r1
+    c1ac:	5238 	movi	r1, 56
+    c1ae:	53c1 	movhi	r1, -63
+    c1b0:	aa44 	jal	r5, r1
+    c1b2:	2fc2 	addi	r7, r7, 2
+    c1b4:	43bf 	st	-2(r6), r1
+
+  write(0,  0, mensaje1, long_mensaje1, BLANCO);
+    c1b6:	2ff6 	addi	r7, r7, -10
+    c1b8:	25c0 	addi	r2, r7, 0
+    c1ba:	5200 	movi	r1, 0
+    c1bc:	4280 	st	0(r2), r1
+    c1be:	5200 	movi	r1, 0
+    c1c0:	4281 	st	2(r2), r1
+    c1c2:	5200 	movi	r1, 0
+    c1c4:	5380 	movhi	r1, -128
+    c1c6:	4282 	st	4(r2), r1
+    c1c8:	33bd 	ld	r1, -6(r6)
+    c1ca:	4283 	st	6(r2), r1
+    c1cc:	523f 	movi	r1, 63
+    c1ce:	e288 	stb	8(r2), r1
+    c1d0:	5290 	movi	r1, -112
+    c1d2:	53c0 	movhi	r1, -64
+    c1d4:	aa44 	jal	r5, r1
+    c1d6:	2fca 	addi	r7, r7, 10
+  write(1,  3, mensaje2, long_mensaje2, ROJO);
+    c1d8:	2ff6 	addi	r7, r7, -10
+    c1da:	25c0 	addi	r2, r7, 0
+    c1dc:	5201 	movi	r1, 1
+    c1de:	4280 	st	0(r2), r1
+    c1e0:	5203 	movi	r1, 3
+    c1e2:	4281 	st	2(r2), r1
+    c1e4:	520d 	movi	r1, 13
+    c1e6:	5380 	movhi	r1, -128
+    c1e8:	4282 	st	4(r2), r1
+    c1ea:	33be 	ld	r1, -4(r6)
+    c1ec:	4283 	st	6(r2), r1
+    c1ee:	5203 	movi	r1, 3
+    c1f0:	e288 	stb	8(r2), r1
+    c1f2:	5290 	movi	r1, -112
+    c1f4:	53c0 	movhi	r1, -64
+    c1f6:	aa44 	jal	r5, r1
+    c1f8:	2fca 	addi	r7, r7, 10
+  write(2,  6, mensaje3, long_mensaje3, VERDE);
+    c1fa:	2ff6 	addi	r7, r7, -10
+    c1fc:	25c0 	addi	r2, r7, 0
+    c1fe:	5202 	movi	r1, 2
+    c200:	4280 	st	0(r2), r1
+    c202:	5206 	movi	r1, 6
+    c204:	4281 	st	2(r2), r1
+    c206:	5252 	movi	r1, 82
+    c208:	5380 	movhi	r1, -128
+    c20a:	4282 	st	4(r2), r1
+    c20c:	33bf 	ld	r1, -2(r6)
+    c20e:	4283 	st	6(r2), r1
+    c210:	520c 	movi	r1, 12
+    c212:	e288 	stb	8(r2), r1
+    c214:	5290 	movi	r1, -112
+    c216:	53c0 	movhi	r1, -64
+    c218:	aa44 	jal	r5, r1
+    c21a:	2fca 	addi	r7, r7, 10
+  write(3,  9, mensaje1, long_mensaje1, AZUL);
+    c21c:	2ff6 	addi	r7, r7, -10
+    c21e:	25c0 	addi	r2, r7, 0
+    c220:	5203 	movi	r1, 3
+    c222:	4280 	st	0(r2), r1
+    c224:	5209 	movi	r1, 9
+    c226:	4281 	st	2(r2), r1
+    c228:	5200 	movi	r1, 0
+    c22a:	5380 	movhi	r1, -128
+    c22c:	4282 	st	4(r2), r1
+    c22e:	33bd 	ld	r1, -6(r6)
+    c230:	4283 	st	6(r2), r1
+    c232:	5230 	movi	r1, 48
+    c234:	e288 	stb	8(r2), r1
+    c236:	5290 	movi	r1, -112
+    c238:	53c0 	movhi	r1, -64
+    c23a:	aa44 	jal	r5, r1
+    c23c:	2fca 	addi	r7, r7, 10
+  write(4, 12, mensaje2, long_mensaje2, GRIS_OSCURO);
+    c23e:	2ff6 	addi	r7, r7, -10
+    c240:	25c0 	addi	r2, r7, 0
+    c242:	5204 	movi	r1, 4
+    c244:	4280 	st	0(r2), r1
+    c246:	520c 	movi	r1, 12
+    c248:	4281 	st	2(r2), r1
+    c24a:	520d 	movi	r1, 13
+    c24c:	5380 	movhi	r1, -128
+    c24e:	4282 	st	4(r2), r1
+    c250:	33be 	ld	r1, -4(r6)
+    c252:	4283 	st	6(r2), r1
+    c254:	5215 	movi	r1, 21
+    c256:	e288 	stb	8(r2), r1
+    c258:	5290 	movi	r1, -112
+    c25a:	53c0 	movhi	r1, -64
+    c25c:	aa44 	jal	r5, r1
+    c25e:	2fca 	addi	r7, r7, 10
+  write(5, 15, mensaje3, long_mensaje3, AZUL_CIELO);
+    c260:	2ff6 	addi	r7, r7, -10
+    c262:	25c0 	addi	r2, r7, 0
+    c264:	5205 	movi	r1, 5
+    c266:	4280 	st	0(r2), r1
+    c268:	520f 	movi	r1, 15
+    c26a:	4281 	st	2(r2), r1
+    c26c:	5252 	movi	r1, 82
+    c26e:	5380 	movhi	r1, -128
+    c270:	4282 	st	4(r2), r1
+    c272:	33bf 	ld	r1, -2(r6)
+    c274:	4283 	st	6(r2), r1
+    c276:	523c 	movi	r1, 60
+    c278:	e288 	stb	8(r2), r1
+    c27a:	5290 	movi	r1, -112
+    c27c:	53c0 	movhi	r1, -64
+    c27e:	aa44 	jal	r5, r1
+    c280:	2fca 	addi	r7, r7, 10
+  write(6, 18, mensaje1, long_mensaje1, AMARILLO);
+    c282:	2ff6 	addi	r7, r7, -10
+    c284:	25c0 	addi	r2, r7, 0
+    c286:	5206 	movi	r1, 6
+    c288:	4280 	st	0(r2), r1
+    c28a:	5212 	movi	r1, 18
+    c28c:	4281 	st	2(r2), r1
+    c28e:	5200 	movi	r1, 0
+    c290:	5380 	movhi	r1, -128
+    c292:	4282 	st	4(r2), r1
+    c294:	33bd 	ld	r1, -6(r6)
+    c296:	4283 	st	6(r2), r1
+    c298:	520f 	movi	r1, 15
+    c29a:	e288 	stb	8(r2), r1
+    c29c:	5290 	movi	r1, -112
+    c29e:	53c0 	movhi	r1, -64
+    c2a0:	aa44 	jal	r5, r1
+    c2a2:	2fca 	addi	r7, r7, 10
+  write(7, 21, mensaje2, long_mensaje2, LILA);
+    c2a4:	2ff6 	addi	r7, r7, -10
+    c2a6:	25c0 	addi	r2, r7, 0
+    c2a8:	5207 	movi	r1, 7
+    c2aa:	4280 	st	0(r2), r1
+    c2ac:	5215 	movi	r1, 21
+    c2ae:	4281 	st	2(r2), r1
+    c2b0:	520d 	movi	r1, 13
+    c2b2:	5380 	movhi	r1, -128
+    c2b4:	4282 	st	4(r2), r1
+    c2b6:	33be 	ld	r1, -4(r6)
+    c2b8:	4283 	st	6(r2), r1
+    c2ba:	522a 	movi	r1, 42
+    c2bc:	e288 	stb	8(r2), r1
+    c2be:	5290 	movi	r1, -112
+    c2c0:	53c0 	movhi	r1, -64
+    c2c2:	aa44 	jal	r5, r1
+    c2c4:	2fca 	addi	r7, r7, 10
+  write(8, 24, mensaje3, long_mensaje3, GRIS_CLARO);
+    c2c6:	2ff6 	addi	r7, r7, -10
+    c2c8:	25c0 	addi	r2, r7, 0
+    c2ca:	5208 	movi	r1, 8
+    c2cc:	4280 	st	0(r2), r1
+    c2ce:	5218 	movi	r1, 24
+    c2d0:	4281 	st	2(r2), r1
+    c2d2:	5252 	movi	r1, 82
+    c2d4:	5380 	movhi	r1, -128
+    c2d6:	4282 	st	4(r2), r1
+    c2d8:	33bf 	ld	r1, -2(r6)
+    c2da:	4283 	st	6(r2), r1
+    c2dc:	523f 	movi	r1, 63
+    c2de:	e288 	stb	8(r2), r1
+    c2e0:	5290 	movi	r1, -112
+    c2e2:	53c0 	movhi	r1, -64
+    c2e4:	aa44 	jal	r5, r1
+    c2e6:	2fca 	addi	r7, r7, 10
+
+  return 1;
+    c2e8:	5201 	movi	r1, 1
+}
+    c2ea:	35c0 	ld	r2, 0(r7)
+    c2ec:	3dc4 	ld	r6, 8(r7)
+    c2ee:	3bc5 	ld	r5, 10(r7)
+    c2f0:	2fcc 	addi	r7, r7, 12
+    c2f2:	a143 	jmp	r5
+
+temp_HelloWorld2.o:     file format elf32-sisa
+temp_HelloWorld2.o
+architecture: sisa:3, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x00000000
+
+Program Header:
+    LOAD off    0x00000000 vaddr 0x00007f8c paddr 0x00007f8c align 2**0
+         filesz 0x00000112 memsz 0x00000112 flags rw-
+    LOAD off    0x00000112 vaddr 0x0000c000 paddr 0x0000c000 align 2**0
+         filesz 0x000002f4 memsz 0x000002f4 flags r-x
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn  Flags
+  0 .sistema      000002f4  0000c000  0000c000  00000112  2**1  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .sysdata      0000009e  00008000  00008000  00000074  2**0  CONTENTS, ALLOC, LOAD, DATA
+  2 .stab         000005c4  000080a0  000080a0  00000408  2**2  CONTENTS, READONLY, DEBUGGING
+  3 .stabstr      000004bb  00008664  00008664  000009cc  2**0  CONTENTS, READONLY, DEBUGGING
+SYMBOL TABLE:
+00008000 l    d  .sysdata	00000000 .sysdata
+00008052 g     O .sysdata	0000004c mensaje3
+00008000 g     O .sysdata	0000000d mensaje1
+0000800d g     O .sysdata	00000045 mensaje2
+
+
+Disassembly of section .sysdata:
+
+00008000 <mensaje1>:
+    8000:	48 65 6c 6c 6f 20 57 6f 72 6c 64 2e 00              Hello World..
+
+0000800d <mensaje2>:
+    800d:	48 6f 6c 61 20 4d 6f 6e 2e 20 42 65 6e 76 69 6e     Hola Mon. Benvin
+    801d:	67 75 74 73 20 61 6c 20 70 72 69 6d 65 72 20 70     guts al primer p
+    802d:	72 6f 67 72 61 6d 61 20 65 6e 20 43 20 71 75 65     rograma en C que
+    803d:	20 74 65 20 73 65 63 63 69 6f 20 64 65 20 64 61      te seccio de da
+    804d:	64 65 73 2e 00                                      des..
+
+00008052 <mensaje3>:
+    8052:	48 6f 6c 61 20 4d 75 6e 64 6f 2e 20 42 69 65 6e     Hola Mundo. Bien
+    8062:	76 65 6e 69 64 6f 73 20 61 6c 20 70 72 69 6d 65     venidos al prime
+    8072:	72 20 70 72 6f 67 72 61 6d 61 20 65 6e 20 43 20     r programa en C 
+    8082:	71 75 65 20 74 69 65 6e 65 20 73 65 63 63 69 6f     que tiene seccio
+    8092:	6e 20 64 65 20 64 61 74 6f 73 2e 00                 n de datos..

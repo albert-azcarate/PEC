@@ -1,0 +1,59 @@
+
+test_vga_echo_keyboard.o:     file format elf32-sisa
+test_vga_echo_keyboard.o
+architecture: sisa:3, flags 0x00000010:
+HAS_SYMS
+start address 0x00000000
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn  Flags
+  0 .text         00000034  00000000  00000000  00000034  2**0  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00000000  00000000  00000068  2**0  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000000  00000000  00000000  00000068  2**0  ALLOC
+SYMBOL TABLE:
+00000000 l    d  .text	00000000 .text
+00000000 l    d  .data	00000000 .data
+00000000 l    d  .bss	00000000 .bss
+0000000c l       .text	00000000 bucle3
+0000000e l       .text	00000000 polling
+0000002c l       .text	00000000 act_cursor
+
+
+
+test_vga_echo_keyboard.o:     file format elf32-sisa
+
+Disassembly of section .text:
+
+00000000 <bucle3-0xc>:
+   0:	5e0f 	movi	r7, 15
+   2:	7f09 	out	9, r7
+   4:	5000 	movi	r0, 0
+   6:	51a0 	movhi	r0, -96
+   8:	5c00 	movi	r6, 0
+   a:	7d0b 	out	11, r6
+
+0000000c <bucle3>:
+   c:	7d0a 	out	10, r6
+
+0000000e <polling>:
+   e:	7210 	in	r1, 16
+  10:	62fe 	bz	r1, -2	<polling>
+  12:	720f 	in	r1, 15
+  14:	7310 	out	16, r1
+  16:	533f 	movhi	r1, 63
+  18:	4200 	st	0(r0), r1
+  1a:	2002 	addi	r0, r0, 2
+  1c:	2d81 	addi	r6, r6, 1
+  1e:	5e5f 	movi	r7, 95
+  20:	5f09 	movhi	r7, 9
+  22:	1f8f 	cmple	r7, r6, r7
+  24:	6f03 	bnz	r7, 8
+  26:	5000 	movi	r0, 0
+  28:	51a0 	movhi	r0, -96
+  2a:	5c00 	movi	r6, 0
+
+0000002c <act_cursor>:
+  2c:	7d0b 	out	11, r6
+  2e:	5e01 	movi	r7, 1
+  30:	6fed 	bnz	r7, -36
+  32:	ffff 	halt	
