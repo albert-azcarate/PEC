@@ -20,6 +20,11 @@ package op_code is
   constant STF			: op_code_t := "1100";
   constant LDB 			: op_code_t := "1101";
   constant STB 			: op_code_t := "1110";
+  --constant RDS      : op_code_t := "1111"; -- REVISAR SHOW
+  --constant WRS      : op_code_t := "1111";
+  --constant EI       : op_code_t := "1111";
+  --constant DI       : op_code_t := "1111";
+  --constant RETI     : op_code_t := "1111";
   constant HALT 		: op_code_t := "1111";
   constant NOP			: op_code_t := "0010"; -- NOP = ADDI R0 0
 
@@ -67,6 +72,14 @@ package f_code is
  
  constant IN_OP 	: f_code_t := "000";
  constant OUT_OP 	: f_code_t := "001";
+
+ constant RDS_OP  : f_code_t := "000";
+ constant WRS_OP  : f_code_t := "001";
+ constant EI_OP   : f_code_t := "010";
+ constant DI_OP   : f_code_t := "011";
+ constant RETI_OP : f_code_t := "100";
+ constant HALT_OP : f_code_t := "111";
+ 
 end package f_code;
 
 

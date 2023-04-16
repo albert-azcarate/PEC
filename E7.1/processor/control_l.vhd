@@ -5,27 +5,28 @@ use work.op_code.all;
 use work.f_code.all;
 
 ENTITY control_l IS
-    PORT(	ir        		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			op 		  		: out op_code_t;
-			f         		: out f_code_t;
-			ldpc      		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-			wrd       		: OUT STD_LOGIC;
-			addr_a    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			addr_b    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			addr_d    		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			immed     		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			wr_m      		: OUT STD_LOGIC;
-			in_d      		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-			immed_x2  		: OUT STD_LOGIC;
-			word_byte 		: OUT STD_LOGIC;
-			immed_or_reg 	: OUT STD_LOGIC;
-			halt_cont	 	: out STD_LOGIC;
-			addr_io 		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-			rd_in 			: OUT STD_LOGIC;
-			wr_out 			: OUT STD_LOGIC;
-			-- MODELSIM SIGNALS
-			Instruccio		: out string(1 to 4); 	-- modELSIM
-			operacio		: out string(1 to 6)	--modELSIM
+	PORT (	ir				: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			op				: OUT op_code_t;
+			f				: OUT f_code_t;
+			wrd				: OUT STD_LOGIC;
+			wrd_s			: OUT STD_LOGIC;
+			u_s				: OUT STD_LOGIC;
+			wr_m			: OUT STD_LOGIC;
+			immed_x2		: OUT STD_LOGIC;
+			word_byte		: OUT STD_LOGIC;
+			immed_or_reg	: OUT STD_LOGIC;
+			halt_cont		: OUT STD_LOGIC;
+			rd_in			: OUT STD_LOGIC;
+			wr_out			: OUT STD_LOGIC;
+			ldpc			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			immed			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			Instruccio		: OUT string(1 to 4); 	-- modelsim
+			operacio		: OUT string(1 to 6)	-- modelsim
 			);
 END control_l;
 
@@ -49,22 +50,33 @@ BEGIN
 	op_code_ir_pre <= ir_interna(15 downto 12);	
 	
 	-- Revisio per aplicar NOPS en operacions ilegals
-	op_code_ir <= 	NOP when	op_code_ir_pre = FLOAT 											-- FLOAT
+	op_code_ir <= NOP when	op_code_ir_pre = FLOAT												-- FLOAT
 							or op_code_ir_pre = STF  											-- STF
 							or op_code_ir_pre = LDF 											-- LDF
-							or (op_code_ir_pre = HALT and ir_interna(11 downto 0) /= x"fff") 	-- SPECIAL(not HALT)
+
+							or (op_code_ir_pre = HALT 
+								and ir_interna(11 downto 0) /= x"fff"							-- SPECIAL(not HALT)
+								and ir_interna(11 downto 0) /= x"020" 							-- SPECIAL(EI)
+								and ir_interna(11 downto 0) /= x"021" 							-- SPECIAL(DI)
+								and ir_interna(11 downto 0) /= x"024" 							-- SPECIAL(RETI)
+								and ir_interna(5 downto 0) /= "101100" 							-- SPECIAL(RDS)
+								and ir_interna(5 downto 0) /= "110000")							-- SPECIAL(WRS)
+
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "010")       -- NOP en operaciones COMP pero F_CODE no implementado
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "110")        
-							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "111")        
+							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "111")
+
 							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "011") 	-- NOP en operaciones MULDIV pero F_CODE no implementado
 							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "110")      
-							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "111")      
+							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "111") 
+
 							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "010")        -- NOP en operaciones JMP pero F_CODE no implementado 
 							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "101") 
 							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "110") 
+
 							or (op_code_ir_pre = IO and ir_interna(5 downto 0) < x"20") else   	-- NOP en operaciones IO pero con puerto no accesible
 					op_code_ir_pre;
-					
+
 	-- Assignem a la sortida de OP
 	op <= op_code_ir;
 	
@@ -80,33 +92,50 @@ BEGIN
 	wr_out <= ir_interna(8) when op_code_ir = IO else '0';
 	
 	-- Signal Funcio_temporal ens permet definir dins de cada tipus de operacio general quina volem en concret
-	f_temp 	<= 	ir_interna(5 downto 3) when op_code_ir /= MOVE and op_code_ir /= BZ and op_code_ir /= JMP and op_code_ir/= IO and op_code_ir /= NOP else	-- Cas base: F esta als bits 5-3
-				MOVHI when (op_code_ir = MOVE and ir_interna(8) = '1') else 															-- Cas MOVE: F depen del bit 8
-				MOVI when (op_code_ir = MOVE and ir_interna(8) = '0') else 					
-				BZ_OP when (op_code_ir = BZ and ir_interna(8) = '0') else																-- Cas BN: F depen del bit 8 
-				BNZ_OP when (op_code_ir = BZ and ir_interna(8) = '1') else
-				IN_OP when (op_code_ir = IO and ir_interna(8) = '0') else																-- Cas IN/OUT: F depen del bit 8
-				OUT_OP when (op_code_ir = IO and ir_interna(8) = '1') else
-				JZ_OP when (op_code_ir = JMP and ir_interna(2 downto 0) = "000") else													-- Cas JMP: F depen dels bits 2-0
-				JNZ_OP when (op_code_ir = JMP and ir_interna(2 downto 0) =  "001") else
-				JMP_OP when (op_code_ir = JMP and ir_interna(2 downto 0) =  "011") else
-				JAL_OP when (op_code_ir = JMP and ir_interna(2 downto 0) =  "100") else
+	f_temp 	<= 	ir_interna(5 downto 3) when op_code_ir /= MOVE 											-- Cas base: F esta als bits 5-3
+											and op_code_ir /= BZ 
+											and op_code_ir /= JMP 
+											and op_code_ir/= IO 
+											and op_code_ir /= HALT 
+											and op_code_ir /= NOP 
+				else	
+					MOVHI when (op_code_ir = MOVE and ir_interna(8) = '1') else							-- Cas MOVE: F depen del bit 8
+					MOVI when (op_code_ir = MOVE and ir_interna(8) = '0') else 					
 
-				NOP_OP when op_code_ir = NOP else
-				NOP_OP;																												-- Else 0
+					BZ_OP when (op_code_ir = BZ and ir_interna(8) = '0') else							-- Cas BN: F depen del bit 8 
+					BNZ_OP when (op_code_ir = BZ and ir_interna(8) = '1') else
+
+					IN_OP when (op_code_ir = IO and ir_interna(8) = '0') else							-- Cas IN/OUT: F depen del bit 8
+					OUT_OP when (op_code_ir = IO and ir_interna(8) = '1') else
+
+					JZ_OP when (op_code_ir = JMP and ir_interna(2 downto 0) = "000") else				-- Cas JMP: F depen dels bits 2-0
+					JNZ_OP when (op_code_ir = JMP and ir_interna(2 downto 0) =  "001") else
+					JMP_OP when (op_code_ir = JMP and ir_interna(2 downto 0) =  "011") else
+					JAL_OP when (op_code_ir = JMP and ir_interna(2 downto 0) =  "100") else
+
+					RDS_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "101100") else			-- Cas R/W Sysreg: F depen dels bits 5-0
+					WRS_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110000") else
+
+					EI_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"020") else			-- Cas EI/DI/RETI: F depen dels bits 11-0
+					DI_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"021") else
+					RETI_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"024") else
+
+					NOP_OP when op_code_ir = NOP else
+				NOP_OP;																					-- Else 0
 	
 	-- Assignem f
 	f <= f_temp;
 
 	-- ldpc ens indica d'on carregar el nou PC
 	-- Load next Pc or not (Fetch / Decode)
+	-- En interrupcions no cal modificarho, perque ho controlem desde multi
 	ldpc <= 	"11" when op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" else	-- 11 HALT
 				"10" when op_code_ir = BZ else											-- 10 BRANCH
 				"01" when op_code_ir = JMP else											-- 01 JUMPS
 				"00" ; 			 														-- 00 RUN; falta CALLS
 
 	-- wrd habilita l'escriptura al banc de registres
-	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL), BRANCHES i OUT
+	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL), BRANCHES, OUT, NOP, EI, DI, RETI, WRS
 	wrd <= '0' when (op_code_ir = HALT and ir_interna(11 downto 0) = x"fff")
 					or op_code_ir = ST 
 					or op_code_ir = STB 
@@ -114,9 +143,28 @@ BEGIN
 					or op_code_ir = BZ 
 					or (op_code_ir = NOP and op_code_ir_pre /= ADDI)
 					or (op_code_ir = IO and f_temp = OUT_OP)
+					or (op_code_ir = HALT and f_temp = EI_OP)
+					or (op_code_ir = HALT and f_temp = DI_OP)
+					or (op_code_ir = HALT and f_temp = RETI_OP)
+					or (op_code_ir = HALT and f_temp = WRS_OP)
 					else
 		   '1';
-	
+
+	-- wrd_s habilita l'escriptura al banc de registres de sistema
+	-- Nomes escribim a sysregfile en Interrupts, Exceptions, WRS, EI, DI, RETI
+	wrd_s <= '1' when 	(op_code_ir = HALT and f_temp = WRS_OP)
+						or (op_code_ir = HALT and f_temp = EI_OP) 
+						or (op_code_ir = HALT and f_temp = DI_OP)
+						or (op_code_ir = HALT and f_temp = RETI_OP)
+						else 
+			 '0';	
+	-- u_s ens indica si llegim de user o system al banc de registres 
+	-- Sempre user excepte RDS, RETI
+	u_s <= '1' when (op_code_ir = HALT and f_temp = RDS_OP)
+					or (op_code_ir = HALT and f_temp = RETI_OP)
+					else 
+			'0';
+
 	-- word_byte indica a la memora si accedim a nivell de word o byte; Sempre accedim a words excepte LDB i STB
 	word_byte <= '1' when op_code_ir = LDB or op_code_ir = STB else '0';
 	
@@ -146,9 +194,9 @@ BEGIN
 					
 	-- in_d indica des d'on venen les dades que es guardaran a addr_d
 	-- Desde memoria a LD i LDB, desde el PCup a JAL, desde io_reg en IN i la resta desde la ALU
-	in_d <= "01" when op_code_ir = LD or op_code_ir = LDB else 
+	in_d <= "01" when (op_code_ir = LD or op_code_ir = LDB) else 
 			"10" when (op_code_ir = JMP and f_temp = JAL_OP) else 
-			"11" when (op_code_ir = IO and f_temp = IN_OP) else --new
+			"11" when (op_code_ir = IO and f_temp = IN_OP) else
 			"00";
 
 	-- halt_cont indica si estem en HALT; REVISAR US
@@ -179,6 +227,9 @@ BEGIN
 							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0) when op_code_ir = ADDI else   				-- Cas ADDI: immed als 5 bits de menor pes; No pasa res si tambe es un NOP, perque els NOP pillen reg d'entrada a la alu
 							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0);			                               		-- Else: immed als 6 bits de menor pes 
 
+
+
+
 -- MODELSIM SIGNALS	
 	Instruccio <=   "ALU " when op_code_ir = AL else 
 					"COMP" when op_code_ir = COMP else 
@@ -191,8 +242,13 @@ BEGIN
 					"STB " when op_code_ir = STB else 
 					"BN  " when op_code_ir = BZ else 
 					"JMP " when op_code_ir = JMP else 
-					"HALT" when (op_code_ir = HALT and ir_interna(11 downto 0) = x"fff") else 
 					"I/O " when op_code_ir = IO else
+					"HALT" when (op_code_ir = HALT and ir_interna(11 downto 0) = x"fff") else
+					"WRD " when (op_code_ir = HALT and f_temp = WRD_OP) else
+					"RDS " when (op_code_ir = HALT and f_temp = RDS_OP) else
+					"EI  " when (op_code_ir = HALT and f_temp = EI_OP) else
+					"DI  " when (op_code_ir = HALT and f_temp = DI_OP) else	
+					"RETI" when (op_code_ir = HALT and f_temp = RETI_OP) else
 					"NOP ";
 							 
 
@@ -229,8 +285,13 @@ BEGIN
 				"ADDI  " when op_code_ir_pre = ADDI else
 				"IN    " when f_temp = IN_OP and op_code_ir = IO else
 				"OUT   " when f_temp = OUT_OP and op_code_ir = IO else
+				"RDS   " when f_temp = RDS_OP and op_code_ir = HALT else
+				"WRD   " when f_temp = WRD_OP and op_code_ir = HALT else
+				"DI    " when f_temp = DI_OP and op_code_ir = HALT else
+				"EI    " when f_temp = EI_OP and op_code_ir = HALT else
+				"RETI  " when f_temp = RETI_OP and op_code_ir = HALT else
 				"NOP   " when f_temp = NOP_OP and op_code_ir = NOP else
-				"-     ";
+				"DEAD  ";
 -- END MODELSIM SIGNALS
 	
 END Structure;
