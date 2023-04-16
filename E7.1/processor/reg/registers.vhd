@@ -5,16 +5,17 @@ USE ieee.numeric_std.all;        --Esta libreria sera necesaria si usais convers
 use work.all;
 
 ENTITY registers IS
-    PORT (clk    : IN  STD_LOGIC;
-          wrd    : IN  STD_LOGIC;
-		  wrd_s  : IN  STD_LOGIC;
-		  u_s 	 : IN  STD_LOGIC;
-          d      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          addr_a : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_b : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_d : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-          a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-          b      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+    PORT (clk    	: IN  STD_LOGIC;
+          wrd    	: IN  STD_LOGIC;
+		  wrd_s  	: IN  STD_LOGIC;
+		  u_s 	 	: IN  STD_LOGIC;
+          d      	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+          addr_a 	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+          addr_b 	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+          addr_d 	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+		  int_type	: IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+          a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+          b			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 		  );
 END registers;
 
@@ -33,12 +34,13 @@ component regfile IS
 	END component;
 
 component sysregfile IS
-    PORT (clk    : IN  STD_LOGIC;
-          wrd    : IN  STD_LOGIC;
-          d      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          addr_a : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_d : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-          a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+    PORT (clk		: IN  STD_LOGIC;
+          wrd		: IN  STD_LOGIC;
+          d			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+          addr_a	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+          addr_d	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+		  int_type	: IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+          a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 		  );
 	END component;
 
@@ -62,6 +64,7 @@ BEGIN
 												d => d,
 												addr_a => addr_a,
 												addr_d => addr_d,
+												int_type => int_type,
 												a => a_sys
 												);
 

@@ -14,6 +14,7 @@ entity multi is
 			rd_in_l		: IN  STD_LOGIC;
 			wr_out_l	: IN  STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
 			wrd			: OUT STD_LOGIC;
 			wrd_s		: OUT STD_LOGIC;
@@ -25,13 +26,14 @@ entity multi is
 			rd_in		: OUT STD_LOGIC;
 			wr_out		: OUT STD_LOGIC;
 			ldpc		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-			addr_io		: OUT  STD_LOGIC_VECTOR(7 DOWNTO 0)
+			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
 end entity;
 
 architecture Structure of multi is
 
-signal estat		: std_logic_vector := "0";
+signal estat : std_logic_vector(1 downto 0) := "00";
 	 
 begin
 	-- Actualitzacio de l'estat
@@ -90,7 +92,7 @@ begin
 
 	-- 	En DECODE pasem la dada				
 	with estat select
-		addr_io <=  x"000" when "00",
+		addr_io <=  x"00" when "00",
 					addr_io_l when others;
 	
 	-- 	En DECODE pasem la dada				

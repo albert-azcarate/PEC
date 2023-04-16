@@ -23,6 +23,7 @@ ENTITY control_l IS
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			immed			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			Instruccio		: OUT string(1 to 4); 	-- modelsim
@@ -165,6 +166,7 @@ BEGIN
 					else 
 			'0';
 
+
 	-- word_byte indica a la memora si accedim a nivell de word o byte; Sempre accedim a words excepte LDB i STB
 	word_byte <= '1' when op_code_ir = LDB or op_code_ir = STB else '0';
 	
@@ -227,7 +229,11 @@ BEGIN
 							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0) when op_code_ir = ADDI else   				-- Cas ADDI: immed als 5 bits de menor pes; No pasa res si tambe es un NOP, perque els NOP pillen reg d'entrada a la alu
 							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0);			                               		-- Else: immed als 6 bits de menor pes 
 
-
+	-- int_type indica si la interrupcio es EI, DI o RETI
+	int_type <= "00" when (op_code_ir = HALT and f_temp = EI_OP) else
+				"01" when (op_code_ir = HALT and f_temp = DI_OP) else
+				"10" when (op_code_ir = HALT and f_temp = RETI_OP) else
+				"11";
 
 
 -- MODELSIM SIGNALS	
@@ -244,7 +250,7 @@ BEGIN
 					"JMP " when op_code_ir = JMP else 
 					"I/O " when op_code_ir = IO else
 					"HALT" when (op_code_ir = HALT and ir_interna(11 downto 0) = x"fff") else
-					"WRD " when (op_code_ir = HALT and f_temp = WRD_OP) else
+					"WRD " when (op_code_ir = HALT and f_temp = WRS_OP) else
 					"RDS " when (op_code_ir = HALT and f_temp = RDS_OP) else
 					"EI  " when (op_code_ir = HALT and f_temp = EI_OP) else
 					"DI  " when (op_code_ir = HALT and f_temp = DI_OP) else	
@@ -286,7 +292,7 @@ BEGIN
 				"IN    " when f_temp = IN_OP and op_code_ir = IO else
 				"OUT   " when f_temp = OUT_OP and op_code_ir = IO else
 				"RDS   " when f_temp = RDS_OP and op_code_ir = HALT else
-				"WRD   " when f_temp = WRD_OP and op_code_ir = HALT else
+				"WRD   " when f_temp = WRS_OP and op_code_ir = HALT else
 				"DI    " when f_temp = DI_OP and op_code_ir = HALT else
 				"EI    " when f_temp = EI_OP and op_code_ir = HALT else
 				"RETI  " when f_temp = RETI_OP and op_code_ir = HALT else

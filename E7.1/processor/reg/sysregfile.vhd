@@ -29,12 +29,13 @@ USE ieee.numeric_std.all;        --Esta libreria sera necesaria si usais convers
 use work.all;
 
 ENTITY sysregfile IS
-    PORT (	clk    : IN  STD_LOGIC;
-			wrd    : IN  STD_LOGIC;
-			d      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			addr_a : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-			addr_d : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-			a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+    PORT (	clk			: IN  STD_LOGIC;
+			wrd			: IN  STD_LOGIC;
+			d			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_d		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+		  	int_type	: IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+			a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 END sysregfile;
 
@@ -45,13 +46,21 @@ signal reg_vector : reg.slv_array_t;
 
 BEGIN
 	-- lectura asinc
-	a <= reg_vector(conv_integer(addr_a));
+	a <= reg_vector(1) when int_type = "10" else reg_vector(conv_integer(addr_a));
 	
 	process (clk) begin
 		-- escriptura sinc
 		if rising_edge(clk) then
-			if wrd = '1' then
-				reg_vector(conv_integer(addr_d)) <= d;
+			if int_type = "00" then			-- EI
+				reg_vector(7)(1) <= '1';
+			elsif int_type = "01" then		-- DI
+				reg_vector(7)(1) <= '0';
+			elsif int_type = "10" then		-- RETI
+				reg_vector(7) <= reg_vector(0);
+			else							-- USUAL WRITE
+				if wrd = '1' then
+					reg_vector(conv_integer(addr_d)) <= d;
+				end if;
 			end if;
 		end if;
 	end process;

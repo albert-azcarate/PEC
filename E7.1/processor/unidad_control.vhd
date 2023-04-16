@@ -25,6 +25,7 @@ ENTITY unidad_control IS
 			rd_in			: OUT std_logic;
 			wr_out			: OUT std_logic;
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -56,6 +57,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			immed			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			Instruccio		: OUT string(1 to 4); 	-- modelsim
@@ -67,6 +69,7 @@ ARCHITECTURE Structure OF unidad_control IS
 	component  multi is
 	port (	clk			: IN  STD_LOGIC;
 			boot		: IN  STD_LOGIC;
+			interrupt	: IN  STD_LOGIC;
 			wrd_l		: IN  STD_LOGIC;
 			wrd_s_l		: IN  STD_LOGIC;
 			u_s_l		: IN  STD_LOGIC;
@@ -76,6 +79,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			rd_in_l		: IN  STD_LOGIC;
 			wr_out_l	: IN  STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
 			wrd			: OUT STD_LOGIC;
 			wrd_s		: OUT STD_LOGIC;
@@ -87,7 +91,8 @@ ARCHITECTURE Structure OF unidad_control IS
 			rd_in		: OUT STD_LOGIC;
 			wr_out		: OUT STD_LOGIC;
 			ldpc		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-			addr_io		: OUT  STD_LOGIC_VECTOR(7 DOWNTO 0)
+			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
 	end component;
 
@@ -116,6 +121,9 @@ signal despla				: std_logic_vector(15 downto 0);
 signal addr_io_conn 		: std_logic_vector(7 downto 0);
 signal load_pc_connection	: std_logic_vector(1 downto 0);   
 signal load_pc_out			: std_logic_vector(1 downto 0);
+signal int_type_conn			: std_logic_vector(1 downto 0);
+
+signal interrupt 			: std_logic := '0';
 
 signal instruction			: string (1 to 4);	-- modelsim
 signal operacio				: string (1 to 6);	-- modelsim
@@ -211,56 +219,60 @@ BEGIN
 	
 	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL; REVISAR si no pot ser asignat normal ja que nomes fem servir pc quan es JAL
 	pc <= old_2_Pc when load_pc_out = "01" and f_out = JAL_OP else regPC;
+
 	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
   	 
-	control_ins : control_l port map(ir => ir_connection,
-												op => op,
-												f => f_out,
-												ldpc=> load_pc_connection,
-												wrd => enable,
-												wrd_s => enable_sys,
-												u_s => user_sys,
-												addr_a => addr_a, 
-												addr_b => addr_b,
-												addr_d => addr_d,
-												immed => immed,
-												wr_m => word_mem,
-												in_d => in_d,
-												immed_x2 => immed_x2,
-												word_byte => word_byte_connection,
-												halt_cont => halt_conn,
-												Instruccio => Instruction,			--modelsim
-												immed_or_reg => immed_or_reg,
-												addr_io => addr_io_conn,
-												rd_in => rd_in_conn,
-												wr_out => wr_out_conn
-												);
-	
-	multi0 : multi port map(clk => clk, 
-									boot => boot,
-									interrupt => interrupt,
-									ldpc_l => load_pc_connection,
-									wrd_l => enable,
-									wrd_s_l => enable_sys,
-									u_s_l => user_sys,
-									wr_m_l => word_mem,
-									addr_io_l => addr_io_conn,
-									rd_in_l => rd_in_conn,
-									wr_out_l => wr_out_conn,
-									w_b => word_byte_connection,
-									ldpc => load_pc_out,
-									wrd => wrd,
-									wrd_s => wrd_s,
-									u_s => u_s, 
-									wr_m => wr_m,
-									ldir => load_ins,
-									ins_dad => ins_dad_conn,
-									word_byte => word_byte,
-									halt_cont => halt_conn,
-									addr_io => addr_io,
-									rd_in => rd_in,
-									wr_out => wr_out
-									);
+	control_ins : control_l port map (	ir => ir_connection,
+										op => op,
+										f => f_out,
+										ldpc=> load_pc_connection,
+										wrd => enable,
+										wrd_s => enable_sys,
+										u_s => user_sys,
+										addr_a => addr_a, 
+										addr_b => addr_b,
+										addr_d => addr_d,
+										immed => immed,
+										wr_m => word_mem,
+										in_d => in_d,
+										immed_x2 => immed_x2,
+										word_byte => word_byte_connection,
+										halt_cont => halt_conn,
+										immed_or_reg => immed_or_reg,
+										addr_io => addr_io_conn,
+										rd_in => rd_in_conn,
+										wr_out => wr_out_conn,
+										int_type => int_type_conn,
+										Instruccio => Instruction			--modelsim
+										);
+
+	multi0 : multi port map (	clk => clk, 
+								boot => boot,
+								interrupt => interrupt,
+								ldpc_l => load_pc_connection,
+								wrd_l => enable,
+								wrd_s_l => enable_sys,
+								u_s_l => user_sys,
+								wr_m_l => word_mem,
+								addr_io_l => addr_io_conn,
+								rd_in_l => rd_in_conn,
+								wr_out_l => wr_out_conn,
+								int_type_l => int_type_conn,
+								w_b => word_byte_connection,
+								ldpc => load_pc_out,
+								wrd => wrd,
+								wrd_s => wrd_s,
+								u_s => u_s, 
+								wr_m => wr_m,
+								ldir => load_ins,
+								ins_dad => ins_dad_conn,
+								word_byte => word_byte,
+								halt_cont => halt_conn,
+								addr_io => addr_io,
+								rd_in => rd_in,
+								wr_out => wr_out,
+								int_type => int_type
+								);
 									
 
 END Structure;

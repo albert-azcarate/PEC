@@ -22,6 +22,7 @@ ENTITY datapath IS
 			datard_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			pc				: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			in_d			: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			int_type		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			rd_io			: IN  std_LOGIC_VECTOR(15 DOWNTO 0);
 			z				: OUT std_LOGIC;
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
@@ -65,7 +66,9 @@ BEGIN
 											addr_d => addr_d,
 											a => regbank_to_alu_a,
 											addr_b => addr_b,
-											b => regbank_to_alu_b );
+											b => regbank_to_alu_b, 
+											int_type => int_type
+											);
 	
 	alu_unit : alu port map(x => regbank_to_alu_a,
 							y => input_y,

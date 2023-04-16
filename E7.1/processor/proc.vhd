@@ -41,6 +41,7 @@ ARCHITECTURE Structure OF proc IS
 			rd_in			: OUT STD_LOGIC;
 			wr_out			: OUT STD_LOGIC;
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -68,6 +69,7 @@ ARCHITECTURE Structure OF proc IS
 			pc				: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			in_d			: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			rd_io			: IN  std_LOGIC_VECTOR(15 DOWNTO 0);
+			int_type		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			z				: OUT std_LOGIC;
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -88,6 +90,7 @@ signal z_conn				: STD_LOGIC;
 signal wrd_s_conn			: STD_LOGIC;
 signal u_s_conn				: STD_LOGIC;
 signal in_d_conn			: STD_LOGIC_VECTOR(1 DOWNTO 0);
+signal int_type_conn				: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal addr_a_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
 signal addr_b_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
 signal addr_d_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -120,7 +123,8 @@ BEGIN
 											z => z_conn,
 											addr_io => addr_io,
 											rd_in => rd_in,
-											wr_out => wr_out
+											wr_out => wr_out,
+											int_type => int_type_conn
 											);
 	
 	PATH: datapath port map(clk => clk,
@@ -144,7 +148,8 @@ BEGIN
 									alu_out_path => alu_out_conn,
 									z => z_conn,
 									rd_io	=> rd_io,
-									wr_io => wr_io
+									wr_io => wr_io,
+									int_type => int_type_conn
 									);
 
 END Structure;
