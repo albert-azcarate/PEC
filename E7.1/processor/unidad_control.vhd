@@ -52,7 +52,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			halt_cont		: OUT STD_LOGIC;
 			rd_in			: OUT STD_LOGIC;
 			wr_out			: OUT STD_LOGIC;
-			ldpc			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			ldpc			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -78,7 +78,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			halt_cont	: IN  STD_LOGIC;
 			rd_in_l		: IN  STD_LOGIC;
 			wr_out_l	: IN  STD_LOGIC;
-			ldpc_l		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
 			wrd			: OUT STD_LOGIC;
@@ -90,7 +90,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			word_byte	: OUT STD_LOGIC;
 			rd_in		: OUT STD_LOGIC;
 			wr_out		: OUT STD_LOGIC;
-			ldpc		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
@@ -119,9 +119,10 @@ signal ir_reg				: std_logic_vector(15 downto 0);
 signal old_2_Pc				: std_logic_vector(15 downto 0);
 signal despla				: std_logic_vector(15 downto 0);
 signal addr_io_conn 		: std_logic_vector(7 downto 0);
-signal load_pc_connection	: std_logic_vector(1 downto 0);   
-signal load_pc_out			: std_logic_vector(1 downto 0);
+signal load_pc_connection	: std_logic_vector(2 downto 0);   
+signal load_pc_out			: std_logic_vector(2 downto 0);
 signal int_type_conn			: std_logic_vector(1 downto 0);
+signal int_type_out			: std_logic_vector(1 downto 0);
 
 signal interrupt 			: std_logic := '0';
 
@@ -144,13 +145,13 @@ BEGIN
 					regPC <= regPC;
 				else						-- RUN
 				
-					if load_pc_out = "00" and ins_dad_conn = '1' then		-- RUN
+					if load_pc_out = "000" and ins_dad_conn = '1' then		-- RUN
 						if regPC < x"FFFE" then
 							regPC <= regPC + 2;
 						else 
 							regPC <= regPC;
 						end if;
-					elsif load_pc_out = "01" then							-- Cas JMP's
+					elsif load_pc_out = "001" then							-- Cas JMP's
 						if f_out = JMP_OP then 								-- JMP
 							regPC <= alu_out;	
 						elsif z = '0' and f_out = JZ_OP and alu_out >= x"C000" and alu_out <= x"FFFE" then 		-- JZ i saltem
@@ -167,7 +168,7 @@ BEGIN
 							end if;
 						end if;
 						
-					elsif load_pc_out = "10" then							-- Cas BZ's
+					elsif load_pc_out = "010" then							-- Cas BZ's
 						if z = '0' and f_out = BZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) <= x"FFFE" then 					-- BZ i saltem
 							regPC <= regPC + 2 + despla;
 						elsif z = '1' and f_out = BNZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) <= x"FFFE" then 				-- BNZ i saltem
@@ -178,7 +179,10 @@ BEGIN
 							regPC <= regPC; 	-- aixo ha de ser un HALT REVISAR
 						end if;
 							
-					else 													-- REVISAR de que serveix aquest else, ja que no entrem aqui mai
+					elsif load_pc_out = "100" then	-- Cas RET
+						regPC <= alu_out;
+
+					else 
 						regPC <= regPC;
 					end if;
 				end if;
@@ -216,9 +220,11 @@ BEGIN
 	ins_dad <= ins_dad_conn;
 	ir_connection <= ir_reg;
 	f <=  f_out;
+	int_type <= int_type_out;
 	
 	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL; REVISAR si no pot ser asignat normal ja que nomes fem servir pc quan es JAL
-	pc <= old_2_Pc when load_pc_out = "01" and f_out = JAL_OP else regPC;
+	pc <= old_2_Pc when load_pc_out = "01" and f_out = JAL_OP else
+		  regPC;
 
 	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
   	 
@@ -271,7 +277,7 @@ BEGIN
 								addr_io => addr_io,
 								rd_in => rd_in,
 								wr_out => wr_out,
-								int_type => int_type
+								int_type => int_type_out
 								);
 									
 

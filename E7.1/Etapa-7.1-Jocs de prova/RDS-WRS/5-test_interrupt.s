@@ -10,5 +10,5 @@ st 0(r0), r5
 st 2(r0), r6
 movi r1,0xF
 out 9, r1     ; activa todos los visores
-out 10, r6   ; muestra el valor hexadecimal en los visores
+out 10, r5   ; muestra el valor hexadecimal en los visores
 halt

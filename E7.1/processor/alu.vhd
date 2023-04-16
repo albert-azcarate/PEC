@@ -94,6 +94,8 @@ BEGIN
 					
 					x + y when op = ST or op = LD or op = STB or op = LDB or op = ADDI else		-- LDs, STs ADDi
 					
+					x when op = HALT else
+					
 					(others => 'Z');
 				
 	w <= w_temporal;

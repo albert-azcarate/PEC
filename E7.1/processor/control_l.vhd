@@ -18,7 +18,7 @@ ENTITY control_l IS
 			halt_cont		: OUT STD_LOGIC;
 			rd_in			: OUT STD_LOGIC;
 			wr_out			: OUT STD_LOGIC;
-			ldpc			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			ldpc			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -130,10 +130,11 @@ BEGIN
 	-- ldpc ens indica d'on carregar el nou PC
 	-- Load next Pc or not (Fetch / Decode)
 	-- En interrupcions no cal modificarho, perque ho controlem desde multi
-	ldpc <= 	"11" when op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" else	-- 11 HALT
-				"10" when op_code_ir = BZ else											-- 10 BRANCH
-				"01" when op_code_ir = JMP else											-- 01 JUMPS
-				"00" ; 			 														-- 00 RUN; falta CALLS
+	ldpc <= 	"011" when op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" else	-- 11 HALT
+				"010" when op_code_ir = BZ else											-- 10 BRANCH
+				"001" when op_code_ir = JMP else											-- 01 JUMPS
+				"100" when op_code_ir = HALT and ir_interna = x"f024" else				-- 100 RETI
+				"000" ; 			 														-- 00 RUN; falta CALLS
 
 	-- wrd habilita l'escriptura al banc de registres
 	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL), BRANCHES, OUT, NOP, EI, DI, RETI, WRS
@@ -156,14 +157,14 @@ BEGIN
 	wrd_s <= '1' when 	(op_code_ir = HALT and f_temp = WRS_OP)
 						or (op_code_ir = HALT and f_temp = EI_OP) 
 						or (op_code_ir = HALT and f_temp = DI_OP)
-						or (op_code_ir = HALT and f_temp = RETI_OP)
+						or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024") -- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix codi
 						else 
 			 '0';	
 	-- u_s ens indica si llegim de user o system al banc de registres 
 	-- Sempre user excepte RDS, RETI
 	u_s <= '1' when (op_code_ir = HALT and f_temp = RDS_OP)
-					or (op_code_ir = HALT and f_temp = RETI_OP)
-					else 
+					or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024")-- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix codi
+					else
 			'0';
 
 

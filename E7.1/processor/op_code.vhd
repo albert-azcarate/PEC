@@ -35,14 +35,14 @@ library ieee;
 use ieee.std_logic_1164.all;
 package f_code is
  subtype f_code_t is std_logic_vector(2 downto 0); 
- constant AND_OP 	: f_code_t := "000";
- constant OR_OP 		: f_code_t := "001";
- constant XOR_OP 	: f_code_t := "010";
- constant NOT_OP 	: f_code_t := "011";
- constant ADD_OP 	: f_code_t := "100";
- constant SUB_OP 	: f_code_t := "101";
- constant SHA_OP 	: f_code_t := "110";
- constant SHL_OP 	: f_code_t := "111";
+ constant AND_OP	: f_code_t := "000";
+ constant OR_OP   : f_code_t := "001";
+ constant XOR_OP	: f_code_t := "010";
+ constant NOT_OP	: f_code_t := "011";
+ constant ADD_OP	: f_code_t := "100";
+ constant SUB_OP	: f_code_t := "101";
+ constant SHA_OP	: f_code_t := "110";
+ constant SHL_OP	: f_code_t := "111";
  
  constant CMPLT_OP 	: f_code_t := "000";
  constant CMPLE_OP 	: f_code_t := "001";

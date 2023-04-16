@@ -13,7 +13,7 @@ entity multi is
 			halt_cont	: IN  STD_LOGIC;
 			rd_in_l		: IN  STD_LOGIC;
 			wr_out_l	: IN  STD_LOGIC;
-			ldpc_l		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
 			wrd			: OUT STD_LOGIC;
@@ -25,7 +25,7 @@ entity multi is
 			word_byte	: OUT STD_LOGIC;
 			rd_in		: OUT STD_LOGIC;
 			wr_out		: OUT STD_LOGIC;
-			ldpc		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
@@ -60,9 +60,9 @@ begin
 	end process;
 	
 	-- HALT quan ens diuen de parar, ldpc_l quan estem a DECODE, else RUN
-	ldpc <= "11" when estat = "00" and halt_cont = '1' else 
+	ldpc <= "011" when estat = "00" and halt_cont = '1' else 
 			ldpc_l when estat = "01"else 
-			"00"; 
+			"000"; 
 
 	-- 	En DECODE pasem la dada
 	with estat select
@@ -81,8 +81,13 @@ begin
 
 	-- 	En DECODE pasem la dada				
 	with estat select
-		wrd_s <=  '0' when "00",
-				wrd_s_l when others;
+		wrd_s <=  	'0' when "00",
+					wrd_s_l when others;
+
+	-- 	En DECODE pasem la dada				
+	with estat select
+		int_type <=	"11" when "00",
+					int_type_l when others;
 
 	-- 	En DECODE pasem la dada				
 	with estat select
