@@ -97,10 +97,9 @@ BEGIN
 		
 		if boot='1' then							-- BOOT estem a boot posem el reg 16 a 0 (si no no anava, era sempre 1); REVISAR buscar workaround( diria que amb el others others de io_reg ja esta)
 			io_registers(16) <= x"0000";
-			-- Posem tots els registres a 0
-			for i in 0 to 31 loop
-				io_registers(i) <= (others => '0');
-			end loop;		
+			-- Posem tots els registres a 0 (others => (others => '0'))
+			io_registers <= (others => (others => '0'));
+					
 		elsif rising_edge(CLOCK_50) then 			-- RUN
 			-- Llegim els Switchs i Keys
 			io_registers(8) <= "0000000"&SW;

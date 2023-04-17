@@ -20,12 +20,7 @@ package op_code is
   constant STF			: op_code_t := "1100";
   constant LDB 			: op_code_t := "1101";
   constant STB 			: op_code_t := "1110";
-  --constant RDS      : op_code_t := "1111"; -- REVISAR SHOW
-  --constant WRS      : op_code_t := "1111";
-  --constant EI       : op_code_t := "1111";
-  --constant DI       : op_code_t := "1111";
-  --constant RETI     : op_code_t := "1111";
-  constant HALT 		: op_code_t := "1111";
+  constant HALT 		: op_code_t := "1111"; -- RDS, WRS, EI, DI, RETI, HALT = HALT, diferenciem per el f_code
   constant NOP			: op_code_t := "0010"; -- NOP = ADDI R0 0
 
   
@@ -35,48 +30,49 @@ library ieee;
 use ieee.std_logic_1164.all;
 package f_code is
  subtype f_code_t is std_logic_vector(2 downto 0); 
- constant AND_OP	: f_code_t := "000";
- constant OR_OP   : f_code_t := "001";
- constant XOR_OP	: f_code_t := "010";
- constant NOT_OP	: f_code_t := "011";
- constant ADD_OP	: f_code_t := "100";
- constant SUB_OP	: f_code_t := "101";
- constant SHA_OP	: f_code_t := "110";
- constant SHL_OP	: f_code_t := "111";
+
+ constant AND_OP    : f_code_t := "000";
+ constant OR_OP     : f_code_t := "001";
+ constant XOR_OP    : f_code_t := "010";
+ constant NOT_OP    : f_code_t := "011";
+ constant ADD_OP    : f_code_t := "100";
+ constant SUB_OP    : f_code_t := "101";
+ constant SHA_OP    : f_code_t := "110";
+ constant SHL_OP    : f_code_t := "111";
  
- constant CMPLT_OP 	: f_code_t := "000";
- constant CMPLE_OP 	: f_code_t := "001";
- constant CMPEQ_OP 	: f_code_t := "011";
+ constant CMPLT_OP  : f_code_t := "000";
+ constant CMPLE_OP  : f_code_t := "001";
+ constant CMPEQ_OP  : f_code_t := "011";
  constant CMPLTU_OP : f_code_t := "100";
  constant CMPLEU_OP : f_code_t := "101"; 
- constant MUL_OP 	: f_code_t := "000";
- constant MULH_OP 	: f_code_t := "001";
- constant MULHU_OP 	: f_code_t := "010";
- constant DIV_OP 	: f_code_t := "100";
- constant DIVU_OP 	: f_code_t := "101";
+ constant MUL_OP    : f_code_t := "000";
+ constant MULH_OP   : f_code_t := "001";
+ constant MULHU_OP  : f_code_t := "010";
+ constant DIV_OP    : f_code_t := "100";
+ constant DIVU_OP   : f_code_t := "101";
  
- constant MOVI 	: f_code_t := "000";
- constant MOVHI 	: f_code_t := "001";
-  
- constant BZ_OP 	: f_code_t := "000";
- constant BNZ_OP 	: f_code_t := "001";
+ constant MOVI      : f_code_t := "000";
+ constant MOVHI     : f_code_t := "001";
  
- constant JZ_OP 	: f_code_t := "000";
- constant JNZ_OP 	: f_code_t := "001";
- constant JMP_OP 	: f_code_t := "011";
- constant JAL_OP 	: f_code_t := "100";
+ constant BZ_OP     : f_code_t := "000";
+ constant BNZ_OP    : f_code_t := "001";
+ 
+ constant JZ_OP     : f_code_t := "000";
+ constant JNZ_OP    : f_code_t := "001";
+ constant JMP_OP    : f_code_t := "011";
+ constant JAL_OP    : f_code_t := "100";
  --constant CALLS_OP 	: f_code_t := "111";
- constant NOP_OP 	: f_code_t := "100";
+ constant NOP_OP    : f_code_t := "100";
  
- constant IN_OP 	: f_code_t := "000";
- constant OUT_OP 	: f_code_t := "001";
-
- constant RDS_OP  : f_code_t := "000";
- constant WRS_OP  : f_code_t := "001";
- constant EI_OP   : f_code_t := "010";
- constant DI_OP   : f_code_t := "011";
- constant RETI_OP : f_code_t := "100";
- constant HALT_OP : f_code_t := "111";
+ constant IN_OP     : f_code_t := "000";
+ constant OUT_OP    : f_code_t := "001";
+ 
+ constant RDS_OP    : f_code_t := "000";
+ constant WRS_OP    : f_code_t := "001";
+ constant EI_OP     : f_code_t := "010";
+ constant DI_OP     : f_code_t := "011";
+ constant RETI_OP   : f_code_t := "100";
+ constant HALT_OP   : f_code_t := "111";
  
 end package f_code;
 
