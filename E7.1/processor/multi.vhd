@@ -64,48 +64,41 @@ begin
 			ldpc_l when estat = "01"else 
 			"000"; 
 
-	-- 	En DECODE pasem la dada
+-- Sempre en Decode passem la dada; sha de mirar que fer en interrupcio, el estat SYSTEM "10"
+
+
 	with estat select
 		word_byte <=  	'0' when "00",
 						w_b when others;
 						
-	-- 	En DECODE pasem la dada
 	with estat select
 		wr_m <=  '0' when "00",
 					wr_m_l when others;
-					
-	-- 	En DECODE pasem la dada				
+								
 	with estat select
 		wrd <=  '0' when "00",
 				wrd_l when others;
-
-	-- 	En DECODE pasem la dada				
+			
 	with estat select
 		wrd_s <=  	'0' when "00",
 					wrd_s_l when others;
-
-	-- 	En DECODE pasem la dada				
+			
 	with estat select
-		int_type <=	"11" when "00",
+		int_type <=	"11" when "00",	-- "11" es no interrupcio
 					int_type_l when others;
-
-	-- 	En DECODE pasem la dada				
+		
 	with estat select
 		u_s <=  '0' when "00",
 				u_s_l when others;
-
-
-	-- 	En DECODE pasem la dada				
+		
 	with estat select
 		addr_io <=  x"00" when "00",
 					addr_io_l when others;
-	
-	-- 	En DECODE pasem la dada				
+				
 	with estat select
 		rd_in <=  	'0' when "00",
 					rd_in_l when others;
-	
-	-- 	En DECODE pasem la dada				
+				
 	with estat select
 		wr_out <=  	'0' when "00",
 					wr_out_l when others;

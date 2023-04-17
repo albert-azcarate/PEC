@@ -132,9 +132,9 @@ BEGIN
 	-- En interrupcions no cal modificarho, perque ho controlem desde multi
 	ldpc <= 	"011" when op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" else	-- 11 HALT
 				"010" when op_code_ir = BZ else											-- 10 BRANCH
-				"001" when op_code_ir = JMP else											-- 01 JUMPS
+				"001" when op_code_ir = JMP else										-- 01 JUMPS
 				"100" when op_code_ir = HALT and ir_interna = x"f024" else				-- 100 RETI
-				"000" ; 			 														-- 00 RUN; falta CALLS
+				"000" ; 			 													-- 00 RUN; falta CALLS
 
 	-- wrd habilita l'escriptura al banc de registres
 	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL), BRANCHES, OUT, NOP, EI, DI, RETI, WRS
@@ -157,13 +157,13 @@ BEGIN
 	wrd_s <= '1' when 	(op_code_ir = HALT and f_temp = WRS_OP)
 						or (op_code_ir = HALT and f_temp = EI_OP) 
 						or (op_code_ir = HALT and f_temp = DI_OP)
-						or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024") -- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix codi
+						or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024") -- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix f_code
 						else 
 			 '0';	
 	-- u_s ens indica si llegim de user o system al banc de registres 
 	-- Sempre user excepte RDS, RETI
 	u_s <= '1' when (op_code_ir = HALT and f_temp = RDS_OP)
-					or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024")-- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix codi
+					or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024")-- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix f_code
 					else
 			'0';
 
@@ -223,7 +223,7 @@ BEGIN
 
 	--immed depen de quina instruccio es esta codificat a llocs i tamanys diferents; Les dos seguents asignacions juguen amb com estan codificades
 	immed(15 downto 8) <= 	(others => ir_interna(7)) when op_code_ir = MOVE or op_code_ir = BZ else	-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes (extenem el signe)
-							(others => ir_interna(5)) when op_code_ir = ADDI else						-- Cas ADDI: immed als 5 bits de menor pes (extenem el signe)
+							(others => ir_interna(5)) when op_code_ir = ADDI else						-- Cas ADDI: immed als 5 bits de menor pes (extenem el signe) --REVISAR, es pot treure, perque ara tot son 6 bits; IDEM amb immed(7-0)
 							(others => ir_interna(5)); 													-- Else: immed als 6 bits de menor pes (extenem el signe)
 
 	immed(7 downto 0)  <= 	ir_interna(7 downto 0) when op_code_ir = MOVE or op_code_ir = BZ else 							-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes
@@ -234,7 +234,7 @@ BEGIN
 	int_type <= "00" when (op_code_ir = HALT and f_temp = EI_OP) else
 				"01" when (op_code_ir = HALT and f_temp = DI_OP) else
 				"10" when (op_code_ir = HALT and f_temp = RETI_OP) else
-				"11";
+				"11";	-- No es interrupcio, posem 11 de forma arbitraria
 
 
 -- MODELSIM SIGNALS	

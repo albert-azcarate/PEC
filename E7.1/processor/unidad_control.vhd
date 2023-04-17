@@ -118,13 +118,13 @@ signal new_ir				: std_logic_vector(15 downto 0);
 signal ir_reg				: std_logic_vector(15 downto 0);
 signal old_2_Pc				: std_logic_vector(15 downto 0);
 signal despla				: std_logic_vector(15 downto 0);
-signal addr_io_conn 		: std_logic_vector(7 downto 0);
+signal addr_io_conn			: std_logic_vector(7 downto 0);
 signal load_pc_connection	: std_logic_vector(2 downto 0);   
 signal load_pc_out			: std_logic_vector(2 downto 0);
-signal int_type_conn			: std_logic_vector(1 downto 0);
+signal int_type_conn		: std_logic_vector(1 downto 0);
 signal int_type_out			: std_logic_vector(1 downto 0);
 
-signal interrupt 			: std_logic := '0';
+signal interrupt			: std_logic := '0';
 
 signal instruction			: string (1 to 4);	-- modelsim
 signal operacio				: string (1 to 6);	-- modelsim
@@ -134,44 +134,45 @@ BEGIN
 	process (boot, load_pc_out, clk) begin
 		if rising_edge(clk) then
 			
-			despla(15 downto 9) <= (others => datard_m(7));
-			despla(8 downto 0) <= datard_m(7 downto 0)&'0';
-			old_2_Pc <= regPC + 2;	-- Ens guardem el PC + 2 pels JALS
+			despla(15 downto 9) <= (others => datard_m(7));	-- Calculem el desplaçament dels Branches
+			despla(8 downto 0) <= datard_m(7 downto 0)&'0';	-- Extenem el signe per els Branches relatius i x2 per alinear-ho
+
+			old_2_Pc <= regPC + 2;	-- Ens guardem el PC + 2 pels JALS i els RETI
 			
-			if boot = '1' then 				-- BOOT
+			if boot = '1' then 				-- BOOT; REVISAR plantejar la idea de passar boot als registres i posarlos a 0 en Boot, si no, ens emplenem de merda si fem toggle-untoggle per fer tests
 				regPC <= x"C000";
 			else
-				if load_pc_out = "11" then  -- HALT
+				if load_pc_out = "011" then  -- HALT
 					regPC <= regPC;
 				else						-- RUN
 				
-					if load_pc_out = "000" and ins_dad_conn = '1' then		-- RUN
+					if load_pc_out = "000" and ins_dad_conn = '1' then		-- RUN; ins_dad_conn fa de proxy de l'estat del multi
 						if regPC < x"FFFE" then
 							regPC <= regPC + 2;
 						else 
-							regPC <= regPC;
+							regPC <= regPC;		-- REVISAR, aixo hauria de ser un HALT
 						end if;
 					elsif load_pc_out = "001" then							-- Cas JMP's
-						if f_out = JMP_OP then 								-- JMP
+						if f_out = JMP_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 					-- JMP; alu_out >= x"C000" i alu_out < x"FFFE" per evitar que saltem a la ROM
+							regPC <= alu_out;																			-- alu_out < FFFE perque si no el seguent PC + 2 fa overflow
+						elsif z = '0' and f_out = JZ_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 		-- JZ i saltem
+							regPC <= alu_out;																			-- REVISAR s'ha de mira si la adressa es aligned?
+						elsif z = '1' and f_out = JNZ_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 	-- JNZ i saltem
 							regPC <= alu_out;	
-						elsif z = '0' and f_out = JZ_OP and alu_out >= x"C000" and alu_out <= x"FFFE" then 		-- JZ i saltem
-							regPC <= alu_out;	
-						elsif z = '1' and f_out = JNZ_OP and alu_out >= x"C000" and alu_out <= x"FFFE" then 	-- JNZ i saltem
-							regPC <= alu_out;	
-						elsif f_out = JAL_OP and alu_out >= x"C000" and alu_out <= x"FFFE" then							-- JAL
+						elsif f_out = JAL_OP and alu_out >= x"C000" and alu_out < x"FFFE" then							-- JAL
 							regPC <= alu_out;
 						else												-- Else no saltem (pc <= pc + 2)
 							if regPC < x"FFFE" then
 								regPC <= regPC + 2;
 							else 
-								regPC <= regPC;
+								regPC <= regPC;	-- REVISAR, aixo hauria de ser un HALT
 							end if;
 						end if;
 						
 					elsif load_pc_out = "010" then							-- Cas BZ's
-						if z = '0' and f_out = BZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) <= x"FFFE" then 					-- BZ i saltem
-							regPC <= regPC + 2 + despla;
-						elsif z = '1' and f_out = BNZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) <= x"FFFE" then 				-- BNZ i saltem
+						if z = '0' and f_out = BZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) < x"FFFE" then 					-- BZ i saltem
+							regPC <= regPC + 2 + despla;																								-- @ < FFFE perque si no el seguent PC + 2 fa overflow
+						elsif z = '1' and f_out = BNZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) < x"FFFE" then 				-- BNZ i saltem
 							regPC <= regPC + 2 +  despla;
 						elsif regPC + 2 < x"FFFE" then																									-- Else no saltem (pc <= pc + 2)
 							regPC <= regPC + 2;
@@ -179,7 +180,7 @@ BEGIN
 							regPC <= regPC; 	-- aixo ha de ser un HALT REVISAR
 						end if;
 							
-					elsif load_pc_out = "100" then	-- Cas RET
+					elsif load_pc_out = "100" and alu_out >= x"C000" and alu_out < x"FFFE" then	-- Cas RET; alu_out < FFFE perque si no el seguent PC + 2 fa overflow
 						regPC <= alu_out;
 
 					else 
@@ -197,11 +198,15 @@ BEGIN
 		if boot = '1' then 										--BOOT
 			new_ir <= x"C000";
 		else
-			if load_pc_out /= "11" then							-- Cas RUN
+			if load_pc_out /= "11" then		-- Cas RUN
 				if load_ins = '1' or load_pc_out = "01"  then  	-- DECODE or JMP carreguem a ir el que ens ve de memoria
 					new_ir <= datard_m ;
-				else											-- Cas FETCH
-					new_ir <= ir_reg;							-- Ens quedem igual
+				else											-- Cas FETCH 
+					if regPC < x"fffe" then
+						new_ir <= ir_reg;							-- Ens quedem igual
+					else
+						new_ir <= x"FFFF";							-- FETCH amb un PC invalid
+					end if;
 				end if;
 			else 
 				new_ir <= x"FFFF";								-- Cas HALT, ens quedem a HALT
