@@ -17,6 +17,8 @@ ENTITY proc IS
 			rd_io 		: in std_logic_vector(15 downto 0);
 			wr_out 		: out std_logic;
 			rd_in 		: out std_logic
+			--inta		: IN std_logic;
+			--intr		: IN std_logic
 			 );
 END proc;
 

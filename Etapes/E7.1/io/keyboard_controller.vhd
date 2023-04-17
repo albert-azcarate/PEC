@@ -4,14 +4,17 @@ use IEEE.numeric_std.all;
 use IEEE.std_logic_unsigned.all;
 
 
-entity keyboard_controller is
+entity keyboard_controller is --inta , intr
     Port (clk        : in    STD_LOGIC;
           reset      : in    STD_LOGIC;
           ps2_clk    : inout STD_LOGIC;
           ps2_data   : inout STD_LOGIC;
           read_char  : out   STD_LOGIC_VECTOR (7 downto 0);
           clear_char : in    STD_LOGIC;
-          data_ready : out   STD_LOGIC);
+          data_ready : out   STD_LOGIC;
+			 inta 		: IN 	  std_LOGIC;--new
+			 intr 		: OUT   std_LOGIC --new
+			 );
 end keyboard_controller;
 
 architecture Behavioral of keyboard_controller is
@@ -52,8 +55,14 @@ end component;
     type state_type is (idle, clearing);
     signal state   : state_type;
 
+	 
+	 signal clear : std_LOGIC;
+	 signal ready : std_LOGIC;
 begin
 
+	clear <= inta or clear_char;
+	intr <= ready;
+   data_ready <= ready;
     k0 : ps2_keyboard_interface port map(
                 clk => clk,
                 reset => reset,
@@ -71,7 +80,7 @@ begin
                 tx_write_ack_o => tx_write_ack_o,
                 tx_error_no_keyboard_ack => tx_error_no_keyboard_ack
        );
-
+	 
 
     process (clk) begin
         if (clk'event and clk = '1') then
@@ -80,7 +89,7 @@ begin
             else
                 case state is
                     when idle =>
-                        if (clear_char = '1') then
+                        if (clear = '1') then
                             state <= clearing;
                         end if;
                     when clearing =>
@@ -113,9 +122,9 @@ begin
 
     process (clk) begin
         if (clk'event and clk = '1') then
-            data_ready <= '0';
+            ready <= '0';
             if (data_ready_we = '1') then
-                data_ready <= data_available;
+                ready <= data_available;
                 if (data_available = '1') then
                     read_char <= rx_ascii;
                 end if;

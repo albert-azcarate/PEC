@@ -34,7 +34,10 @@ ENTITY controladores_IO IS
 			ps2_clk 	: inout std_logic;
 			ps2_data 	: inout std_logic;
 			vga_cursor  : out std_logic_vector(15 downto 0);
-			vga_cursor_enable : out std_logic
+			vga_cursor_enable : out std_logic;
+			iid : out std_LOGIC_VECTOR (7 downto 0);
+			inta : in std_LOGIC;
+			intr : out std_LOGIC
 		);
 END controladores_IO;
 
@@ -63,6 +66,19 @@ ARCHITECTURE Structure OF controladores_IO IS
 	signal contador_ciclos			: STD_LOGIC_VECTOR(15 downto 0):=x"0000";
 	signal contador_milisegundos	: STD_LOGIC_VECTOR(15 downto 0):=x"0000";
 	
+	signal ps2_inta_conn : std_logic; 
+	signal timer_inta_conn : std_logic; 
+	signal key_inta_conn : std_logic; 
+	signal switch_inta_conn : std_logic; 
+	signal ps2_intr_conn : std_logic; 
+	signal timer_intr_conn : std_logic; 
+	signal key_intr_conn : std_logic; 
+	signal switch_intr_conn : std_logic;
+	signal read_key_conn : STD_LOGIC_VECTOR (7 downto 0); 
+	signal rd_switch_conn : std_logic_vector(7 downto 0);
+	signal rd_io_conn : std_logic_vector(15 downto 0);
+	signal iid_conn : std_logic_vector(1 downto 0);
+	
 	
 	component keyboard_controller is
 	port (	clk			: in 	STD_LOGIC;
@@ -71,7 +87,9 @@ ARCHITECTURE Structure OF controladores_IO IS
 			ps2_data	: inout STD_LOGIC;
 			read_char	: out 	STD_LOGIC_VECTOR (7 downto 0);
 			clear_char	: in 	STD_LOGIC;
-			data_ready	: out 	STD_LOGIC
+			data_ready	: out 	STD_LOGIC;
+			 inta 		: IN 	  std_LOGIC;--new
+			 intr 		: OUT   std_LOGIC --new
 			);
 	end component keyboard_controller; 
 	
@@ -83,7 +101,56 @@ ARCHITECTURE Structure OF controladores_IO IS
 			OUT_HEX3	: OUT std_logic_vector(6 downto 0)
 			);
 	END component;
-
+	
+	component timer is 
+			PORT (
+				boot		: in std_logic;
+				clk		: in std_logic; --20ns
+				inta		: in std_logic;
+				intr 		: out std_logic
+			);
+	end component;
+	
+		component interruptores is 
+			PORT (
+				boot		: in std_logic;
+				clk		: in std_logic;
+				inta		: in std_logic;
+				switches	: in std_logic_vector(7 downto 0);
+				intr 		: out std_logic;
+				rd_switch : out std_logic_vector(7 downto 0)
+			);
+	end component;
+	
+	component pulsadores is 
+			PORT (
+				boot		: in std_logic;
+				clk		: in std_logic;
+				inta		: in std_logic;
+				keys		: in std_logic_vector(3 downto 0);
+				intr 		: out std_logic;
+				read_key : out std_logic_vector(3 downto 0)
+			);
+	end component;
+	
+	component interrupt_controller is 
+			PORT (
+				boot			: in std_logic;
+				clk			: in std_logic; --20ns
+				inta			: in std_logic;
+				intr 			: out std_logic;
+				key_intr 	: in std_logic;
+				ps2_intr		: in std_logic;
+				switch_intr	: in std_logic;
+				timer_intr	: in std_logic;
+				key_inta		: out std_logic;
+				ps2_inta		: out std_logic;
+				switch_inta	: out std_logic;
+				timer_inta	: out std_logic;
+				iid			: out std_logic_vector(7 downto 0)
+			);
+	end component;
+	
 BEGIN
 
 	-- Assignem els 8 bits de menor pes als leds corresponents
@@ -91,7 +158,20 @@ BEGIN
 	led_verdes <= io_registers(5)(7 downto 0);
 	
 	-- Quin port IO volem accedir
-	adress_reg <= conv_integer(addr_io);	
+	adress_reg <= conv_integer(addr_io);
+
+
+	iid <= "000000"&iid_conn;
+	
+	with iid_conn select
+		rd_io <= 	rd_io_conn when x"ff",
+					x"0001" when x"00",
+					read_key_conn when x"01",
+					rd_switch_conn when x"02",
+					char_readed when x"03",
+					x"0000" when others;
+					
+				
 
 	process (CLOCK_50, boot) begin
 		
@@ -121,7 +201,7 @@ BEGIN
 
 				elsif rd_in = '1' then											-- IN
 				
-					rd_io <=  io_registers(adress_reg);
+					rd_io_conn <=  io_registers(adress_reg);
 					if adress_reg = 16 then										-- Si llegim el port 16, el posem a 0, conforme ja hem llegit
 						io_registers(16) <= x"0000";
 					end if;
@@ -173,7 +253,47 @@ BEGIN
 		ps2_data	=> PS2_DATA, 		-- Bus de comunicacio serie
 		read_char 	=> char_readed, 	-- Ultima teclat pitjada
 		clear_char 	=> clear, 			-- Ack cap al teclat ; 			Si se desea conectar el teclado para trabajar por encuesta, se debe hacer una instruccion out sobre el puerto al que esta conectada esta senyal para indicar que la tecla ya ha sido leida
-		data_ready	=> ready			-- Indica noves dades al bus;	Para usar el controlador por encuesta, se debe hacer una instruccion in sobre el puerto al que esta conectada esta senyal para saber si hay una tecla nueva disponible.
+		data_ready	=> ready	,		-- Indica noves dades al bus;	Para usar el controlador por encuesta, se debe hacer una instruccion in sobre el puerto al que esta conectada esta senyal para saber si hay una tecla nueva disponible.
+		intr => ps2_intr_conn, --out
+		inta => ps2_inta_conn --in
 		); 
+		
+	TIMER_INT: timer 	port map(
+				boot		=> boot,
+				clk		=> CLOCK_50,
+				inta		=> timer_inta_conn,
+				intr 		=> timer_intr_conn );
+	
+	PUL_INT: pulsadores port map(
+				boot => boot,
+				clk => CLOCK_50,
+				inta	=> key_inta_conn,
+				keys => KEY,
+				intr 		=> key_intr_conn,
+				read_key => read_key_conn );
+	
+	INT_INT: interruptores port map(
+				boot			=> boot,
+				clk			=> CLOCK_50,
+				inta			=> switch_inta_conn,
+				switches		=> sw,
+				intr 			=> switch_intr_conn,
+				rd_switch 	=> rd_switch_conn );
+	
+	CINT : interrupt_controller port map(
+				boot			=> boot,
+				clk			=> CLOCK_50,
+				inta			=> inta,
+				intr 			=> intr,
+				key_intr 	=> key_intr_conn,
+				ps2_intr		=> ps2_intr_conn,
+				switch_intr	=> switch_intr_conn,
+				timer_intr	=> timer_intr_conn,
+				key_inta		=> key_inta_conn,
+				ps2_inta		=> ps2_inta_conn,
+				switch_inta	=> switch_inta_conn,
+				timer_inta	=> timer_inta_conn,
+				iid			=> iid_conn);
+	
 
 END Structure;

@@ -222,11 +222,11 @@ BEGIN
 					'1';
 
 	--immed depen de quina instruccio es esta codificat a llocs i tamanys diferents; Les dos seguents asignacions juguen amb com estan codificades
-	immed(15 downto 8) <= 	(others => ir_interna(7)) when op_code_ir = MOVE or op_code_ir = BZ else	-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes (extenem el signe)
+	immed(15 downto 8) <= 	(others => ir_interna(7)) when op_code_ir = MOVE or op_code_ir = BZ else	-- Cas MOVE o BZ: immed als 8 bits de menor pes (extenem el signe)
 							(others => ir_interna(5)) when op_code_ir = ADDI else						-- Cas ADDI: immed als 5 bits de menor pes (extenem el signe) --REVISAR, es pot treure, perque ara tot son 6 bits; IDEM amb immed(7-0)
 							(others => ir_interna(5)); 													-- Else: immed als 6 bits de menor pes (extenem el signe)
 
-	immed(7 downto 0)  <= 	ir_interna(7 downto 0) when op_code_ir = MOVE or op_code_ir = BZ else 							-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes
+	immed(7 downto 0)  <= 	ir_interna(7 downto 0) when op_code_ir = MOVE or op_code_ir = BZ else 							-- Cas MOVE o BZ
 							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0) when op_code_ir = ADDI else   				-- Cas ADDI: immed als 5 bits de menor pes; No pasa res si tambe es un NOP, perque els NOP pillen reg d'entrada a la alu
 							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0);			                               		-- Else: immed als 6 bits de menor pes 
 
