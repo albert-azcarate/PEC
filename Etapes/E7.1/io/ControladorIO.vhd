@@ -77,7 +77,7 @@ ARCHITECTURE Structure OF controladores_IO IS
 	signal read_key_conn : STD_LOGIC_VECTOR (7 downto 0); 
 	signal rd_switch_conn : std_logic_vector(7 downto 0);
 	signal rd_io_conn : std_logic_vector(15 downto 0);
-	signal iid_conn : std_logic_vector(1 downto 0);
+	signal iid_conn : std_logic_vector(7 downto 0);
 	
 	
 	component keyboard_controller is
@@ -161,15 +161,15 @@ BEGIN
 	adress_reg <= conv_integer(addr_io);
 
 
-	iid <= "000000"&iid_conn;
+	iid <= iid_conn;
 	
 	with iid_conn select
-		rd_io <= 	rd_io_conn when x"ff",
-					x"0001" when x"00",
-					read_key_conn when x"01",
-					rd_switch_conn when x"02",
-					char_readed when x"03",
-					x"0000" when others;
+		rd_io <= 	rd_io_conn		when x"ff", -- No interrupcio
+					x"0001"			when x"00",	-- Timer
+					read_key_conn	when x"01",	-- Key
+					rd_switch_conn	when x"02", -- Switch
+					char_readed		when x"03", -- PS2
+					x"0000"			when others;
 					
 				
 
@@ -254,8 +254,8 @@ BEGIN
 		read_char 	=> char_readed, 	-- Ultima teclat pitjada
 		clear_char 	=> clear, 			-- Ack cap al teclat ; 			Si se desea conectar el teclado para trabajar por encuesta, se debe hacer una instruccion out sobre el puerto al que esta conectada esta senyal para indicar que la tecla ya ha sido leida
 		data_ready	=> ready	,		-- Indica noves dades al bus;	Para usar el controlador por encuesta, se debe hacer una instruccion in sobre el puerto al que esta conectada esta senyal para saber si hay una tecla nueva disponible.
-		intr => ps2_intr_conn, --out
-		inta => ps2_inta_conn --in
+		intr => ps2_intr_conn,
+		inta => ps2_inta_conn
 		); 
 		
 	TIMER_INT: timer 	port map(
