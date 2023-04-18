@@ -31,6 +31,7 @@ ENTITY controladores_IO IS
 			HEX2 		: OUT   std_logic_vector(6 DOWNTO 0);
 			HEX3 		: OUT   std_logic_vector(6 DOWNTO 0);
 			KEY 		: in    std_logic_vector(3 DOWNTO 0);
+			reg_debug   : in    std_logic_vector(15 downto 0);
 			ps2_clk 	: inout std_logic;
 			ps2_data 	: inout std_logic;
 			vga_cursor  : out std_logic_vector(15 downto 0);
@@ -238,10 +239,18 @@ BEGIN
 	end process;
 	
 	-- Bits 3 downto 0 del reg 9 encenen o apaguen els 7-segment; Input X l'apaga
-	input_disp(3 downto 0) 	 <= io_registers(10)(3 downto 0)   when io_registers(9)(0) = '1' else (others => 'X');
-	input_disp(7 downto 4)   <= io_registers(10)(7 downto 4)   when io_registers(9)(1) = '1' else (others => 'X');
-	input_disp(11 downto 8)  <= io_registers(10)(11 downto 8)  when io_registers(9)(2) = '1' else (others => 'X');
-	input_disp(15 downto 12) <= io_registers(10)(15 downto 12) when io_registers(9)(3) = '1' else (others => 'X');
+	input_disp(3 downto 0) 	 <= io_registers(10)(3 downto 0)	when io_registers(9)(0) = '1' and SW(8) = '0' else 
+								reg_debug(3 downto 0) 			when SW(8) = '1' else 
+								(others => 'X');
+	input_disp(7 downto 4)   <= io_registers(10)(7 downto 4)   	when io_registers(9)(1) = '1' and SW(8) = '0' else 
+								reg_debug(7 downto 4)			when SW(8) = '1' else 
+								(others => 'X');
+	input_disp(11 downto 8)  <= io_registers(10)(11 downto 8)  	when io_registers(9)(2) = '1' and SW(8) = '0' else 
+								reg_debug(11 downto 8) 			when SW(8) = '1' else 
+								(others => 'X');
+	input_disp(15 downto 12) <= io_registers(10)(15 downto 12) 	when io_registers(9)(3) = '1' and SW(8) = '0' else 
+								reg_debug(15 downto 12) 		when SW(8) = '1' else 
+								(others => 'X');
 	
 	
 	driver : BCD port map(input => input_disp, out_HEX0 => HEX0, out_HEX1 => HEX1, out_HEX2 => HEX2, out_HEX3 => HEX3);

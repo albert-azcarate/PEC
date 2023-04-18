@@ -28,13 +28,32 @@ ENTITY datapath IS
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			data_wr			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			alu_out_path	: out std_LOGIC_VECTOR(15 downto 0)
+			alu_out_path	: out std_LOGIC_VECTOR(15 downto 0);
+			SW 			: in std_logic_vector(7 downto 0);	
+			reg_debug   : out    std_logic_vector(15 downto 0);
 			);
 END datapath;
 
 
 ARCHITECTURE Structure OF datapath IS
 
+
+	COMPONENT registers IS
+    PORT (clk    	: IN  STD_LOGIC;
+          wrd    	: IN  STD_LOGIC;
+		  wrd_s  	: IN  STD_LOGIC;
+		  u_s 	 	: IN  STD_LOGIC;
+          d      	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+          addr_a 	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+          addr_b 	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+          addr_d 	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+		  int_type	: IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+          a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+          b			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+		  addr_debug : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+		  debug 	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+		  );
+	END component;
 
 	
 	component alu IS
@@ -67,7 +86,8 @@ BEGIN
 											a => regbank_to_alu_a,
 											addr_b => addr_b,
 											b => regbank_to_alu_b, 
-											int_type => int_type
+											int_type => int_type,
+											debug => regbank_debug
 											);
 	
 	alu_unit : alu port map(x => regbank_to_alu_a,
@@ -101,4 +121,18 @@ BEGIN
 	alu_out_path <= alu_out; 
 	 
 	wr_io <= regbank_to_alu_b;
+
+	-- assign addr_debug based on which swicth(7 downto 0) is toggled
+	addr_debug <=	"000" when SW = "00000001" else
+					"001" when SW = "00000010" else
+					"010" when SW = "00000100" else
+					"011" when SW = "00001000" else
+					"100" when SW = "00010000" else
+					"101" when SW = "00100000" else
+					"110" when SW = "01000000" else
+					"111" when SW = "10000000" else
+					"000";
+
+
+	reg_debug <= regbank_debug;
 END Structure;

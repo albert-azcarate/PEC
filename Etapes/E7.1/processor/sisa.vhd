@@ -69,7 +69,10 @@ ARCHITECTURE Structure OF sisa IS
 			wr_io 		: out std_logic_vector(15 downto 0);
 			rd_io 		: in  std_logic_vector(15 downto 0);
 			wr_out 		: out std_logic;
-			rd_in 		: out std_logic
+			rd_in 		: out std_logic;
+
+			SW 			: in  std_logic_vector(8 DOWNTO 0);
+			reg_debug   : out    std_logic_vector(15 downto 0);
 			);
 	END component;
 
@@ -89,10 +92,14 @@ ARCHITECTURE Structure OF sisa IS
 			HEX2 		: OUT   std_logic_vector(6 DOWNTO 0);
 			HEX3 		: OUT   std_logic_vector(6 DOWNTO 0);
 			KEY 		: in    std_logic_vector(3 DOWNTO 0);
+			reg_debug   : in    std_logic_vector(15 downto 0);
 			ps2_clk 	: inout std_logic;
 			ps2_data 	: inout std_logic;
 			vga_cursor 	: out std_logic_vector(15 downto 0);
-			vga_cursor_enable : out std_logic
+			vga_cursor_enable : out std_logic;
+			iid : out std_LOGIC_VECTOR (7 downto 0);
+			inta : in std_LOGIC;
+			intr : out std_LOGIC
 			);
 	END component;
 	
@@ -141,6 +148,8 @@ ARCHITECTURE Structure OF sisa IS
 	
 	signal vga_cursor_dummy     	: std_logic_vector(15 downto 0) := (others => '0');
 	signal vga_cursor_enable_dummy	: std_logic := '0';
+
+	signal debug : std_logic_vector(15 downto 0);
 	
 BEGIN
 
@@ -183,7 +192,9 @@ BEGIN
 		wr_io 		=> wr_io_to_io,
 		rd_io 		=> rd_io_to_io,
 		wr_out 		=> wr_out_to_io,
-		rd_in 		=> rd_in_to_io
+		rd_in 		=> rd_in_to_io,
+		SW 			=> SW(7 downto 0),
+		reg_debug 	=> debug
 		);
 		
 	CIO : controladores_IO port map (
@@ -203,7 +214,8 @@ BEGIN
 		HEX3 		=> HEX3,
 		KEY 		=> KEY,
 		PS2_CLK 	=> PS2_CLK,
-		PS2_DATA 	=> PS2_DAT
+		PS2_DATA 	=> PS2_DAT,
+		reg_debug 	=> debug
 		);	
 	
 	Display : vga_controller port map(
