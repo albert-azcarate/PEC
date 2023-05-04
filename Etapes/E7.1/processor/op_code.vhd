@@ -22,7 +22,7 @@ package op_code is
   constant STB 			: op_code_t := "1110";
   constant HALT 		: op_code_t := "1111"; -- RDS, WRS, EI, DI, RETI, HALT = HALT, diferenciem per el f_code
   constant NOP			: op_code_t := "0010"; -- NOP = ADDI R0 0
-
+  
   
 end package op_code;
 
@@ -73,6 +73,7 @@ package f_code is
  constant DI_OP     : f_code_t := "011";
  constant RETI_OP   : f_code_t := "100";
  constant HALT_OP   : f_code_t := "111";
+ constant GETIID_OP : f_code_t := "101";
  
 end package f_code;
 

@@ -19,9 +19,7 @@ ENTITY registers IS
 		  int_type	: IN STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_e		: OUT STD_LOGIC;
           a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-          b			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		  addr_debug : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-		  debug 	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+          b			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 		  );
 END registers;
 
@@ -35,9 +33,7 @@ component regfile IS
           addr_b : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_d : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-          b      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		  addr_debug : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-		  debug 	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+          b      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 		  );
 	END component;
 
@@ -68,13 +64,7 @@ BEGIN
 										addr_d => addr_d,
 										a => a_user,
 										addr_b => addr_b,
-<<<<<<< HEAD:E7.1/processor/reg/registers.vhd
 										b => b
-=======
-										b => b,
-										addr_debug => addr_debug,
-										debug => debug
->>>>>>> 6ffa200d9039d8eda8607a90260c725afc38b373:Etapes/E7.1/processor/reg/registers.vhd
 										);
 
 	sys_register_bank : sysregfile port map (	clk => clk,

@@ -129,11 +129,7 @@ signal load_pc_out			: std_logic_vector(2 downto 0);
 signal int_type_conn		: std_logic_vector(1 downto 0);
 signal int_type_out			: std_logic_vector(1 downto 0);
 
-<<<<<<< HEAD:E7.1/processor/unidad_control.vhd
 
-=======
-signal interrupt			: std_logic := '0';
->>>>>>> 6ffa200d9039d8eda8607a90260c725afc38b373:Etapes/E7.1/processor/unidad_control.vhd
 
 signal instruction			: string (1 to 4);	-- modelsim
 signal operacio				: string (1 to 6);	-- modelsim
@@ -143,11 +139,7 @@ BEGIN
 	process (boot, load_pc_out, clk) begin
 		if rising_edge(clk) then
 			
-<<<<<<< HEAD:E7.1/processor/unidad_control.vhd
 			despla(15 downto 9) <= (others => datard_m(7));	-- Calculem el desplaï¿½ament dels Branches
-=======
-			despla(15 downto 9) <= (others => datard_m(7));	-- Calculem el desplaçament dels Branches
->>>>>>> 6ffa200d9039d8eda8607a90260c725afc38b373:Etapes/E7.1/processor/unidad_control.vhd
 			despla(8 downto 0) <= datard_m(7 downto 0)&'0';	-- Extenem el signe per els Branches relatius i x2 per alinear-ho
 
 			old_2_Pc <= regPC + 2;	-- Ens guardem el PC + 2 pels JALS i els RETI

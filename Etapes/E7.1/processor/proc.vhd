@@ -17,16 +17,8 @@ ENTITY proc IS
 			rd_io 		: in std_logic_vector(15 downto 0);
 			wr_out 		: out std_logic;
 			rd_in 		: out std_logic;
-<<<<<<< HEAD:E7.1/processor/proc.vhd
 			inta		: out std_logic;
 			intr		: IN std_logic
-=======
-
-			SW 			: in std_logic_vector(7 downto 0);
-			reg_debug   : out    std_logic_vector(15 downto 0);
-			--inta		: IN std_logic;
-			--intr		: IN std_logic
->>>>>>> 6ffa200d9039d8eda8607a90260c725afc38b373:Etapes/E7.1/processor/proc.vhd
 			 );
 END proc;
 
@@ -90,10 +82,7 @@ ARCHITECTURE Structure OF proc IS
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			data_wr			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			alu_out_path	: out std_LOGIC_VECTOR(15 downto 0);
-
-			SW 				: in std_logic_vector(7 downto 0);
-			reg_debug   : OUT    std_logic_vector(15 downto 0)
+			alu_out_path	: out std_LOGIC_VECTOR(15 downto 0)
 			);
 			 
 	END component;

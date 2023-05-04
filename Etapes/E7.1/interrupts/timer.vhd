@@ -15,7 +15,7 @@ END timer;
 
 ARCHITECTURE Structure OF timer IS
 
-	signal count : std_logic_vector(9 downto 0) := x"0";
+	signal count : std_logic_vector(9 downto 0) :=(others => '0');
 	signal interrupt : std_logic := '0';
 	
 begin

@@ -94,12 +94,8 @@ begin
 					wrd_s_l when others;
 			
 	with estat select
-<<<<<<< HEAD:E7.1/processor/multi.vhd
 		int_type <=	"11" when "00",	-- "11" es no interrupcio
 					"11" when "10",
-=======
-		int_type <=	"11" when "00",	-- "11" es no interrupcio
->>>>>>> 6ffa200d9039d8eda8607a90260c725afc38b373:Etapes/E7.1/processor/multi.vhd
 					int_type_l when others;
 		
 	with estat select
