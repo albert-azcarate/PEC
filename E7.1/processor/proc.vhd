@@ -16,7 +16,9 @@ ENTITY proc IS
 			wr_io 		: out std_logic_vector(15 downto 0);
 			rd_io 		: in std_logic_vector(15 downto 0);
 			wr_out 		: out std_logic;
-			rd_in 		: out std_logic
+			rd_in 		: out std_logic;
+			inta		: out std_logic;
+			intr		: IN std_logic
 			 );
 END proc;
 
@@ -26,6 +28,8 @@ ARCHITECTURE Structure OF proc IS
 	PORT (	boot			: IN  STD_LOGIC;
 			clk				: IN  STD_LOGIC;
 			z				: IN  std_LOGIC;
+			intr 			: IN std_logic;
+			int_e		: IN STD_LOGIC;
 			datard_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			alu_out			: IN  STD_LOGIC_VECTOR(15 downto 0);
 			op				: out op_code_t;
@@ -40,6 +44,7 @@ ARCHITECTURE Structure OF proc IS
 			immed_or_reg	: OUT STD_LOGIC;
 			rd_in			: OUT STD_LOGIC;
 			wr_out			: OUT STD_LOGIC;
+			inta		: OUT STD_LOGIC;
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -59,6 +64,8 @@ ARCHITECTURE Structure OF proc IS
 			immed_x2		: IN  STD_LOGIC;
 			ins_dad			: IN  STD_LOGIC;
 			immed_or_reg	: IN  STD_LOGIC;
+			intr				: IN STD_LOGIC;
+		  inta		: IN STD_LOGIC;
 			op				: IN  op_code_t;
 			f				: IN  f_code_t;
 			addr_a			: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -71,6 +78,7 @@ ARCHITECTURE Structure OF proc IS
 			rd_io			: IN  std_LOGIC_VECTOR(15 DOWNTO 0);
 			int_type		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			z				: OUT std_LOGIC;
+			int_e		: OUT STD_LOGIC;
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			data_wr			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -89,6 +97,8 @@ signal immed_or_reg_conn	: STD_LOGIC;
 signal z_conn				: STD_LOGIC;
 signal wrd_s_conn			: STD_LOGIC;
 signal u_s_conn				: STD_LOGIC;
+signal int_e_conn				: STD_LOGIC;
+signal inta_conn				: STD_LOGIC;
 signal in_d_conn			: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal int_type_conn				: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal addr_a_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -114,6 +124,7 @@ BEGIN
 											addr_d => addr_d_conn,
 											immed => immed_conn,
 											pc => pc_conn,
+											int_e => int_e_conn,
 											ins_dad => ins_dad_conn,
 											in_d => in_d_conn,
 											immed_x2 => immed_x2_conn,
@@ -124,8 +135,12 @@ BEGIN
 											addr_io => addr_io,
 											rd_in => rd_in,
 											wr_out => wr_out,
-											int_type => int_type_conn
+											int_type => int_type_conn,
+											intr => intr,
+											inta => inta_conn
 											);
+	inta <= inta_conn;
+	
 	
 	PATH: datapath port map(clk => clk,
 									datard_m => datard_m,
@@ -139,6 +154,8 @@ BEGIN
 									addr_d => addr_d_conn,
 									immed => immed_conn, 
 									pc => pc_conn, 
+											int_e => int_e_conn,
+											inta => inta_conn,
 									ins_dad => ins_dad_conn, 
 									in_d => in_d_conn, 
 									immed_x2 => immed_x2_conn,
@@ -149,7 +166,8 @@ BEGIN
 									z => z_conn,
 									rd_io	=> rd_io,
 									wr_io => wr_io,
-									int_type => int_type_conn
+									int_type => int_type_conn,	
+									intr => intr
 									);
 
 END Structure;
