@@ -22,7 +22,10 @@ ENTITY interrupt_controller IS
 	);
 END interrupt_controller;
 
+
 ARCHITECTURE Structure OF interrupt_controller IS
+
+signal interrupt_treated : std_logic := '0';
 
 begin
 
@@ -30,19 +33,34 @@ begin
 		if boot = '1' then
 		else 
 			if rising_edge(clk) then
-				if timer_intr = '1' and inta = '1' then
-					timer_inta <= '1';
-					iid <= x"00";
-				elsif key_intr = '1' and inta = '1'  then
-					key_inta <= '1';
-					iid <= x"01";
-				elsif switch_intr = '1' and inta = '1'  then
-					switch_inta <= '1';
-					iid <= x"02";
-				elsif ps2_intr = '1' and inta = '1'  then
-					ps2_inta <= '1';
-					iid <= x"03";
+				if interrupt_treated = '0' then
+					interrupt_treated <= '1';
+				
+					-- Valors default
+					timer_inta <= '0';
+					key_inta <= '0';
+					switch_inta <= '0';
+					ps2_inta <= '0';
+					iid <= x"FF";
+					
+					-- Mirem si hi ha cap interrupcio
+					if timer_intr = '1' and inta = '1' then
+						timer_inta <= '1';
+						iid <= x"00";
+					elsif key_intr = '1' and inta = '1'  then
+						key_inta <= '1';
+						iid <= x"01";
+					elsif switch_intr = '1' and inta = '1'  then
+						switch_inta <= '1';
+						iid <= x"02";
+					elsif ps2_intr = '1' and inta = '1'  then
+						ps2_inta <= '1';
+						iid <= x"03";
+					else
+						
+					end if;
 				else
+					interrupt_treated <= '0';
 					timer_inta <= '0';
 					key_inta <= '0';
 					switch_inta <= '0';
@@ -54,5 +72,6 @@ begin
 	end process;
 	
 	intr <= (key_intr or timer_intr) or (ps2_intr or switch_intr);
+	
 	
 end structure;
