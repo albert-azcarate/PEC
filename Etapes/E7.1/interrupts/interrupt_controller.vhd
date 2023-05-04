@@ -7,7 +7,7 @@ use work.all;
 ENTITY interrupt_controller IS
 	PORT (
 		boot			: in std_logic;
-		clk			: in std_logic; --20ns
+		clk			: in std_logic;
 		inta			: in std_logic;
 		intr 			: out std_logic;
 		key_intr 	: in std_logic;
@@ -30,18 +30,22 @@ begin
 		if boot = '1' then
 		else 
 			if rising_edge(clk) then
-				if timer_intr = '1' and inta = '1' then
+
+				-- En el cas que inta = '1' posarem el iid al bus d'interrupcions i fem ack a la interrupcio
+				if timer_intr = '1' and inta = '1' then		-- Interrupcio de timer
 					timer_inta <= '1';
 					iid <= x"00";
-				elsif key_intr = '1' and inta = '1'  then
+				elsif key_intr = '1' and inta = '1' then		-- Interrupcio de teclat
 					key_inta <= '1';
 					iid <= x"01";
-				elsif switch_intr = '1' and inta = '1'  then
+				elsif switch_intr = '1' and inta = '1' then	-- Interrupcio de switch
 					switch_inta <= '1';
 					iid <= x"02";
-				elsif ps2_intr = '1' and inta = '1'  then
+				elsif ps2_intr = '1' and inta = '1' then		-- Interrupcio de ps2
 					ps2_inta <= '1';
 					iid <= x"03";
+				
+				-- Si no hi han interrupcions, acks = 0
 				else
 					timer_inta <= '0';
 					key_inta <= '0';

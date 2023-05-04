@@ -60,10 +60,9 @@ BEGIN
 								and ir_interna(11 downto 0) /= x"020" 							-- SPECIAL(EI)
 								and ir_interna(11 downto 0) /= x"021" 							-- SPECIAL(DI)
 								and ir_interna(11 downto 0) /= x"024" 							-- SPECIAL(RETI)
-								and ir_interna(5 downto 0) /= "101100" 						-- SPECIAL(RDS)
-								and ir_interna(5 downto 0) /= "110000"							-- SPECIAL(WRS)
-								and ir_interna(5 downto 0) /= "101000")						-- SPECIAL (GETIID)
-	
+								and ir_interna(5 downto 0) /= "101100" 							-- SPECIAL(RDS)
+								and ir_interna(5 downto 0) /= "110000")							-- SPECIAL(WRS)
+
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "010")       -- NOP en operaciones COMP pero F_CODE no implementado
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "110")        
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "111")
@@ -85,8 +84,7 @@ BEGIN
 	
 
 	-- Assignem el port al que es vol fer IO
-	addr_io <= ir_interna(7 downto 0) when op_code_ir /= HALT and f_temp /= GETIID_OP else
-					x"00";
+	addr_io <= ir_interna(7 downto 0);
 	
 	-- Read IO enable quan ir(8) es 0
 	rd_in <= not(ir_interna(8)) when op_code_ir = IO else '0';
@@ -118,11 +116,11 @@ BEGIN
 
 					RDS_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "101100") else			-- Cas R/W Sysreg: F depen dels bits 5-0
 					WRS_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110000") else
-					GETIID_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "101000") else
 
 					EI_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"020") else			-- Cas EI/DI/RETI: F depen dels bits 11-0
 					DI_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"021") else
 					RETI_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"024") else
+
 					NOP_OP when op_code_ir = NOP else
 				NOP_OP;																					-- Else 0
 	
@@ -134,9 +132,9 @@ BEGIN
 	-- En interrupcions no cal modificarho, perque ho controlem desde multi
 	ldpc <= 	"011" when op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" else	-- 11 HALT
 				"010" when op_code_ir = BZ else											-- 10 BRANCH
-				"001" when op_code_ir = JMP else										-- 01 JUMPS
+				"001" when op_code_ir = JMP else											-- 01 JUMPS
 				"100" when op_code_ir = HALT and ir_interna = x"f024" else				-- 100 RETI
-				"000" ; 			 													-- 00 RUN; falta CALLS
+				"000" ; 			 														-- 00 RUN; falta CALLS
 
 	-- wrd habilita l'escriptura al banc de registres
 	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL), BRANCHES, OUT, NOP, EI, DI, RETI, WRS
@@ -159,13 +157,13 @@ BEGIN
 	wrd_s <= '1' when 	(op_code_ir = HALT and f_temp = WRS_OP)
 						or (op_code_ir = HALT and f_temp = EI_OP) 
 						or (op_code_ir = HALT and f_temp = DI_OP)
-						or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024") -- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix f_code
+						or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024") -- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix codi
 						else 
 			 '0';	
 	-- u_s ens indica si llegim de user o system al banc de registres 
 	-- Sempre user excepte RDS, RETI
 	u_s <= '1' when (op_code_ir = HALT and f_temp = RDS_OP)
-					or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024")-- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix f_code
+					or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024")-- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix codi
 					else
 			'0';
 
@@ -201,7 +199,7 @@ BEGIN
 	-- Desde memoria a LD i LDB, desde el PCup a JAL, desde io_reg en IN i la resta desde la ALU
 	in_d <= "01" when (op_code_ir = LD or op_code_ir = LDB) else 
 			"10" when (op_code_ir = JMP and f_temp = JAL_OP) else 
-			"11" when (op_code_ir = IO and (f_temp = IN_OP or f_temp = GETIID_OP)) else
+			"11" when (op_code_ir = IO and f_temp = IN_OP) else
 			"00";
 
 	-- halt_cont indica si estem en HALT; REVISAR US
@@ -224,11 +222,11 @@ BEGIN
 					'1';
 
 	--immed depen de quina instruccio es esta codificat a llocs i tamanys diferents; Les dos seguents asignacions juguen amb com estan codificades
-	immed(15 downto 8) <= 	(others => ir_interna(7)) when op_code_ir = MOVE or op_code_ir = BZ else	-- Cas MOVE o BZ: immed als 8 bits de menor pes (extenem el signe)
-							(others => ir_interna(5)) when op_code_ir = ADDI else						-- Cas ADDI: immed als 5 bits de menor pes (extenem el signe) --REVISAR, es pot treure, perque ara tot son 6 bits; IDEM amb immed(7-0)
+	immed(15 downto 8) <= 	(others => ir_interna(7)) when op_code_ir = MOVE or op_code_ir = BZ else	-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes (extenem el signe)
+							(others => ir_interna(5)) when op_code_ir = ADDI else						-- Cas ADDI: immed als 5 bits de menor pes (extenem el signe)
 							(others => ir_interna(5)); 													-- Else: immed als 6 bits de menor pes (extenem el signe)
 
-	immed(7 downto 0)  <= 	ir_interna(7 downto 0) when op_code_ir = MOVE or op_code_ir = BZ else 							-- Cas MOVE o BZ
+	immed(7 downto 0)  <= 	ir_interna(7 downto 0) when op_code_ir = MOVE or op_code_ir = BZ else 							-- Cas MOVE: [BZ(REVISAR)] immed als 8 bits de menor pes
 							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0) when op_code_ir = ADDI else   				-- Cas ADDI: immed als 5 bits de menor pes; No pasa res si tambe es un NOP, perque els NOP pillen reg d'entrada a la alu
 							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0);			                               		-- Else: immed als 6 bits de menor pes 
 
@@ -236,7 +234,7 @@ BEGIN
 	int_type <= "00" when (op_code_ir = HALT and f_temp = EI_OP) else
 				"01" when (op_code_ir = HALT and f_temp = DI_OP) else
 				"10" when (op_code_ir = HALT and f_temp = RETI_OP) else
-				"11";	-- No es interrupcio, posem 11 de forma arbitraria
+				"11";
 
 
 -- MODELSIM SIGNALS	
@@ -258,7 +256,6 @@ BEGIN
 					"EI  " when (op_code_ir = HALT and f_temp = EI_OP) else
 					"DI  " when (op_code_ir = HALT and f_temp = DI_OP) else	
 					"RETI" when (op_code_ir = HALT and f_temp = RETI_OP) else
-					"GETI" when (op_code_ir = HALT and f_temp = GETIID_OP) else
 					"NOP ";
 							 
 
@@ -301,7 +298,6 @@ BEGIN
 				"EI    " when f_temp = EI_OP and op_code_ir = HALT else
 				"RETI  " when f_temp = RETI_OP and op_code_ir = HALT else
 				"NOP   " when f_temp = NOP_OP and op_code_ir = NOP else
-				"GETIID" when f_temp = GETIID_OP and op_code_ir = HALT else
 				"DEAD  ";
 -- END MODELSIM SIGNALS
 	

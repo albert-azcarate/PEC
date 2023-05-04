@@ -9,15 +9,11 @@ ENTITY registers IS
           wrd    	: IN  STD_LOGIC;
 		  wrd_s  	: IN  STD_LOGIC;
 		  u_s 	 	: IN  STD_LOGIC;
-		  intr		: IN STD_LOGIC;
-		  inta		: IN STD_LOGIC;
           d      	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 PCup    : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
           addr_a 	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_b 	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_d 	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 		  int_type	: IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-			int_e		: OUT STD_LOGIC;
           a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           b			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 		  );
@@ -40,15 +36,11 @@ component regfile IS
 component sysregfile IS
     PORT (clk		: IN  STD_LOGIC;
           wrd		: IN  STD_LOGIC;
-		  intr		: IN STD_LOGIC;
-		  inta		: IN STD_LOGIC;
           d			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
           addr_a	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_d	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 		  int_type	: IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-		   PCup     	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 int_e : OUT STD_LOGIC
+          a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 		  );
 	END component;
 
@@ -64,7 +56,7 @@ BEGIN
 										addr_d => addr_d,
 										a => a_user,
 										addr_b => addr_b,
-										b => b
+										b => b 
 										);
 
 	sys_register_bank : sysregfile port map (	clk => clk,
@@ -73,11 +65,7 @@ BEGIN
 												addr_a => addr_a,
 												addr_d => addr_d,
 												int_type => int_type,
-												a => a_sys,
-												intr => intr,
-												inta => inta,
-												PCup => PCup,
-												int_e => int_e
+												a => a_sys
 												);
 
 	a <= a_user when u_s = '0' else a_sys;

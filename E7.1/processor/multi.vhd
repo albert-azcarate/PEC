@@ -13,7 +13,6 @@ entity multi is
 			halt_cont	: IN  STD_LOGIC;
 			rd_in_l		: IN  STD_LOGIC;
 			wr_out_l	: IN  STD_LOGIC;
-			int_e		: IN STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -26,7 +25,6 @@ entity multi is
 			word_byte	: OUT STD_LOGIC;
 			rd_in		: OUT STD_LOGIC;
 			wr_out		: OUT STD_LOGIC;
-			inta			: OUT STd_LOGIC;
 			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
@@ -42,11 +40,8 @@ begin
 	process (clk) begin
 		if rising_edge(clk) then 
 			if boot = '0' then			-- Si estem a RUN
-				inta <= '0';
-			
-				if interrupt = '1' and estat = "01" and int_e = '1' then	-- Si hi ha interrupy ens podem en estat interrupcio
+				if interrupt = '1' then	-- Si hi ha interrupy ens podem en estat interrupcio
 					estat <= "10"; 
-					inta <= '1';
 				else
 					if estat = "00" then -- Si estem a FETCH -> DECODE
 						estat <= "01";
@@ -66,66 +61,59 @@ begin
 	
 	-- HALT quan ens diuen de parar, ldpc_l quan estem a DECODE, else RUN
 	ldpc <= "011" when estat = "00" and halt_cont = '1' else 
-			ldpc_l when estat = "01" else 
-			"101" when estat = "10" else
+			ldpc_l when estat = "01"else 
 			"000"; 
 
--- Sempre en Decode passem la dada; sha de mirar que fer en interrupcio, el estat SYSTEM "10"
-
-
+	-- 	En DECODE pasem la dada
 	with estat select
 		word_byte <=  	'0' when "00",
-							'0' when "10",
 						w_b when others;
 						
+	-- 	En DECODE pasem la dada
 	with estat select
 		wr_m <=  '0' when "00",
-					'0' when "10",
 					wr_m_l when others;
-								
+					
+	-- 	En DECODE pasem la dada				
 	with estat select
 		wrd <=  '0' when "00",
-					'0' when "10",
 				wrd_l when others;
-			
+
+	-- 	En DECODE pasem la dada				
 	with estat select
 		wrd_s <=  	'0' when "00",
-					'0' when "10",
 					wrd_s_l when others;
-			
+
+	-- 	En DECODE pasem la dada				
 	with estat select
-		int_type <=	"11" when "00",	-- "11" es no interrupcio
-					"11" when "10",
+		int_type <=	"11" when "00",
 					int_type_l when others;
-		
+
+	-- 	En DECODE pasem la dada				
 	with estat select
 		u_s <=  '0' when "00",
-					'1' when "10",
 				u_s_l when others;
-		
+
+
+	-- 	En DECODE pasem la dada				
 	with estat select
 		addr_io <=  x"00" when "00",
-					x"00" when "10",
 					addr_io_l when others;
-				
+	
+	-- 	En DECODE pasem la dada				
 	with estat select
 		rd_in <=  	'0' when "00",
-					'0' when "10",
 					rd_in_l when others;
-				
+	
+	-- 	En DECODE pasem la dada				
 	with estat select
 		wr_out <=  	'0' when "00",
-					'0' when "10",
 					wr_out_l when others;
 	
 	-- ldir indica si carreguem el Instruction register amb la dad de memoria (carreguem en estat fetch)
-	ldir <= '1' when estat = "00" else 
-				'0' when estat = "10" else
-				'0';
+	ldir <= '1' when estat = "00" else '0';
 	
 	-- ins_dad indica que posem al bus, si instruccions(0) o dades(1)
-	ins_dad <= '0' when estat = "00" else 
-					'0' when estat = "10" else
-					'1';
+	ins_dad <= '0' when estat = "00" else '1';
 	 
 end Structure;

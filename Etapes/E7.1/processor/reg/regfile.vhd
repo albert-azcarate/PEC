@@ -27,7 +27,10 @@ ENTITY regfile IS
           addr_b : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_d : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-          b      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+          b      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+		  addr_debug : in std_logic_vector(2 downto 0);
+		  debug : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+		  );
 END regfile;
 
 ARCHITECTURE Structure OF regfile IS
@@ -39,6 +42,7 @@ BEGIN
 	-- lectura asinc
 	a <= reg_vector(conv_integer(addr_a));
 	b <= reg_vector(conv_integer(addr_b));
+	debug <= reg_vector(conv_integer(addr_debug));
 	
 	process (clk) begin
 		-- escriptura sinc

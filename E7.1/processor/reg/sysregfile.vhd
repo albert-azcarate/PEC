@@ -13,13 +13,13 @@
 
 
 -- Tipus de excepcio o interrupcio:
---		0 : Excepciï¿½n de tipo ?Instrucciï¿½n ilegal?.
---		1 : Excepciï¿½n de tipo ?Acceso a memoria mal alineado?.
---		2 : Excepciï¿½n de tipo ?Overflow en operaciï¿½n de coma flotante?.
---		3 : Excepciï¿½n de tipo ?Divisiï¿½n por cero en coma flotante?
---		4 : Excepciï¿½n de tipo ?Divisiï¿½n por cero en enteros o naturales?
---		5 ,...,14: No usadas en esta versiï¿½n. Reservados para futuras ampliaciones.
---		15: Interrupciï¿½n (externa)
+--		0 : Excepción de tipo ?Instrucción ilegal?.
+--		1 : Excepción de tipo ?Acceso a memoria mal alineado?.
+--		2 : Excepción de tipo ?Overflow en operación de coma flotante?.
+--		3 : Excepción de tipo ?División por cero en coma flotante?
+--		4 : Excepción de tipo ?División por cero en enteros o naturales?
+--		5 ,...,14: No usadas en esta versión. Reservados para futuras ampliaciones.
+--		15: Interrupción (externa)
 
 
 LIBRARY ieee;
@@ -31,15 +31,11 @@ use work.all;
 ENTITY sysregfile IS
     PORT (	clk			: IN  STD_LOGIC;
 			wrd			: IN  STD_LOGIC;
-		  intr		: IN STD_LOGIC;	
-		  inta		: IN STD_LOGIC;
 			d			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			PCup			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 		  	int_type	: IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-			a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			int_e : OUT STD_LOGIC
+			a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 END sysregfile;
 
@@ -50,31 +46,20 @@ signal reg_vector : reg.slv_array_t;
 
 BEGIN
 	-- lectura asinc
-	a <= 	reg_vector(1) when int_type = "10" else 
-			reg_vector(5) when intr = '1' and reg_vector(7)(1) = '1' else
-			reg_vector(conv_integer(addr_a));
-			
-	int_e <= reg_vector(7)(1);
+	a <= reg_vector(1) when int_type = "10" else reg_vector(conv_integer(addr_a));
 	
 	process (clk) begin
 		-- escriptura sinc
 		if rising_edge(clk) then
-			if intr = '1' and inta = '1' and reg_vector(7)(1) = '1' then
-				reg_vector(0) <= reg_vector(7);
-				reg_vector(1) <= PCup;
-				reg_vector(2) <= x"000F";
+			if int_type = "00" then			-- EI
+				reg_vector(7)(1) <= '1';
+			elsif int_type = "01" then		-- DI
 				reg_vector(7)(1) <= '0';
-			else
-				if int_type = "00" then			-- EI
-					reg_vector(7)(1) <= '1';
-				elsif int_type = "01" then		-- DI
-					reg_vector(7)(1) <= '0';
-				elsif int_type = "10" then		-- RETI
-					reg_vector(7) <= reg_vector(0);
-				else							-- USUAL WRITE
-					if wrd = '1' then
-						reg_vector(conv_integer(addr_d)) <= d;
-					end if;
+			elsif int_type = "10" then		-- RETI
+				reg_vector(7) <= reg_vector(0);
+			else							-- USUAL WRITE
+				if wrd = '1' then
+					reg_vector(conv_integer(addr_d)) <= d;
 				end if;
 			end if;
 		end if;
