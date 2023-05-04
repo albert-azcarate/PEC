@@ -45,6 +45,7 @@ ARCHITECTURE Structure OF datapath IS
           y  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
           op : IN  op_code_t;
           f  : IN  f_code_t;
+		  int : IN std_logic;
           w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		  z  : OUT std_logic);
 	END component;
@@ -81,6 +82,7 @@ BEGIN
 							y => input_y,
 							op => op,
 							f => f,
+							int => inta,
 							w => alu_out,
 							z => z);
 		

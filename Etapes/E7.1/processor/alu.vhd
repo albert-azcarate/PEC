@@ -11,6 +11,7 @@ ENTITY alu IS
           y  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
           op : IN  op_code_t;
           f  : IN  f_code_t;
+		  int : IN std_logic;
           w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		  z  : OUT std_logic);
 END alu;
@@ -98,6 +99,6 @@ BEGIN
 					
 					(others => 'Z');
 				
-	w <= w_temporal;
+	w <= w_temporal when int = '0' else x;
 	
 END Structure;

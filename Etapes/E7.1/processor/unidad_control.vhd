@@ -84,6 +84,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			int_e		: IN STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
 			wrd			: OUT STD_LOGIC;
 			wrd_s		: OUT STD_LOGIC;
@@ -97,6 +98,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			inta		: OUT STD_LOGIC;
 			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			addr_a		: OUT  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
 	end component;
@@ -114,6 +116,7 @@ signal halt_conn			: std_logic;
 signal ins_dad_conn			: std_logic;
 signal wr_out_conn			: std_logic;
 signal rd_in_conn			: std_logic;
+signal int_a_conn			: std_logic;
 signal f_out				: f_code_t;
 signal regPC				: std_logic_vector(15 downto 0) := x"C000";
 signal new_Pc				: std_logic_vector(15 downto 0) := x"0000";
@@ -126,6 +129,7 @@ signal despla				: std_logic_vector(15 downto 0);
 signal addr_io_conn			: std_logic_vector(7 downto 0);
 signal load_pc_connection	: std_logic_vector(2 downto 0);   
 signal load_pc_out			: std_logic_vector(2 downto 0);
+signal addr_a_conn			: std_logic_vector(2 downto 0);
 signal int_type_conn		: std_logic_vector(1 downto 0);
 signal int_type_out			: std_logic_vector(1 downto 0);
 
@@ -234,10 +238,11 @@ BEGIN
 	ir_connection <= ir_reg;
 	f <=  f_out;
 	int_type <= int_type_out;
+	inta <= int_a_conn;
 	
 	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL; REVISAR si no pot ser asignat normal ja que nomes fem servir pc quan es JAL
 	pc <= old_2_Pc when load_pc_out = "01" and f_out = JAL_OP else
-			old_2_Pc when intr = '1' and int_e = '1' else
+		  regPC when int_a_conn = '1' and int_e = '1' else
 		  regPC;
 
 	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
@@ -249,7 +254,6 @@ BEGIN
 										wrd => enable,
 										wrd_s => enable_sys,
 										u_s => user_sys,
-										addr_a => addr_a, 
 										addr_b => addr_b,
 										addr_d => addr_d,
 										immed => immed,
@@ -263,6 +267,7 @@ BEGIN
 										rd_in => rd_in_conn,
 										wr_out => wr_out_conn,
 										int_type => int_type_conn,
+										addr_a => addr_a_conn,
 										Instruccio => Instruction			--modelsim
 										);
 
@@ -278,12 +283,13 @@ BEGIN
 								addr_io_l => addr_io_conn,
 								rd_in_l => rd_in_conn,
 								wr_out_l => wr_out_conn,
+								addr_a_l => addr_a_conn,
 								int_type_l => int_type_conn,
 								w_b => word_byte_connection,
 								ldpc => load_pc_out,
 								wrd => wrd,
 								wrd_s => wrd_s,
-								inta => inta,
+								inta => int_a_conn,
 								u_s => u_s, 
 								wr_m => wr_m,
 								ldir => load_ins,
@@ -293,6 +299,7 @@ BEGIN
 								addr_io => addr_io,
 								rd_in => rd_in,
 								wr_out => wr_out,
+								addr_a => addr_a,
 								int_type => int_type_out
 								);
 									

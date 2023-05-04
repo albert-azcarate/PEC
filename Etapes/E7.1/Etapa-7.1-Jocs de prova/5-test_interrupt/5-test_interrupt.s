@@ -8,14 +8,14 @@
        ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
        ; Inicializacion
        ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-       $MOVEI r1, RSG
-       wrs    s5, r1      ;inicializamos en S5 la direccion de la rutina de antencion a las interrupcciones
-       movi   r1, 0xF
-       out     9, r1      ;activa todos los visores hexadecimales
-       movi   r1, 0xFF
-       out    10, r1      ;muestra el valor 0xFFFF en los visores
-       $MOVEI r6, inici   ;adreça de la rutina principal
-       jmp    r6
+       $MOVEI r1, RSG	; c000 c002
+       wrs    s5, r1      ;inicializamos en S5 la direccion de la rutina de antencion a las interrupcciones	4
+       movi   r1, 0xF	;6
+       out     9, r1      ;activa todos los visores hexadecimales  8
+       movi   r1, 0xFF	;A
+       out    10, r1      ;muestra el valor 0xFFFF en los visores	;C
+       $MOVEI r6, inici   ;adreça de la rutina principal	;E ;10
+       jmp    r6		; 12
 
        ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
        ; Rutina de servicio de interrupcion

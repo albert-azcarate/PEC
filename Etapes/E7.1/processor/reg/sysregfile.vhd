@@ -45,7 +45,7 @@ END sysregfile;
 
 ARCHITECTURE Structure OF sysregfile IS
 
-signal reg_vector : reg.slv_array_t;
+signal reg_vector : reg.slv_array_t := (others => x"0000");
 
 
 BEGIN
@@ -56,10 +56,10 @@ BEGIN
 			
 	int_e <= reg_vector(7)(1);
 	
-	process (clk) begin
+	process (clk, inta) begin
 		-- escriptura sinc
 		if rising_edge(clk) then
-			if intr = '1' and inta = '1' and reg_vector(7)(1) = '1' then
+			if inta = '1'and reg_vector(7)(1) = '1' then
 				reg_vector(0) <= reg_vector(7);
 				reg_vector(1) <= PCup;
 				reg_vector(2) <= x"000F";

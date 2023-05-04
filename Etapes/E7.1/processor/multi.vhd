@@ -16,6 +16,7 @@ entity multi is
 			int_e		: IN STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
 			wrd			: OUT STD_LOGIC;
 			wrd_s		: OUT STD_LOGIC;
@@ -29,6 +30,7 @@ entity multi is
 			inta			: OUT STd_LOGIC;
 			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			addr_a		: OUT  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
 end entity;
@@ -51,6 +53,8 @@ begin
 					if estat = "00" then -- Si estem a FETCH -> DECODE
 						estat <= "01";
 					elsif estat = "01" then -- Si estem a DECODE -> FETCH
+						estat <= "00";
+					else 					-- Si estem en SYSTEM -> FETCH
 						estat <= "00";
 					end if;
 				end if;
@@ -100,13 +104,18 @@ begin
 		
 	with estat select
 		u_s <=  '0' when "00",
-					'1' when "10",
+				'1' when "10",
 				u_s_l when others;
 		
 	with estat select
 		addr_io <=  x"00" when "00",
 					x"00" when "10",
 					addr_io_l when others;
+					
+					
+	with estat select
+		addr_a <=  "101" when "10",
+					addr_a_l when others;
 				
 	with estat select
 		rd_in <=  	'0' when "00",
@@ -120,12 +129,12 @@ begin
 	
 	-- ldir indica si carreguem el Instruction register amb la dad de memoria (carreguem en estat fetch)
 	ldir <= '1' when estat = "00" else 
-				'0' when estat = "10" else
-				'0';
+			'0' when estat = "10" else
+			'0';
 	
 	-- ins_dad indica que posem al bus, si instruccions(0) o dades(1)
-	ins_dad <= '0' when estat = "00" else 
-					'0' when estat = "10" else
-					'1';
+	ins_dad <= 	'0' when estat = "00" else 
+				'0' when estat = "10" else
+				'1';
 	 
 end Structure;
