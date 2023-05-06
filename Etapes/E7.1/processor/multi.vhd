@@ -89,7 +89,7 @@ begin
 								
 	with estat select
 		wrd <=  '0' when "00",
-					'0' when "10",
+				'0' when "10",
 				wrd_l when others;
 			
 	with estat select

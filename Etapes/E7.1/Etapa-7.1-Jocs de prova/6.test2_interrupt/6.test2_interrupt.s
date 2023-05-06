@@ -176,6 +176,7 @@ inici:
         out     5, r1              ;apaga los leds verdes
         in     r1, 8               ;leemos el valor de los interruptores
         out     6, r1              ;activa los leds rojos con el valor de los interruptores
+		halt
         $CALL  r6, __clear_screen  ;borra la pantalla (en R6 se almacena la direccion de retorno de la subrutina)
         ei                         ;activa las interrupciones
 

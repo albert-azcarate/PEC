@@ -76,7 +76,7 @@ BEGIN
 							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "101") 
 							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "110") 
 
-							or (op_code_ir_pre = IO and ir_interna(5 downto 0) < x"20") else   	-- NOP en operaciones IO pero con puerto no accesible
+							or (op_code_ir_pre = IO and ir_interna(5 downto 0) > x"20") else   	-- NOP en operaciones IO pero con puerto no accesible
 					op_code_ir_pre;
 
 	-- Assignem a la sortida de OP
@@ -85,6 +85,7 @@ BEGIN
 	
 
 	-- Assignem el port al que es vol fer IO
+	-- En GETIID accedim al port 0 per indicar que es un get iid
 	addr_io <= ir_interna(7 downto 0) when op_code_ir /= HALT and f_temp /= GETIID_OP else
 					x"00";
 	
@@ -145,7 +146,7 @@ BEGIN
 					or op_code_ir = STB 
 					or (op_code_ir = JMP and f_temp /= JAL_OP)
 					or op_code_ir = BZ 
-					or (op_code_ir = NOP and op_code_ir_pre /= ADDI)
+					or (op_code_ir = NOP and op_code_ir_pre /= ADDI and f_temp /= GETIID_OP)
 					or (op_code_ir = IO and f_temp = OUT_OP)
 					or (op_code_ir = HALT and f_temp = EI_OP)
 					or (op_code_ir = HALT and f_temp = DI_OP)
@@ -188,7 +189,7 @@ BEGIN
 					ir_interna(11 downto 9) when others;	-- else addr_b als bits 11-9
 
 	-- addr_d adreca D al banc de registres;				
-	addr_d <= 	"000" when 	(op_code_ir = NOP and op_code_ir_pre /= ADDI) else -- Si es un NOP i el prefiltrat no era ADDI addr_d = 0; NOP i ADDI comparteixen OP_CODE aixi que ho detectem aixi
+	addr_d <= 	"000" when 	(op_code_ir = NOP and op_code_ir_pre /= ADDI and f_temp /= GETIID_OP) else -- Si es un NOP i el prefiltrat no era ADDI addr_d = 0; NOP i ADDI comparteixen OP_CODE aixi que ho detectem aixi
 				ir_interna(11 downto 9);
 	
 	-- wr_m indica si escribim a memoria o no (1 si)
@@ -201,7 +202,7 @@ BEGIN
 	-- Desde memoria a LD i LDB, desde el PCup a JAL, desde io_reg en IN i la resta desde la ALU
 	in_d <= "01" when (op_code_ir = LD or op_code_ir = LDB) else 
 			"10" when (op_code_ir = JMP and f_temp = JAL_OP) else 
-			"11" when (op_code_ir = IO and (f_temp = IN_OP or f_temp = GETIID_OP)) else
+			"11" when (op_code_ir = IO and f_temp = IN_OP) or (op_code_ir = HALT and f_temp = GETIID_OP) else
 			"00";
 
 	-- halt_cont indica si estem en HALT; REVISAR US

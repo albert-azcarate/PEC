@@ -68,7 +68,6 @@ begin
 					key_inta <= '0';
 					switch_inta <= '0';
 					ps2_inta <= '0';
-					iid <= x"FF";
 				end if;
 			end if;
 		end if;

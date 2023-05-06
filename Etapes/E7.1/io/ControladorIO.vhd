@@ -162,24 +162,25 @@ BEGIN
 	-- Quin port IO volem accedir
 	adress_reg <= conv_integer(addr_io);
 	
-	with iid_reg select
-		rd_io_int <= rd_io_conn when x"ff",
-					x"0001" when x"00",
-					x"000"&read_key_conn when x"01",
-					x"00"&rd_switch_conn when x"02",
-					x"00"&char_readed when x"03",
-					x"0000" when others;
+	--with iid_reg select
+	--	rd_io_int <= rd_io_conn when x"ff",
+	--				x"0001" when x"00",
+	--				x"000"&read_key_conn when x"01",
+	--				x"00"&rd_switch_conn when x"02",
+	--				x"00"&char_readed when x"03",
+	--				x"0000" when others;
 					
 				
-	rd_io <= rd_io_int when adress_reg /= 0 else x"00"&iid_reg;
-	process (CLOCK_50, boot) begin
+	rd_io <= rd_io_conn when adress_reg /= 0 else x"00"&iid_reg;
+
+	process (clk, boot) begin
 		
 		if boot='1' then							-- BOOT estem a boot posem el reg 16 a 0 (si no no anava, era sempre 1); REVISAR buscar workaround( diria que amb el others others de io_reg ja esta)
 			io_registers(16) <= x"0000";
 			-- Posem tots els registres a 0 (others => (others => '0'))
 			io_registers <= (others => (others => '0'));
 					
-		elsif rising_edge(CLOCK_50) then 			-- RUN
+		elsif rising_edge(clk) then 			-- RUN
 			-- Llegim els Switchs i Keys
 			io_registers(8) <= "0000000"&SW;
 			io_registers(7) <= x"000"&KEY;
@@ -237,8 +238,8 @@ BEGIN
 		end if;
 	end process;
 	
-	process (clk) begin
-			if inta = '1' then
+	process (clk, inta) begin
+		if timer_inta_conn = '1' or key_inta_conn = '1' or switch_inta_conn = '1' or ps2_inta_conn = '1' then
 				iid_reg <= iid_conn;
 		end if;
 	end process;
