@@ -1,0 +1,23 @@
+Simulación de una memoria comercial SRAM con el Modelsim
+
+1) La memoria emulada es la Cypress CY7C1021BN
+
+2) La memoria es de 1-Mbit (64K x 16) SRAM
+
+   Eso significa que tiene 64k filas de 16 bits cada una, o sea 128KB.
+
+   Como el SISA sólo gestiona 64KB y el nivel de direccionamiento es a nivel de bytes, sólo se usarán las 64KB primeras y la dirección de boot es la 0x06000
+
+3) El fichero "contingut.memoria.hexa16.rom" contiene el programa que se cargará en la memoria (se carga cuando se produce un flanco ascendente de la señal boot)
+
+4) El fichero "test_sisa.vhd" es el que une el SystemOnChip del SISA con el emulador de la memoria SRAM
+
+   Hay que revisar como se ha hecho el boot del procesador para que sea todo consistente
+
+5) Los ficheros "test_sisa.vhd", "contingut.memoria.hexa.rom", "async_64Kx16.vhd", "package_utility.vhd" y "package_timing.vhd", a priori, deben estar en el mismo directorio que el diseño desarrollado.
+
+6) La primera vez hay que compilar el proyecto dos veces en el Modelsim para que funcione, o ordenar los ficheros para que compile primero "package_utility.vhd" y "package_timing.vhd", y luego el "async_64Kx16.vhd"
+
+7) Aunque en el bloque de la memoria hay muchas señales que pueden ser deconocidas para vosotros, el contenido de memoria es la señal mem_array.
+
+8) Por último, no garantizo que funcione al 100%
