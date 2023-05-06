@@ -103,11 +103,12 @@ BEGIN
 						
 	with ins_dad select
 		addr_m <= 	alu_out when '1',
-						pc when others;
-						
+					pc when others;
+
 	data_wr <= regbank_to_alu_b;
 	
 	alu_out_path <= alu_out; 
-	 
+
 	wr_io <= regbank_to_alu_b;
+	
 END Structure;

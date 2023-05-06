@@ -46,7 +46,7 @@ begin
 			if boot = '0' then			-- Si estem a RUN
 				inta <= '0';
 			
-				if interrupt = '1' and estat = "01" and int_e = '1' then	-- Si hi ha interrupy ens podem en estat interrupcio
+				if interrupt = '1' and estat = "01" and int_e = '1' then	-- Si hi ha interrup ens podem en estat interrupcio
 					estat <= "10"; 
 					inta <= '1';
 				else
@@ -71,7 +71,7 @@ begin
 	-- HALT quan ens diuen de parar, ldpc_l quan estem a DECODE, else RUN
 	ldpc <= "011" when estat = "00" and halt_cont = '1' else 
 			ldpc_l when estat = "01" else 
-			"101" when estat = "10" else
+			"101" when estat = "10" else -- SYSTEM
 			"000"; 
 
 -- Sempre en Decode passem la dada; sha de mirar que fer en interrupcio, el estat SYSTEM "10"

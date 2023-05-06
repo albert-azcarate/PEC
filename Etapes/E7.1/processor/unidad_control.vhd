@@ -154,7 +154,7 @@ BEGIN
 				if load_pc_out = "011" then  -- HALT
 					regPC <= regPC;
 					
-				elsif load_pc_out = "101" then
+				elsif load_pc_out = "101" then -- SYSTEM; Posem al PC el que en surt de la ALU(S5, RSG)
 					regPC <= alu_out;
 				else						-- RUN
 				
@@ -210,8 +210,8 @@ BEGIN
 		if boot = '1' then 										--BOOT
 			new_ir <= x"C000";
 		else
-			if load_pc_out /= "11" then		-- Cas RUN
-				if load_ins = '1' or load_pc_out = "01"  then  	-- DECODE or JMP carreguem a ir el que ens ve de memoria
+			if load_pc_out /= "011" then		-- Cas RUN
+				if load_ins = '1' or load_pc_out = "001"  then  	-- DECODE or JMP carreguem a ir el que ens ve de memoria
 					new_ir <= datard_m ;
 				else											-- Cas FETCH 
 					if regPC < x"fffe" then
@@ -241,7 +241,7 @@ BEGIN
 	inta <= int_a_conn;
 	
 	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL; REVISAR si no pot ser asignat normal ja que nomes fem servir pc quan es JAL
-	pc <= old_2_Pc when load_pc_out = "01" and f_out = JAL_OP else
+	pc <= old_2_Pc when load_pc_out = "001" and f_out = JAL_OP else
 		  regPC when int_a_conn = '1' and int_e = '1' else
 		  regPC;
 

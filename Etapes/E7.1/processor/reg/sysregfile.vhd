@@ -50,8 +50,8 @@ signal reg_vector : reg.slv_array_t := (others => x"0000");
 
 BEGIN
 	-- lectura asinc
-	a <= 	reg_vector(1) when int_type = "10" else 
-			reg_vector(5) when intr = '1' and reg_vector(7)(1) = '1' else
+	a <= 	reg_vector(5) when inta = '1' and reg_vector(7)(1) = '1' else
+			reg_vector(1) when int_type = "10" else
 			reg_vector(conv_integer(addr_a));
 			
 	int_e <= reg_vector(7)(1);
@@ -71,6 +71,7 @@ BEGIN
 					reg_vector(7)(1) <= '0';
 				elsif int_type = "10" then		-- RETI
 					reg_vector(7) <= reg_vector(0);
+					--reg_vector(7)(1) <= '1';
 				else							-- USUAL WRITE
 					if wrd = '1' then
 						reg_vector(conv_integer(addr_d)) <= d;

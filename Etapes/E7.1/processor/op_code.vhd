@@ -5,23 +5,23 @@ use ieee.std_logic_1164.all;
 package op_code is
   subtype op_code_t is std_logic_vector(3 downto 0);
 
-  constant AL 			: op_code_t := "0000";
-  constant COMP 		: op_code_t := "0001";
-  constant ADDI 		: op_code_t := "0010";
-  constant LD 			: op_code_t := "0011";
-  constant ST 			: op_code_t := "0100";
-  constant MOVE 		: op_code_t := "0101";
-  constant BZ	 		: op_code_t := "0110";
-  constant IO			: op_code_t := "0111";
-  constant MULDIV 		: op_code_t := "1000";
-  constant FLOAT		: op_code_t := "1001";
-  constant JMP	 		: op_code_t := "1010";
-  constant LDF			: op_code_t := "1011";
-  constant STF			: op_code_t := "1100";
-  constant LDB 			: op_code_t := "1101";
-  constant STB 			: op_code_t := "1110";
-  constant HALT 		: op_code_t := "1111"; -- RDS, WRS, EI, DI, RETI, HALT = HALT, diferenciem per el f_code
-  constant NOP			: op_code_t := "0010"; -- NOP = ADDI R0 0
+  constant AL 			: op_code_t := "0000"; -- 0
+  constant COMP 		: op_code_t := "0001"; -- 1
+  constant ADDI 		: op_code_t := "0010"; -- 2
+  constant LD 			: op_code_t := "0011"; -- 3
+  constant ST 			: op_code_t := "0100"; -- 4
+  constant MOVE 		: op_code_t := "0101"; -- 5
+  constant BZ	 		: op_code_t := "0110"; -- 6
+  constant IO			: op_code_t := "0111"; -- 7
+  constant MULDIV 		: op_code_t := "1000"; -- 8
+  constant FLOAT		: op_code_t := "1001"; -- 9
+  constant JMP	 		: op_code_t := "1010"; -- A
+  constant LDF			: op_code_t := "1011"; -- B
+  constant STF			: op_code_t := "1100"; -- C
+  constant LDB 			: op_code_t := "1101"; -- D
+  constant STB 			: op_code_t := "1110"; -- E
+  constant HALT 		: op_code_t := "1111"; -- F; RDS, WRS, EI, DI, RETI, HALT = HALT, diferenciem per el f_code
+  constant NOP			: op_code_t := "0010"; -- 2; NOP = ADDI R0 0
   
   
 end package op_code;

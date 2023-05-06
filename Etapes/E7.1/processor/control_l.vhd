@@ -133,11 +133,11 @@ BEGIN
 	-- ldpc ens indica d'on carregar el nou PC
 	-- Load next Pc or not (Fetch / Decode)
 	-- En interrupcions no cal modificarho, perque ho controlem desde multi
-	ldpc <= 	"011" when op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" else	-- 11 HALT
-				"010" when op_code_ir = BZ else											-- 10 BRANCH
-				"001" when op_code_ir = JMP else										-- 01 JUMPS
+	ldpc <= 	"011" when op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" else	-- 011 HALT
+				"010" when op_code_ir = BZ else											-- 010 BRANCH
+				"001" when op_code_ir = JMP else										-- 001 JUMPS
 				"100" when op_code_ir = HALT and ir_interna = x"f024" else				-- 100 RETI
-				"000" ; 			 													-- 00 RUN; falta CALLS
+				"000" ; 			 													-- 000 RUN; falta CALLS
 
 	-- wrd habilita l'escriptura al banc de registres
 	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL), BRANCHES, OUT, NOP, EI, DI, RETI, WRS
