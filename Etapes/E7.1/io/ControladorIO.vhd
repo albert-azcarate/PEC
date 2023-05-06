@@ -18,6 +18,7 @@ use work.all;
 ENTITY controladores_IO IS
 	PORT (	boot 		: in    std_logic;
 			CLOCK_50 	: in    std_logic;
+			clk			: in 		std_logic;
 			addr_io 	: in    std_logic_vector(7 downto 0);
 			wr_io 		: in    std_logic_vector(15 downto 0); --entrada que hem d'escriure al nostre banc
 			rd_io 		: out   std_logic_vector(15 downto 0); --sortida de lo que llegim dels nostres bancs
@@ -78,6 +79,7 @@ ARCHITECTURE Structure OF controladores_IO IS
 	signal rd_switch_conn : std_logic_vector(7 downto 0);
 	signal rd_io_conn : std_logic_vector(15 downto 0);
 	signal iid_conn : std_logic_vector(7 downto 0);
+	signal iid_reg	: std_logic_vector(7 downto 0);
 	signal rd_io_int : std_LOGIC_VECTOR(15 downto 0);
 	
 	component keyboard_controller is
@@ -136,7 +138,7 @@ ARCHITECTURE Structure OF controladores_IO IS
 	component interrupt_controller is 
 			PORT (
 				boot			: in std_logic;
-				clk			: in std_logic; --20ns
+				clk			: in std_logic;
 				inta			: in std_logic;
 				intr 			: out std_logic;
 				key_intr 	: in std_logic;
@@ -160,7 +162,7 @@ BEGIN
 	-- Quin port IO volem accedir
 	adress_reg <= conv_integer(addr_io);
 	
-	with iid_conn select
+	with iid_reg select
 		rd_io_int <= rd_io_conn when x"ff",
 					x"0001" when x"00",
 					x"000"&read_key_conn when x"01",
@@ -169,7 +171,7 @@ BEGIN
 					x"0000" when others;
 					
 				
-	rd_io <= rd_io_int when adress_reg /= 0 else x"00"&iid_conn;
+	rd_io <= rd_io_int when adress_reg /= 0 else x"00"&iid_reg;
 	process (CLOCK_50, boot) begin
 		
 		if boot='1' then							-- BOOT estem a boot posem el reg 16 a 0 (si no no anava, era sempre 1); REVISAR buscar workaround( diria que amb el others others de io_reg ja esta)
@@ -182,6 +184,7 @@ BEGIN
 			io_registers(8) <= "0000000"&SW;
 			io_registers(7) <= x"000"&KEY;
 			clear <= '0';
+			
 			
 			-- Si es un port accesible; Else es un NOP(control_l)
 			if adress_reg < 32 then
@@ -234,6 +237,13 @@ BEGIN
 		end if;
 	end process;
 	
+	process (clk) begin
+			if inta = '1' then
+				iid_reg <= iid_conn;
+		end if;
+	end process;
+	
+	
 	-- Bits 3 downto 0 del reg 9 encenen o apaguen els 7-segment; Input X l'apaga
 	input_disp(3 downto 0) 	 <= io_registers(10)(3 downto 0)   when io_registers(9)(0) = '1' else (others => 'X');
 	input_disp(7 downto 4)   <= io_registers(10)(7 downto 4)   when io_registers(9)(1) = '1' else (others => 'X');
@@ -279,7 +289,7 @@ BEGIN
 	
 	CINT : interrupt_controller port map(
 				boot			=> boot,
-				clk			=> CLOCK_50,
+				clk			=> clk,
 				inta			=> inta,
 				intr 			=> intr,
 				key_intr 	=> key_intr_conn,

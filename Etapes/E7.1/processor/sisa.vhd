@@ -78,6 +78,7 @@ ARCHITECTURE Structure OF sisa IS
 	component controladores_IO is
 	port ( 	boot 		: in    std_logic;
 			CLOCK_50 	: in    std_logic;
+			clk			: in 		std_logic;
 			addr_io 	: in    std_logic_vector(7 downto 0);
 			wr_io 		: in    std_logic_vector(15 downto 0); --entrada que hem d'escriure al nostre banc
 			rd_io 		: out   std_logic_vector(15 downto 0); --sortida de lo que llegim dels nostres bancs
@@ -197,6 +198,7 @@ BEGIN
 	CIO : controladores_IO port map (
 		boot 		=> SW(9),
 		CloCK_50 	=> CLOCK_50,
+		clk => clk(2),
 		addr_io 	=> addr_io_to_io,
 		wr_io 		=> wr_io_to_io,
 		rd_io 		=> rd_io_to_io,

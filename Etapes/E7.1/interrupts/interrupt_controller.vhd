@@ -7,7 +7,7 @@ use work.all;
 ENTITY interrupt_controller IS
 	PORT (
 		boot			: in std_logic;
-		clk			: in std_logic; --20ns
+		clk			: in std_logic;
 		inta			: in std_logic;
 		intr 			: out std_logic;
 		key_intr 	: in std_logic;
@@ -34,7 +34,6 @@ begin
 		else 
 			if rising_edge(clk) then
 				if interrupt_treated = '0' then
-					interrupt_treated <= '1';
 				
 					-- Valors default
 					timer_inta <= '0';
@@ -47,15 +46,19 @@ begin
 					if timer_intr = '1' and inta = '1' then
 						timer_inta <= '1';
 						iid <= x"00";
+						interrupt_treated <= '1';
 					elsif key_intr = '1' and inta = '1'  then
 						key_inta <= '1';
 						iid <= x"01";
+						interrupt_treated <= '1';
 					elsif switch_intr = '1' and inta = '1'  then
 						switch_inta <= '1';
 						iid <= x"02";
+						interrupt_treated <= '1';
 					elsif ps2_intr = '1' and inta = '1'  then
 						ps2_inta <= '1';
 						iid <= x"03";
+						interrupt_treated <= '1';
 					else
 						
 					end if;
