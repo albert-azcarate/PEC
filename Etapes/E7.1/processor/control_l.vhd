@@ -234,76 +234,76 @@ BEGIN
 							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0);			                               		-- Else: immed als 6 bits de menor pes 
 
 	-- int_type indica si la interrupcio es EI, DI o RETI
-	int_type <= "00" when (op_code_ir = HALT and f_temp = EI_OP) else
-				"01" when (op_code_ir = HALT and f_temp = DI_OP) else
-				"10" when (op_code_ir = HALT and f_temp = RETI_OP) else
+	int_type <= "00" when (op_code_ir = HALT and f_temp = EI_OP and op_code_ir_pre /= ADDI) else
+				"01" when (op_code_ir = HALT and f_temp = DI_OP and op_code_ir_pre /= ADDI) else
+				"10" when (op_code_ir = HALT and f_temp = RETI_OP and op_code_ir_pre /= ADDI) else
 				"11";	-- No es interrupcio, posem 11 de forma arbitraria
 
 
 -- MODELSIM SIGNALS	
-	Instruccio <=   "ALU " when op_code_ir = AL else 
-					"COMP" when op_code_ir = COMP else 
-					"ADDI" when op_code_ir_pre = ADDI else 
-					"MUDI" when op_code_ir = MULDIV else 
-					"MOVE" when op_code_ir = MOVE else 
-					"LD  " when op_code_ir = LD else 
-					"LDB " when op_code_ir = LDB else 
-					"ST  " when op_code_ir = ST else 
-					"STB " when op_code_ir = STB else 
-					"BN  " when op_code_ir = BZ else 
-					"JMP " when op_code_ir = JMP else 
-					"I/O " when op_code_ir = IO else
-					"HALT" when (op_code_ir = HALT and ir_interna(11 downto 0) = x"fff") else
-					"WRD " when (op_code_ir = HALT and f_temp = WRS_OP) else
-					"RDS " when (op_code_ir = HALT and f_temp = RDS_OP) else
-					"EI  " when (op_code_ir = HALT and f_temp = EI_OP) else
-					"DI  " when (op_code_ir = HALT and f_temp = DI_OP) else	
-					"RETI" when (op_code_ir = HALT and f_temp = RETI_OP) else
-					"GETI" when (op_code_ir = HALT and f_temp = GETIID_OP) else
-					"NOP ";
-							 
-
-	operacio <= "AND   " when f_temp = AND_OP and op_code_ir = AL else 
-				"OR    " when f_temp = OR_OP and op_code_ir = AL else 
-				"XOR   " when f_temp = XOR_OP and op_code_ir = AL else 
-				"NOT   " when f_temp = NOT_OP and op_code_ir = AL else 
-				"ADD   " when f_temp = ADD_OP and op_code_ir = AL else 
-				"SUB   " when f_temp = SUB_OP and op_code_ir = AL else 
-				"SHA   " when f_temp = SHA_OP and op_code_ir = AL else 
-				"SHL   " when f_temp = SHL_OP and op_code_ir = AL else 			
-				"CMPLT " when f_temp = CMPLT_OP and op_code_ir = COMP else 
-				"CMPLE " when f_temp = CMPLE_OP and op_code_ir = COMP else 
-				"CMPEQ " when f_temp = CMPEQ_OP and op_code_ir = COMP else 
-				"CMPLTU" when f_temp = CMPLTU_OP and op_code_ir = COMP else 
-				"CMPLEU" when f_temp = CMPLEU_OP and op_code_ir = COMP else 
-				"MUL   " when f_temp = MUL_OP and op_code_ir = MULDIV else 
-				"MULH  " when f_temp = MULH_OP and op_code_ir = MULDIV else 
-				"MULHU " when f_temp = MULHU_OP and op_code_ir = MULDIV else 
-				"DIV   " when f_temp = DIV_OP and op_code_ir = MULDIV else 
-				"DIVU  " when f_temp = DIVU_OP and op_code_ir = MULDIV else 
-				"BZ    " when f_temp = BZ_OP and op_code_ir = BZ else 
-				"BNZ   " when f_temp = BNZ_OP and op_code_ir = BZ else 
-				"JZ    " when f_temp = JZ_OP and op_code_ir = JMP else 
-				"JNZ   " when f_temp = JNZ_OP and op_code_ir = JMP else 
-				"JMP   " when f_temp = JMP_OP and op_code_ir = JMP else 
-				"JAL   " when f_temp = JAL_OP and op_code_ir = JMP else 
-				"MOVHI " when f_temp = MOVHI and op_code_ir = MOVE else 
-				"MOVI  " when f_temp = MOVI and op_code_ir = MOVE else 
-				"LD    " when op_code_ir = LD else 
-				"LDB   " when op_code_ir = LDB else 
-				"ST    " when op_code_ir = ST else 
-				"STB   " when op_code_ir = STB else 
-				"ADDI  " when op_code_ir_pre = ADDI else
-				"IN    " when f_temp = IN_OP and op_code_ir = IO else
-				"OUT   " when f_temp = OUT_OP and op_code_ir = IO else
-				"RDS   " when f_temp = RDS_OP and op_code_ir = HALT else
-				"WRD   " when f_temp = WRS_OP and op_code_ir = HALT else
-				"DI    " when f_temp = DI_OP and op_code_ir = HALT else
-				"EI    " when f_temp = EI_OP and op_code_ir = HALT else
-				"RETI  " when f_temp = RETI_OP and op_code_ir = HALT else
-				"NOP   " when f_temp = NOP_OP and op_code_ir = NOP else
-				"GETIID" when f_temp = GETIID_OP and op_code_ir = HALT else
-				"DEAD  ";
+--	Instruccio <=   "ALU " when op_code_ir = AL else 
+--					"COMP" when op_code_ir = COMP else 
+--					"ADDI" when op_code_ir_pre = ADDI else 
+--					"MUDI" when op_code_ir = MULDIV else 
+--					"MOVE" when op_code_ir = MOVE else 
+--					"LD  " when op_code_ir = LD else 
+--					"LDB " when op_code_ir = LDB else 
+--					"ST  " when op_code_ir = ST else 
+--					"STB " when op_code_ir = STB else 
+--					"BN  " when op_code_ir = BZ else 
+--					"JMP " when op_code_ir = JMP else 
+--					"I/O " when op_code_ir = IO else
+--					"HALT" when (op_code_ir = HALT and ir_interna(11 downto 0) = x"fff") else
+--					"WRD " when (op_code_ir = HALT and f_temp = WRS_OP) else
+--					"RDS " when (op_code_ir = HALT and f_temp = RDS_OP) else
+--					"EI  " when (op_code_ir = HALT and f_temp = EI_OP) else
+--					"DI  " when (op_code_ir = HALT and f_temp = DI_OP) else	
+--					"RETI" when (op_code_ir = HALT and f_temp = RETI_OP) else
+--					"GETI" when (op_code_ir = HALT and f_temp = GETIID_OP) else
+--					"NOP ";
+--							 
+--
+--	operacio <= "AND   " when f_temp = AND_OP and op_code_ir = AL else 
+--				"OR    " when f_temp = OR_OP and op_code_ir = AL else 
+--				"XOR   " when f_temp = XOR_OP and op_code_ir = AL else 
+--				"NOT   " when f_temp = NOT_OP and op_code_ir = AL else 
+--				"ADD   " when f_temp = ADD_OP and op_code_ir = AL else 
+--				"SUB   " when f_temp = SUB_OP and op_code_ir = AL else 
+--				"SHA   " when f_temp = SHA_OP and op_code_ir = AL else 
+--				"SHL   " when f_temp = SHL_OP and op_code_ir = AL else 			
+--				"CMPLT " when f_temp = CMPLT_OP and op_code_ir = COMP else 
+--				"CMPLE " when f_temp = CMPLE_OP and op_code_ir = COMP else 
+--				"CMPEQ " when f_temp = CMPEQ_OP and op_code_ir = COMP else 
+--				"CMPLTU" when f_temp = CMPLTU_OP and op_code_ir = COMP else 
+--				"CMPLEU" when f_temp = CMPLEU_OP and op_code_ir = COMP else 
+--				"MUL   " when f_temp = MUL_OP and op_code_ir = MULDIV else 
+--				"MULH  " when f_temp = MULH_OP and op_code_ir = MULDIV else 
+--				"MULHU " when f_temp = MULHU_OP and op_code_ir = MULDIV else 
+--				"DIV   " when f_temp = DIV_OP and op_code_ir = MULDIV else 
+--				"DIVU  " when f_temp = DIVU_OP and op_code_ir = MULDIV else 
+--				"BZ    " when f_temp = BZ_OP and op_code_ir = BZ else 
+--				"BNZ   " when f_temp = BNZ_OP and op_code_ir = BZ else 
+--				"JZ    " when f_temp = JZ_OP and op_code_ir = JMP else 
+--				"JNZ   " when f_temp = JNZ_OP and op_code_ir = JMP else 
+--				"JMP   " when f_temp = JMP_OP and op_code_ir = JMP else 
+--				"JAL   " when f_temp = JAL_OP and op_code_ir = JMP else 
+--				"MOVHI " when f_temp = MOVHI and op_code_ir = MOVE else 
+--				"MOVI  " when f_temp = MOVI and op_code_ir = MOVE else 
+--				"LD    " when op_code_ir = LD else 
+--				"LDB   " when op_code_ir = LDB else 
+--				"ST    " when op_code_ir = ST else 
+--				"STB   " when op_code_ir = STB else 
+--				"ADDI  " when op_code_ir_pre = ADDI else
+--				"IN    " when f_temp = IN_OP and op_code_ir = IO else
+--				"OUT   " when f_temp = OUT_OP and op_code_ir = IO else
+--				"RDS   " when f_temp = RDS_OP and op_code_ir = HALT else
+--				"WRD   " when f_temp = WRS_OP and op_code_ir = HALT else
+--				"DI    " when f_temp = DI_OP and op_code_ir = HALT else
+--				"EI    " when f_temp = EI_OP and op_code_ir = HALT else
+--				"RETI  " when f_temp = RETI_OP and op_code_ir = HALT else
+--				"NOP   " when f_temp = NOP_OP and op_code_ir = NOP else
+--				"GETIID" when f_temp = GETIID_OP and op_code_ir = HALT else
+--				"DEAD  ";
 -- END MODELSIM SIGNALS
 	
 END Structure;

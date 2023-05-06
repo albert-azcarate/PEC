@@ -146,7 +146,7 @@ BEGIN
 			despla(15 downto 9) <= (others => datard_m(7));	-- Calculem el despla�ament dels Branches
 			despla(8 downto 0) <= datard_m(7 downto 0)&'0';	-- Extenem el signe per els Branches relatius i x2 per alinear-ho
 
-			old_2_Pc <= regPC + 2;	-- Ens guardem el PC + 2 pels JALS i els RETI
+			old_2_Pc <= regPC + 2;	-- Ens guardem el PC + 2 pels JALS
 			
 			if boot = '1' then 				-- BOOT; REVISAR plantejar la idea de passar boot als registres i posarlos a 0 en Boot, si no, ens emplenem de merda si fem toggle-untoggle per fer tests
 				regPC <= x"C000";
@@ -242,8 +242,8 @@ BEGIN
 	
 	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL; REVISAR si no pot ser asignat normal ja que nomes fem servir pc quan es JAL
 	pc <= old_2_Pc when load_pc_out = "001" and f_out = JAL_OP else
-		  regPC when int_a_conn = '1' and int_e = '1' else
-		  regPC;
+		  regPC;-- RETI pilla el seguent regPC per despres torar
+
 
 	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
   	 
