@@ -76,7 +76,7 @@ BEGIN
 							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "101") 
 							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "110") 
 
-							or (op_code_ir_pre = IO and ir_interna(5 downto 0) > x"20") else   	-- NOP en operaciones IO pero con puerto no accesible
+							or (op_code_ir_pre = IO and ir_interna(5 downto 0) > "100000") else   	-- NOP en operaciones IO pero con puerto no accesible
 					op_code_ir_pre;
 
 	-- Assignem a la sortida de OP

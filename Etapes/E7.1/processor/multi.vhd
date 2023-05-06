@@ -107,9 +107,8 @@ begin
 				'1' when "10",
 				u_s_l when others;
 		
-	with estat select
-		addr_io <=  x"00" when "00",
-					x"00" when "10",
+	with estat select -- En Fetch deixem el addr_io previ per facilitar la lectura
+		addr_io <=  x"00" when "10",
 					addr_io_l when others;
 					
 					
