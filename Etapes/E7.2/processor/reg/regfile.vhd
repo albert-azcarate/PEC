@@ -17,7 +17,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.std_logic_unsigned.all; --Esta libreria sera necesaria si usais conversiones CONV_INTEGER
 USE ieee.numeric_std.all;        --Esta libreria sera necesaria si usais conversiones TO_INTEGER
-use work.all;
+use work.reg.all;
 
 ENTITY regfile IS
     PORT (clk    : IN  STD_LOGIC;
@@ -32,7 +32,7 @@ END regfile;
 
 ARCHITECTURE Structure OF regfile IS
 
-signal reg_vector : reg.slv_array_t;
+signal reg_vector : slv_array_t;
 
 
 BEGIN

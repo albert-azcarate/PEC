@@ -26,10 +26,11 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.std_logic_unsigned.all; --Esta libreria sera necesaria si usais conversiones CONV_INTEGER
 USE ieee.numeric_std.all;        --Esta libreria sera necesaria si usais conversiones TO_INTEGER
-use work.all;
+use work.reg.all;
+
 
 ENTITY sysregfile IS
-    PORT (	clk			: IN  STD_LOGIC;
+    PORT (clk			: IN  STD_LOGIC;
 			wrd			: IN  STD_LOGIC;
 		  intr		: IN STD_LOGIC;	
 		  inta		: IN STD_LOGIC;
@@ -45,7 +46,7 @@ END sysregfile;
 
 ARCHITECTURE Structure OF sysregfile IS
 
-signal reg_vector : reg.slv_array_t := (others => x"0000");
+signal reg_vector : slv_array_t := (others => x"0000");
 
 
 BEGIN
@@ -71,7 +72,6 @@ BEGIN
 					reg_vector(7)(1) <= '0';
 				elsif int_type = "10" then		-- RETI
 					reg_vector(7) <= reg_vector(0);
-					--reg_vector(7)(1) <= '1';
 				else							-- USUAL WRITE
 					if wrd = '1' then
 						reg_vector(conv_integer(addr_d)) <= d;

@@ -2,7 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.std_logic_unsigned.all; 
 use ieee.numeric_std.all;
-use work.all;
+--use work.all;
 use work.op_code.all;
 use work.f_code.all;
 
@@ -19,14 +19,15 @@ END alu;
 
 ARCHITECTURE Structure OF alu IS
 
-signal movhi_signal : std_logic_vector (15 downto 0) := (others => '0');
-signal ext_signe : std_logic_vector (15 downto 0) := (others => '0');
-constant true : std_logic_vector (15 downto 0) := "0000000000000001";
-constant false : std_logic_vector (15 downto 0) := (others => '0');
-signal mul : std_logic_vector (31 downto 0) := (others => '0');
-signal mulu : std_logic_vector (31 downto 0) := (others => '0');
-signal w_temporal :  std_logic_vector (15 downto 0);
-signal shift: integer;
+constant true		: std_logic_vector (15 downto 0) := "0000000000000001";
+constant false		: std_logic_vector (15 downto 0) := (others => '0');
+
+signal w_temporal	: std_logic_vector (15 downto 0);
+signal movhi_signal	: std_logic_vector (15 downto 0) := (others => '0');
+signal ext_signe	: std_logic_vector (15 downto 0) := (others => '0');
+signal mul			: std_logic_vector (31 downto 0) := (others => '0');
+signal mulu			: std_logic_vector (31 downto 0) := (others => '0');
+signal shift		: integer;
 
 BEGIN
 	-- shift es el N a fer shift en ca2 de y
@@ -95,10 +96,12 @@ BEGIN
 					
 					x + y when op = ST or op = LD or op = STB or op = LDB or op = ADDI else		-- LDs, STs ADDi
 					
+					-- En RETI treurem X, ens entra el Pc antic
 					x when op = HALT else
 					
 					(others => 'Z');
-				
+					
+	-- En RETI treurem X, ens entra el Pc antic
 	w <= w_temporal when int = '0' else x;
 	
 END Structure;

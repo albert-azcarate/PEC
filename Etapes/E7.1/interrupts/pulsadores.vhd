@@ -1,6 +1,6 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
-use work.all;
+--use work.all;
 
 
 ENTITY pulsadores IS

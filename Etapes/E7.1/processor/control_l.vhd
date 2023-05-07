@@ -1,6 +1,6 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
-use work.all;
+--use work.all;
 use work.op_code.all;
 use work.f_code.all;
 
@@ -33,12 +33,14 @@ END control_l;
 
 
 ARCHITECTURE Structure OF control_l IS
-	signal ir_interna : std_logic_vector(15 downto 0);
-	signal op_code_ir : op_code_t;
-	signal op_code_ir_pre : op_code_t;
-	signal f_temp : f_code_t;
-BEGIN
 
+	signal f_temp			: f_code_t;
+	signal op_code_ir		: op_code_t;
+	signal op_code_ir_pre	: op_code_t;
+	signal ir_interna		: std_logic_vector(15 downto 0);
+	
+BEGIN
+	-- Mirem si IR conte X, si es el cas, fem una NOP
 	process (ir) begin
 		if is_X(ir) then
 			ir_interna <= x"fffe";
@@ -60,9 +62,9 @@ BEGIN
 								and ir_interna(11 downto 0) /= x"020" 							-- SPECIAL(EI)
 								and ir_interna(11 downto 0) /= x"021" 							-- SPECIAL(DI)
 								and ir_interna(11 downto 0) /= x"024" 							-- SPECIAL(RETI)
-								and ir_interna(5 downto 0) /= "101100" 						-- SPECIAL(RDS)
+								and ir_interna(5 downto 0) /= "101100"							-- SPECIAL(RDS)
 								and ir_interna(5 downto 0) /= "110000"							-- SPECIAL(WRS)
-								and ir_interna(5 downto 0) /= "101000")						-- SPECIAL (GETIID)
+								and ir_interna(5 downto 0) /= "101000")							-- SPECIAL (GETIID)
 	
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "010")       -- NOP en operaciones COMP pero F_CODE no implementado
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "110")        
@@ -72,11 +74,11 @@ BEGIN
 							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "110")      
 							or (op_code_ir_pre = MULDIV and ir_interna(5 downto 3) = "111") 
 
-							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "010")        -- NOP en operaciones JMP pero F_CODE no implementado 
+							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "010")		-- NOP en operaciones JMP pero F_CODE no implementado 
 							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "101") 
 							or (op_code_ir_pre = JMP and ir_interna(2 downto 0) = "110") 
 
-							or (op_code_ir_pre = IO and ir_interna(5 downto 0) > "100000") else   	-- NOP en operaciones IO pero con puerto no accesible
+							or (op_code_ir_pre = IO and ir_interna(5 downto 0) > "100000") else	-- NOP en operaciones IO pero con puerto no accesible
 					op_code_ir_pre;
 
 	-- Assignem a la sortida de OP
@@ -86,8 +88,8 @@ BEGIN
 
 	-- Assignem el port al que es vol fer IO
 	-- En GETIID accedim al port 0 per indicar que es un get iid
-	addr_io <= ir_interna(7 downto 0) when op_code_ir /= HALT and f_temp /= GETIID_OP else
-					x"00";
+	addr_io <=	ir_interna(7 downto 0) when op_code_ir /= HALT and f_temp /= GETIID_OP else
+				x"00";
 	
 	-- Read IO enable quan ir(8) es 0
 	rd_in <= not(ir_interna(8)) when op_code_ir = IO else '0';
@@ -125,6 +127,7 @@ BEGIN
 					DI_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"021") else
 					RETI_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"024") else
 					NOP_OP when op_code_ir = NOP else
+
 				NOP_OP;																					-- Else 0
 	
 	-- Assignem f
@@ -233,7 +236,9 @@ BEGIN
 							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0) when op_code_ir = ADDI else   				-- Cas ADDI: immed als 5 bits de menor pes; No pasa res si tambe es un NOP, perque els NOP pillen reg d'entrada a la alu
 							ir_interna(5)&ir_interna(5)&ir_interna(5 downto 0);			                               		-- Else: immed als 6 bits de menor pes 
 
+	
 	-- int_type indica si la interrupcio es EI, DI o RETI
+	-- El nom es una merda, perque no son Interrupcions, sino instruccions que tenen a veure amb interrupcions
 	int_type <= "00" when (op_code_ir = HALT and f_temp = EI_OP and op_code_ir_pre /= ADDI) else
 				"01" when (op_code_ir = HALT and f_temp = DI_OP and op_code_ir_pre /= ADDI) else
 				"10" when (op_code_ir = HALT and f_temp = RETI_OP and op_code_ir_pre /= ADDI) else

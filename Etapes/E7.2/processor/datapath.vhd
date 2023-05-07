@@ -1,9 +1,9 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
-use work.all;
 use work.op_code.all;
 use work.f_code.all;
+use work.all;
 
 ENTITY datapath IS
 	PORT (	clk				: IN  STD_LOGIC;
@@ -13,21 +13,21 @@ ENTITY datapath IS
 			immed_x2		: IN  STD_LOGIC;
 			ins_dad			: IN  STD_LOGIC;
 			immed_or_reg	: IN  STD_LOGIC;
-			intr 				: IN std_logic;
-		  inta		: IN STD_LOGIC;
+			intr			: IN  STD_LOGIC;
+			inta			: IN  STD_LOGIC;
 			op				: IN  op_code_t;
 			f				: IN  f_code_t;
+			in_d			: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			int_type		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b			: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d			: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			immed			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			datard_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			pc				: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			in_d			: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
-			int_type		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			rd_io			: IN  std_LOGIC_VECTOR(15 DOWNTO 0);
-			z				: OUT std_LOGIC;
-			int_e		: OUT STD_LOGIC;
+			z				: OUT STD_LOGIC;
+			int_e			: OUT STD_LOGIC;
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			data_wr			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -49,15 +49,35 @@ ARCHITECTURE Structure OF datapath IS
           w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		  z  : OUT std_logic);
 	END component;
+	
+	component registers is
+	PORT (	clk    		: IN  STD_LOGIC;
+			wrd    		: IN  STD_LOGIC;
+			wrd_s  		: IN  STD_LOGIC;
+			u_s 		: IN  STD_LOGIC;
+			intr		: IN  STD_LOGIC;
+			inta		: IN  STD_LOGIC;
+			int_type	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_b		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_d		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			d			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			PCup		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			int_e		: OUT STD_LOGIC;
+			a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			b			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+			);
+	end component;
+	
 
 
-signal alu_out : std_logic_vector(15 downto 0);
-signal input_y : std_logic_vector(15 downto 0);
-signal immed_y : std_logic_vector(15 downto 0);
-signal input_d : std_logic_vector(15 downto 0);
-signal regbank_to_alu_a : std_logic_vector(15 downto 0);
-signal output_alu_or_mem : std_logic_vector(15 downto 0);
-signal regbank_to_alu_b : std_logic_vector(15 downto 0);	 
+signal alu_out				: std_logic_vector(15 downto 0);
+signal input_y				: std_logic_vector(15 downto 0);
+signal immed_y				: std_logic_vector(15 downto 0);
+signal input_d				: std_logic_vector(15 downto 0);
+signal regbank_to_alu_a		: std_logic_vector(15 downto 0);
+signal output_alu_or_mem	: std_logic_vector(15 downto 0);
+signal regbank_to_alu_b		: std_logic_vector(15 downto 0);	 
 	 
 BEGIN
 

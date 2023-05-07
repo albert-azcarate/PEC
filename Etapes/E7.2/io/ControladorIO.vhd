@@ -13,36 +13,36 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.std_logic_unsigned.all; --Esta libreria sera necesaria si usais conversiones CONV_INTEGER
 USE ieee.numeric_std.all;        --Esta libreria sera necesaria si usais conversiones TO_INTEGER
-use work.all;
+use work.io_reg.all;
 
 ENTITY controladores_IO IS
-	PORT (	boot 		: in    std_logic;
-			CLOCK_50 	: in    std_logic;
-			clk			: in 		std_logic;
-			addr_io 	: in    std_logic_vector(7 downto 0);
-			wr_io 		: in    std_logic_vector(15 downto 0); --entrada que hem d'escriure al nostre banc
-			rd_io 		: out   std_logic_vector(15 downto 0); --sortida de lo que llegim dels nostres bancs
-			wr_out 		: in    std_logic; --hem d'escriure al nostre banc
-			rd_in 		: in    std_logic; --la ALU ens llegeix
-			led_verdes	: OUT   std_logic_vector(7 DOWNTO 0);
-			led_rojos 	: OUT   std_logic_vector(7 DOWNTO 0);
-			SW 			: in    std_logic_vector(8 DOWNTO 0);
-			HEX0 		: OUT   std_logic_vector(6 DOWNTO 0);
-			HEX1 		: OUT   std_logic_vector(6 DOWNTO 0);
-			HEX2 		: OUT   std_logic_vector(6 DOWNTO 0);
-			HEX3 		: OUT   std_logic_vector(6 DOWNTO 0);
-			KEY 		: in    std_logic_vector(3 DOWNTO 0);
+	PORT ( 	boot 		: in	std_logic;
+			CLOCK_50 	: in	std_logic;
+			clk			: in	std_logic;
+			wr_out 		: in	std_logic; --hem d'escriure al nostre banc
+			rd_in 		: in	std_logic; --la ALU ens llegeix
+			inta		: in	STD_LOGIC;
+			KEY 		: in	std_logic_vector(3 DOWNTO 0);
+			addr_io 	: in	std_logic_vector(7 downto 0);
+			SW 			: in	std_logic_vector(8 DOWNTO 0);
+			wr_io 		: in	std_logic_vector(15 downto 0); --entrada que hem d'escriure al nostre banc
 			ps2_clk 	: inout std_logic;
 			ps2_data 	: inout std_logic;
-			vga_cursor  : out std_logic_vector(15 downto 0);
-			vga_cursor_enable : out std_logic;
-			inta : in std_LOGIC;
-			intr : out std_LOGIC
-		);
+			led_verdes	: OUT	std_logic_vector(7 DOWNTO 0);
+			led_rojos 	: OUT	std_logic_vector(7 DOWNTO 0);
+			HEX0 		: OUT	std_logic_vector(6 DOWNTO 0);
+			HEX1 		: OUT	std_logic_vector(6 DOWNTO 0);
+			HEX2 		: OUT	std_logic_vector(6 DOWNTO 0);
+			HEX3 		: OUT	std_logic_vector(6 DOWNTO 0);
+			rd_io 		: out	std_logic_vector(15 downto 0); --sortida de lo que llegim dels nostres bancs
+			vga_cursor 	: out	std_logic_vector(15 downto 0);
+			intr		: out	std_logic;
+			vga_cursor_enable : out std_logic
+			);
 END controladores_IO;
 
 -- Special Ports:
---			 0 - PORT per saber si ens fam la opearació GETIID
+--		 0 - PORT per saber si ens fam la opearació GETIID
 -- 		 5 - IN/OUT - los 8 leds VERDES mapeados en los 8 bits de menor peso del puerto5  : 8 green LEDs
 -- 		 6 - IN/OUT - los 8 leds ROJOS mapeados en los 8 bits de menor peso del puerto6  : 8 red LEDs
 -- 		 7 - IN     - los 4 pulsadores (KEY) de la placa estan constantemente mapeados en los 4 bits de menor peso del registro del puerto7  : 4 push buttons
@@ -57,7 +57,7 @@ END controladores_IO;
 
 ARCHITECTURE Structure OF controladores_IO IS
 	
-	signal io_registers	: io_reg.io_array_t := (others => (others => '0'));
+	signal io_registers	: io_array_t := (others => (others => '0'));
 	signal adress_reg	: integer;
 	signal input_disp	: std_logic_vector(15 downto 0);
 	signal char_readed	: std_logic_vector(7 downto 0);
@@ -67,6 +67,7 @@ ARCHITECTURE Structure OF controladores_IO IS
 	signal contador_ciclos			: STD_LOGIC_VECTOR(15 downto 0):=x"0000";
 	signal contador_milisegundos	: STD_LOGIC_VECTOR(15 downto 0):=x"0000";
 	
+	-- Signals per conectar inta i intr de cada component al controlador de interrupcions
 	signal ps2_inta_conn : std_logic; 
 	signal timer_inta_conn : std_logic; 
 	signal key_inta_conn : std_logic; 
@@ -83,15 +84,15 @@ ARCHITECTURE Structure OF controladores_IO IS
 	signal rd_io_int : std_LOGIC_VECTOR(15 downto 0);
 	
 	component keyboard_controller is
-	port (	clk			: in 	STD_LOGIC;
-			reset		: in 	STD_LOGIC;
+	port (	clk 		: in	STD_LOGIC;
+			reset		: in	STD_LOGIC;
+			inta 		: IN	std_LOGIC;
+			clear_char	: in	STD_LOGIC;
 			ps2_clk		: inout STD_LOGIC;
 			ps2_data	: inout STD_LOGIC;
-			read_char	: out 	STD_LOGIC_VECTOR (7 downto 0);
-			clear_char	: in 	STD_LOGIC;
-			data_ready	: out 	STD_LOGIC;
-			 inta 		: IN 	  std_LOGIC;--new
-			 intr 		: OUT   std_LOGIC --new
+			data_ready	: out	STD_LOGIC;
+			intr 		: out	std_LOGIC;
+			read_char	: out	STD_LOGIC_VECTOR (7 downto 0)
 			);
 	end component keyboard_controller; 
 	
@@ -107,9 +108,9 @@ ARCHITECTURE Structure OF controladores_IO IS
 	component timer is 
 			PORT (
 				boot		: in std_logic;
-				clk		: in std_logic; --20ns
+				clk			: in std_logic;
 				inta		: in std_logic;
-				intr 		: out std_logic
+				intr		: out std_logic
 			);
 	end component;
 	
@@ -161,16 +162,8 @@ BEGIN
 	
 	-- Quin port IO volem accedir
 	adress_reg <= conv_integer(addr_io);
-	
-	--with iid_reg select
-	--	rd_io_int <= rd_io_conn when x"ff",
-	--				x"0001" when x"00",
-	--				x"000"&read_key_conn when x"01",
-	--				x"00"&rd_switch_conn when x"02",
-	--				x"00"&char_readed when x"03",
-	--				x"0000" when others;
-					
-				
+
+	-- Llegim I/O excepte en adress = 0, que llegim IID
 	rd_io <= rd_io_conn when adress_reg /= 0 else x"00"&iid_reg;
 
 	process (clk, boot) begin
@@ -238,6 +231,7 @@ BEGIN
 		end if;
 	end process;
 	
+	-- Si hi ha ack a una interrupcio guardem quin iid es al iid_reg
 	process (clk, inta) begin
 		if timer_inta_conn = '1' or key_inta_conn = '1' or switch_inta_conn = '1' or ps2_inta_conn = '1' then
 				iid_reg <= iid_conn;
@@ -268,7 +262,7 @@ BEGIN
 		
 	TIMER_INT: timer 	port map(
 				boot		=> boot,
-				clk		=> CLOCK_50,
+				clk			=> CLOCK_50,
 				inta		=> timer_inta_conn,
 				intr 		=> timer_intr_conn );
 	

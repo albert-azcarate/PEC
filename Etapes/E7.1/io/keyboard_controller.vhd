@@ -4,17 +4,17 @@ use IEEE.numeric_std.all;
 use IEEE.std_logic_unsigned.all;
 
 
-entity keyboard_controller is --inta , intr
-    Port (clk        : in    STD_LOGIC;
-          reset      : in    STD_LOGIC;
-          ps2_clk    : inout STD_LOGIC;
-          ps2_data   : inout STD_LOGIC;
-          read_char  : out   STD_LOGIC_VECTOR (7 downto 0);
-          clear_char : in    STD_LOGIC;
-          data_ready : out   STD_LOGIC;
-			 inta 		: IN 	  std_LOGIC;--new
-			 intr 		: OUT   std_LOGIC --new
-			 );
+entity keyboard_controller is
+    Port (	clk 		: in	STD_LOGIC;
+			reset		: in	STD_LOGIC;
+			inta 		: IN	std_LOGIC;
+			clear_char	: in	STD_LOGIC;
+			ps2_clk		: inout STD_LOGIC;
+			ps2_data	: inout STD_LOGIC;
+			data_ready	: out	STD_LOGIC;
+			intr 		: out	std_LOGIC;
+			read_char	: out	STD_LOGIC_VECTOR (7 downto 0)
+			);
 end keyboard_controller;
 
 architecture Behavioral of keyboard_controller is
@@ -62,7 +62,7 @@ begin
 
 	clear <= inta or clear_char;
 	intr <= ready;
-   data_ready <= ready;
+    data_ready <= ready;
     k0 : ps2_keyboard_interface port map(
                 clk => clk,
                 reset => reset,

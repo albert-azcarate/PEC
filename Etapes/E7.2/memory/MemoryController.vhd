@@ -2,15 +2,15 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
-use work.all;
+--use work.all;
 
 entity MemoryController is
     port (	CLOCK_50  	: in	std_logic;
+			we        	: in	std_logic;
+			byte_m    	: in	std_logic;
 			addr      	: in	std_logic_vector(15 downto 0);
 			wr_data   	: in	std_logic_vector(15 downto 0);
 			rd_data   	: out	std_logic_vector(15 downto 0);
-			we        	: in	std_logic;
-			byte_m    	: in	std_logic;
 			-- senyales para la placa de desarrollo
 			SRAM_ADDR 	: out	std_logic_vector(17 downto 0);
 			SRAM_DQ   	: inout	std_logic_vector(15 downto 0);

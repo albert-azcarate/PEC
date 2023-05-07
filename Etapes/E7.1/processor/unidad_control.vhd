@@ -2,7 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 USE ieee.std_logic_unsigned.all;
-use work.all;
+--use work.all;
 use work.op_code.all;
 use work.f_code.all;
 
@@ -140,6 +140,7 @@ signal operacio				: string (1 to 6);	-- modelsim
 
 BEGIN
 
+	-- Process per decidir el nou PC
 	process (boot, load_pc_out, clk) begin
 		if rising_edge(clk) then
 			
@@ -154,7 +155,7 @@ BEGIN
 				if load_pc_out = "011" then  -- HALT
 					regPC <= regPC;
 					
-				elsif load_pc_out = "101" then -- SYSTEM; Posem al PC el que en surt de la ALU(S5, RSG)
+				elsif load_pc_out = "101" then -- SYSTEM; Posem al PC el que en surt de la ALU(S5, @RSG)
 					regPC <= alu_out;
 				else						-- RUN
 				
@@ -196,7 +197,7 @@ BEGIN
 						regPC <= alu_out;
 
 					else 
-						regPC <= regPC;
+						regPC <= regPC;	-- aixo ha de ser un HALT REVISAR
 					end if;
 				end if;
 			end if;
@@ -205,7 +206,7 @@ BEGIN
 	end process;
 	
 	
-
+	-- Process per decidir el seguent IR
 	process (clk, load_ins, boot) begin		
 		if boot = '1' then 										--BOOT
 			new_ir <= x"C000";
@@ -240,7 +241,7 @@ BEGIN
 	int_type <= int_type_out;
 	inta <= int_a_conn;
 	
-	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL; REVISAR si no pot ser asignat normal ja que nomes fem servir pc quan es JAL
+	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL
 	pc <= old_2_Pc when load_pc_out = "001" and f_out = JAL_OP else
 		  regPC;-- RETI pilla el seguent regPC per despres torar
 
@@ -302,6 +303,6 @@ BEGIN
 								addr_a => addr_a,
 								int_type => int_type_out
 								);
-									
+
 
 END Structure;

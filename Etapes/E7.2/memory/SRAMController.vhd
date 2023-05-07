@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
-use work.all;
+--use work.all;
 --datasheet: file:///C:/Users/pec05/Desktop/DE1_CD_v08/DE1_CD_v0.8/Datasheets/Memory/61LV25616.pdf
 
 

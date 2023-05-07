@@ -3,7 +3,7 @@ USE ieee.std_logic_1164.all;
 USE ieee.std_logic_arith.all;
 USE ieee.std_logic_unsigned.all;
 
-use work.all;
+--use work.all;
 
 ENTITY sisa IS
 	PORT (	CLOCK_50	: in  	std_logic;
@@ -58,46 +58,46 @@ ARCHITECTURE Structure OF sisa IS
 	end component;
 	
 	component proc IS
-    port (	clk       	: IN  std_logic;
-			boot      	: IN  std_logic;
-			intr			: IN std_logic;
-			datard_m  	: IN  std_logic_vector(15 DOWNTO 0);
-			addr_m    	: OUT std_logic_vector(15 DOWNTO 0);
-			data_wr   	: OUT std_logic_vector(15 DOWNTO 0);
-			wr_m      	: OUT std_logic;
-			word_byte	: OUT std_logic;
-			addr_io 	: out std_logic_vector(7 downto 0);
-			wr_io 		: out std_logic_vector(15 downto 0);
+    port (	clk			: IN  STD_LOGIC;
+			boot		: IN  STD_LOGIC;
+			intr		: IN  std_logic;
+			datard_m	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			rd_io 		: in  std_logic_vector(15 downto 0);
+			wr_m		: OUT STD_LOGIC;
+			word_byte	: OUT STD_LOGIC;
 			wr_out 		: out std_logic;
 			rd_in 		: out std_logic;
-			inta		: OUT STD_LOGIC
+			inta		: out std_logic;
+			addr_io 	: out std_logic_vector(7 downto 0);
+			wr_io 		: out std_logic_vector(15 downto 0);
+			addr_m		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			data_wr		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 	END component;
 
 	component controladores_IO is
-	port ( 	boot 		: in    std_logic;
-			CLOCK_50 	: in    std_logic;
-			clk			: in 		std_logic;
-			addr_io 	: in    std_logic_vector(7 downto 0);
-			wr_io 		: in    std_logic_vector(15 downto 0); --entrada que hem d'escriure al nostre banc
-			rd_io 		: out   std_logic_vector(15 downto 0); --sortida de lo que llegim dels nostres bancs
-			wr_out 		: in    std_logic; --hem d'escriure al nostre banc
-			rd_in 		: in    std_logic; --la ALU ens llegeix
-			led_verdes	: OUT   std_logic_vector(7 DOWNTO 0);
-			led_rojos 	: OUT   std_logic_vector(7 DOWNTO 0);
-			SW 			: in    std_logic_vector(8 DOWNTO 0);
-			HEX0 		: OUT   std_logic_vector(6 DOWNTO 0);
-			HEX1 		: OUT   std_logic_vector(6 DOWNTO 0);
-			HEX2 		: OUT   std_logic_vector(6 DOWNTO 0);
-			HEX3 		: OUT   std_logic_vector(6 DOWNTO 0);
-			KEY 		: in    std_logic_vector(3 DOWNTO 0);
+	port ( 	boot 		: in	std_logic;
+			CLOCK_50 	: in	std_logic;
+			clk			: in	std_logic;
+			wr_out 		: in	std_logic; --hem d'escriure al nostre banc
+			rd_in 		: in	std_logic; --la ALU ens llegeix
+			inta		: in	STD_LOGIC;
+			KEY 		: in	std_logic_vector(3 DOWNTO 0);
+			addr_io 	: in	std_logic_vector(7 downto 0);
+			SW 			: in	std_logic_vector(8 DOWNTO 0);
+			wr_io 		: in	std_logic_vector(15 downto 0); --entrada que hem d'escriure al nostre banc
 			ps2_clk 	: inout std_logic;
 			ps2_data 	: inout std_logic;
-			vga_cursor 	: out std_logic_vector(15 downto 0);
-			vga_cursor_enable : out std_logic;
-			intr		: out std_logic;
-			inta		: in STD_LOGIC
+			led_verdes	: OUT	std_logic_vector(7 DOWNTO 0);
+			led_rojos 	: OUT	std_logic_vector(7 DOWNTO 0);
+			HEX0 		: OUT	std_logic_vector(6 DOWNTO 0);
+			HEX1 		: OUT	std_logic_vector(6 DOWNTO 0);
+			HEX2 		: OUT	std_logic_vector(6 DOWNTO 0);
+			HEX3 		: OUT	std_logic_vector(6 DOWNTO 0);
+			rd_io 		: out	std_logic_vector(15 downto 0); --sortida de lo que llegim dels nostres bancs
+			vga_cursor 	: out	std_logic_vector(15 downto 0);
+			intr		: out	std_logic;
+			vga_cursor_enable : out std_logic
 			);
 	END component;
 	
