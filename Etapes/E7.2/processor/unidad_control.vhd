@@ -30,6 +30,7 @@ ENTITY unidad_control IS
 			rd_in			: OUT std_logic;
 			wr_out			: OUT std_logic;
 			inta			: OUT STD_LOGIC;
+			exca		: OUT STd_LOGIC;
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -104,6 +105,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			rd_in		: OUT STD_LOGIC;
 			wr_out		: OUT STD_LOGIC;
 			inta		: OUT STD_LOGIC;
+			exca		: OUT STd_LOGIC;
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_a		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -219,7 +221,7 @@ BEGIN
 	-- Process per decidir el seguent IR
 	process (clk, load_ins, boot) begin		
 		if boot = '1' then 										--BOOT
-			new_ir <= x"C000";
+			new_ir <= x"5000";
 		else
 			if load_pc_out /= "011" then		-- Cas RUN
 				if load_ins = '1' or load_pc_out = "001"  then  	-- DECODE or JMP carreguem a ir el que ens ve de memoria
@@ -305,6 +307,7 @@ BEGIN
 								wrd => wrd,
 								wrd_s => wrd_s,
 								inta => int_a_conn,
+								exca => exca,
 								u_s => u_s, 
 								wr_m => wr_m,
 								ldir => load_ins,

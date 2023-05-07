@@ -21,6 +21,7 @@ use work.reg.all;
 
 ENTITY regfile IS
     PORT (clk    : IN  STD_LOGIC;
+		  boot		: IN  STD_LOGIC;
           wrd    : IN  STD_LOGIC;
           d      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
           addr_a : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -40,11 +41,16 @@ BEGIN
 	a <= reg_vector(conv_integer(addr_a));
 	b <= reg_vector(conv_integer(addr_b));
 	
-	process (clk) begin
-		-- escriptura sinc
-		if rising_edge(clk) then
-			if wrd = '1' then
-				reg_vector(conv_integer(addr_d)) <= d;
+	process (clk,boot) begin
+		if boot = '1' then
+			-- Posem tots els registres a 0 (others => (others => '0'))
+			reg_vector <= (others => (others => '0'));
+		else 
+			-- escriptura sinc
+			if rising_edge(clk) then
+				if wrd = '1' then
+					reg_vector(conv_integer(addr_d)) <= d;
+				end if;
 			end if;
 		end if;
 	end process;

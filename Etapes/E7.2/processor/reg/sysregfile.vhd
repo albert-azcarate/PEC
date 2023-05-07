@@ -13,13 +13,13 @@
 
 
 -- Tipus de excepcio o interrupcio:
---		0 : Excepciï¿½n de tipo ?Instrucciï¿½n ilegal?.
---		1 : Excepciï¿½n de tipo ?Acceso a memoria mal alineado?.
---		2 : Excepciï¿½n de tipo ?Overflow en operaciï¿½n de coma flotante?.
---		3 : Excepciï¿½n de tipo ?Divisiï¿½n por cero en coma flotante?
---		4 : Excepciï¿½n de tipo ?Divisiï¿½n por cero en enteros o naturales?
---		5 ,...,14: No usadas en esta versiï¿½n. Reservados para futuras ampliaciones.
---		15: Interrupciï¿½n (externa)
+--		0 : ExcepciÃ¯Â¿Â½n de tipo ?InstrucciÃ¯Â¿Â½n ilegal?.
+--		1 : ExcepciÃ¯Â¿Â½n de tipo ?Acceso a memoria mal alineado?.
+--		2 : ExcepciÃ¯Â¿Â½n de tipo ?Overflow en operaciÃ¯Â¿Â½n de coma flotante?.
+--		3 : ExcepciÃ¯Â¿Â½n de tipo ?DivisiÃ¯Â¿Â½n por cero en coma flotante?
+--		4 : ExcepciÃ¯Â¿Â½n de tipo ?DivisiÃ¯Â¿Â½n por cero en enteros o naturales?
+--		5 ,...,14: No usadas en esta versiÃ¯Â¿Â½n. Reservados para futuras ampliaciones.
+--		15: InterrupciÃ¯Â¿Â½n (externa)
 
 
 LIBRARY ieee;
@@ -31,9 +31,11 @@ use work.exc_code.all;
 
 ENTITY sysregfile IS
     PORT (	clk			: IN  STD_LOGIC;
+			boot		: IN  STD_LOGIC;
 			wrd			: IN  STD_LOGIC;
 			intr		: IN  STD_LOGIC;	
 			inta		: IN  STD_LOGIC;
+			exca		: IN STd_LOGIC;
 			exc_code	: IN  exc_code_t;
 		  	int_type	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -53,38 +55,44 @@ signal reg_vector : slv_array_t := (others => x"0000");
 
 BEGIN
 	-- lectura asinc
-	a <= 	reg_vector(5) when inta = '1' and reg_vector(7)(1) = '1' else
+	a <= 	reg_vector(5) when exca = '1' and reg_vector(7)(1) = '1' else
+			reg_vector(5) when inta = '1' and reg_vector(7)(1) = '1' else
 			reg_vector(1) when int_type = "10" else
 			reg_vector(conv_integer(addr_a));
 			
 	int_e <= reg_vector(7)(1);
 	
-	process (clk, inta) begin
-		-- escriptura sinc
-		if rising_edge(clk) then
-			-- exc i int separats per discriminar millor
-			if exc_code /= no_exc_c and exc_code /= interrupt_c then
-				reg_vector(0) <= reg_vector(7);
-				reg_vector(1) <= PCup;
-				reg_vector(2) <= x"000"&exc_code;
-				reg_vector(3) <= addr_m;
-				reg_vector(7)(1) <= '0';
-				
-			elsif inta = '1'and reg_vector(7)(1) = '1' then
-				reg_vector(0) <= reg_vector(7);
-				reg_vector(1) <= PCup;
-				reg_vector(2) <= x"000F";
-				reg_vector(7)(1) <= '0';
-			else
-				if int_type = "00" then			-- EI
-					reg_vector(7)(1) <= '1';
-				elsif int_type = "01" then		-- DI
+	process (clk, inta, boot, exca) begin
+		if boot = '1' then
+			-- Posem tots els registres a 0 (others => (others => '0'))
+			reg_vector <= (others => (others => '0'));
+		else 
+			-- escriptura sinc
+			if rising_edge(clk) then
+				-- exc i int separats per discriminar millor
+				if exc_code /= no_exc_c and exc_code /= interrupt_c and reg_vector(7)(1) = '1' and exca = '1' then -- Si es una excepcio i estan enabled
+					reg_vector(0) <= reg_vector(7);
+					reg_vector(1) <= PCup;
+					reg_vector(2) <= x"000"&exc_code;
+					reg_vector(3) <= addr_m;
 					reg_vector(7)(1) <= '0';
-				elsif int_type = "10" then		-- RETI
-					reg_vector(7) <= reg_vector(0);
-				else							-- USUAL WRITE
-					if wrd = '1' then
-						reg_vector(conv_integer(addr_d)) <= d;
+					
+				elsif inta = '1'and reg_vector(7)(1) = '1' then -- Es una interrupcio i estan enabled
+					reg_vector(0) <= reg_vector(7);
+					reg_vector(1) <= PCup;
+					reg_vector(2) <= x"000F";
+					reg_vector(7)(1) <= '0';
+				else
+					if int_type = "00" then			-- EI
+						reg_vector(7)(1) <= '1';
+					elsif int_type = "01" then		-- DI
+						reg_vector(7)(1) <= '0';
+					elsif int_type = "10" then		-- RETI
+						reg_vector(7) <= reg_vector(0);
+					else							-- USUAL WRITE
+						if wrd = '1' then
+							reg_vector(conv_integer(addr_d)) <= d;
+						end if;
 					end if;
 				end if;
 			end if;

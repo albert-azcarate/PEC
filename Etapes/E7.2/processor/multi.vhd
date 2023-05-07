@@ -32,6 +32,7 @@ entity multi is
 			rd_in		: OUT STD_LOGIC;
 			wr_out		: OUT STD_LOGIC;
 			inta		: OUT STd_LOGIC;
+			exca		: OUT STd_LOGIC;
 			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -43,6 +44,19 @@ end entity;
 architecture Structure of multi is
 
 signal estat : std_logic_vector(1 downto 0) := "00";
+signal exc_code_b : exc_code_t;
+
+component exc is
+	port(	clk 		: IN  STD_LOGIC;
+			boot		: IN  STD_LOGIC;
+			no_al		: IN  STD_LOGIC;
+			ill_ins		: IN  STD_LOGIC;
+			interrupt	: IN  STD_LOGIC;
+			div_z		: IN  STD_LOGIC;
+			exc_code	: OUT exc_code_t
+			);
+end component;
+
 	 
 begin
 	-- Actualitzacio de l'estat
@@ -50,10 +64,12 @@ begin
 		if rising_edge(clk) then 
 			if boot = '0' then			-- Si estem a RUN
 				inta <= '0';
+				exca <= '0';
 				
-				if exc_code /= no_exc_c and exc_code /= interrupt_c and estat = "01" then	-- Si salta una excepcio en Decode(sense comptar interrupcions anem a estat SYSTEM)
-					estat <= "10"
-				elsif interrupt = '1' and estat = "01" and int_e = '1' then	-- Si hi ha interrup en Decode i estan enable ens podem en estat SYSTEM
+				if exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01" and int_e = '1' and halt_cont = '0' then	-- Si salta una excepcio en Decode(sense comptar interrupcions anem a estat SYSTEM)
+					estat <= "10";
+					exca <= '1';
+				elsif interrupt = '1' and estat = "01" and int_e = '1' and halt_cont = '0' then	-- Si hi ha interrup en Decode i estan enable ens podem en estat SYSTEM
 					estat <= "10"; 
 					inta <= '1';
 				else
@@ -143,24 +159,16 @@ begin
 				'0' when estat = "10" else
 				'1';
 				
-	exc_code <=	ill_ins_c 	when ill_ins_l 	= '1' else
-				no_al_c 		when no_al 		= '1' else
-				--ovf_f_c		when ovf_f 		= '1' else
-				--div_z_f_c 	when div_z_f 	= '1' else
-				div_z_c 		when div_z 		= '1' else
-				--no_exc_c		when no_exc 	= '1' else
-				--m_tlb_i_c 	when m_tlb_i 	= '1' else
-				--m_tlb_d_c 	when m_tlb_d 	= '1' else
-				--i_tlb_i_c 	when i_tlb_i 	= '1' else
-				--i_tlb_d_c 	when i_tlb_d 	= '1' else
-				--pp_tlb_i_c 	when pp_tlb_i 	= '1' else
-				--pp_tlb_d_c 	when pp_tlb_d 	= '1' else
-				--lec_tlb_c 	when lec_tlb 	= '1' else
-				--protec_c	when protec 	= '1' else
-				--call_c 		when call 		= '1' else
-				interrupt_c	when interrupt = '1' else
-				no_exc_c;
+	exc_code <= exc_code_b;
 				
-				
-	 
+	exception_controller : exc port map(	clk			=> clk,
+											boot => boot,
+											ill_ins 	=> ill_ins_l,
+											no_al		=> no_al,
+											div_z		=> div_z,
+											interrupt	=> interrupt,
+											exc_code	=> exc_code_b
+											);
+								
+								
 end Structure;

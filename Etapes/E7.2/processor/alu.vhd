@@ -48,10 +48,10 @@ BEGIN
 	mulu <= std_logic_vector(unsigned(x * y));
 	
 	-- z es un bit per saber si y es 0 o no, per fer servir en BNs i JMPs
-	z <= '0' when y = "0" else '1';
+	z <= '0' when y = x"0000" else '1';
 	
 	-- Indicadors de possibles excepcions
-	div_z <= '1' when (op = MULDIV and y = "0" and (f = DIV_OP  or f = DIVU_OP)) else '0';
+	div_z <= '1' when (op = MULDIV and y = x"0000" and (f = DIV_OP  or f = DIVU_OP)) else '0';
 	
 	
 	-- Depen de quina OP i F seleccionem la sortida
@@ -62,7 +62,7 @@ BEGIN
 					x + y 	when op = AL and f = ADD_OP else		--ADD
 					x - y 	when op = AL and f = SUB_OP else		--SUB
 					
-					mul(15 downto 0) 	when op = MULDIV and f = MUL_OP else	--MUL
+					mul(15 downto 0) when op = MULDIV and f = MUL_OP else	--MUL
 					mul(31 downto 16) when op = MULDIV and f = MULH_OP else		--MULH
 					mulu(31 downto 16) when op = MULDIV and f = MULHU_OP else	--MULHU
 					
@@ -103,6 +103,7 @@ BEGIN
 					x + y when op = ST or op = LD or op = STB or op = LDB else		-- LDs, STs
 					
 					x + y when op = ADDI else
+					
 					-- En RETI treurem X, ens entra el Pc antic
 					x when op = HALT else
 					

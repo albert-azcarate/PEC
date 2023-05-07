@@ -31,6 +31,29 @@
         d_segundos:       .word 0
         d_minutos:        .word 0
         d_horas:          .word 0
+		
+		interrupts_vector:
+			.word __interrup_timer ; 0 Interval Timer
+			.word __interrup_key ; 1 Pulsadores (KEY)
+			.word __interrup_switch ; 2 Interruptores (SWITCH)
+			.word __interrup_keyboard ; 3 Teclado PS/2
+		exceptions_vector:
+			.word __ilegal_ins 			; 0 Instrucción ilegal
+			.word __no_align 			; 1 Acceso a memoria no alineado
+			.word RSE_default_halt 		; 2 Overflow en coma flotante
+			.word RSE_default_halt 		; 3 División por cero flotante
+			.word __div_zero	 		; 4 División por cero
+			.word RSE_default_resume 	; 5 No excepcion
+			.word RSE_default_halt	 	; 6 Miss TLB pag ins
+			.word RSE_default_halt 		; 7 Miss TLB pag dat
+			.word RSE_default_halt 		; 8 Pagina invalida TLB ins
+			.word RSE_default_halt 		; 9 Pagina invalida TLB dat
+			.word RSE_default_halt 		; A Pagina protegida TLB ins
+			.word RSE_default_halt 		; B Pagina protegida TLB dat
+			.word RSE_default_halt 		; C Pagina de solo lectura
+			.word RSE_default_halt 		; D Proteccion IO o user
+			.word RSE_default_halt	 	; E Call
+			.word RSE_default_resume 	; F Interrupcion
 
 
 ; seccion de codigo
@@ -48,24 +71,41 @@
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         ; Rutina de servicio de interrupcion
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-RSG:    $PUSH r0, r1, r2, r3, r4, r5, r6 ;salvamos el estado en la pila
-        getiid r1          
-        movi   r3, 0                     ;comprueba si es una interrupcion del interval timer
-        cmpeq  r2, r1, r3
-        bnz    r2, __interrup_timer
-        movi   r3, 1                     ;comprueba si es una interrupcion del controlador de los pulsadores
-        cmpeq  r2, r1, r3 
-        bnz    r2, __interrup_key
-        movi   r3, 2                     ;comprueba si es una interrupcion del controlador de los interruptores
-        cmpeq  r2, r1, r3
-        bnz    r2, __interrup_switch
-        movi   r3, 3                     ;comprueba si es una interrupcion del controlador del teclado
-        cmpeq  r2, r1, r3
-        bnz    r2, __interrup_keyboard
-end_int:
-        $POP r6, r5, r4, r3, r2, r1, r0  ;restauramos el estado desde la pila (ojo orden inverso)
-        reti
-
+RSG:    $push R0, R1, R2, R3, R4, R5, R6
+		rds R1, S0
+		rds R2, S1
+		rds R3, S3
+		$push R1, R2, R3
+		rds R1, S2 				;consultamos el contenido de S2
+		movi R2, 15
+		cmplt R3, R1, R2 		;si es menor a 15 es una excepción
+		bz R3, __interrupcion 	;saltamos a las interrupciones si S2 es igual a 15
+__excepcion:
+		movi R2, lo(exceptions_vector)
+		movhi R2, hi(exceptions_vector)
+		add R1, R1, R1 			;R1 contiene el identificador de excepción
+		add R2, R2, R1
+		ld R2, 0(R2)
+		jal R6, R2
+		bnz R3, __finRSG
+__interrupcion:
+		getiid R1
+		add R1, R1, R1
+		movi R2, lo(interrupts_vector)
+		movhi R2, hi(interrupts_vector)
+		add R2, R2, R1
+		ld R2, 0(R2)
+		jal R6, R2
+__finRSG: 						;Restaurar el estado
+		$pop R3, R2, R1
+		wrs S3, R3
+		wrs S1, R2
+		wrs S0, R1
+		$pop R6, R5, R4, R3, R2, R1, R0
+		reti
+		
+RSE_default_resume: JMP R6
+RSE_default_halt: HALT
 
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         ; Rutina interrupcion reloj
@@ -110,7 +150,7 @@ __interrup_timer:
         addi   r3, r3, 1           ;d_horas++
         st     0(r4), r3
  __finreloj:
-        $MOVEI r6, end_int         ;direccion del fin del servicio de interrupcion
+        $MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 
 
@@ -125,7 +165,7 @@ __interrup_key:
         out     5, r3              ;activa los leds verdes con el valor de los pulsadores
         $MOVEI r4, d_pulsadores    ;carga la direccion de memoria donde esta el dato sobre el estado de los pulsadores
         st     0(r4), r3           ;actualiza la variable sobre el estado de los pulsadores
-        $MOVEI r6, end_int         ;direccion del fin del servicio de interrupcion
+        $MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 
 
@@ -137,7 +177,7 @@ __interrup_switch:
         out     6, r3              ;activa los leds rojos con el valor de los interruptores
         $MOVEI r4, d_interruptores ;carga la direccion de memoria donde esta el dato sobre el estado de los interruptores
         st     0(r4), r3           ;actualiza la variable sobre el estado de los interruptores
-        $MOVEI r6, end_int         ;direccion del fin del servicio de interrupcion
+        $MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 
 
@@ -161,7 +201,7 @@ __distintas:
         movi   r5, 1               ;es la primera vez que se pulsa
 __fin_keyboard:
         st     0(r4), r5           ;actualiza la variable con el numero de repeticiones
-        $MOVEI r6, end_int         ;direccion del fin del servicio de interrupcion
+        $MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 
 
@@ -178,6 +218,9 @@ inici:
         out     6, r1              ;activa los leds rojos con el valor de los interruptores
         $CALL  r6, __clear_screen  ;borra la pantalla (en R6 se almacena la direccion de retorno de la subrutina)
         ei                         ;activa las interrupciones
+		
+		movi	r1, 0
+		div		r1,r1,r1
 
 binf:   
         $MOVEI r1, 0xA000          ;fila 0; columna 0
@@ -231,6 +274,20 @@ binf:
         halt
 
 
+__ilegal_ins:
+		$MOVEI   r1, 0xDEAD
+        out    10, r1
+		halt
+		
+__div_zero:
+		$MOVEI   r1, 0xDEED
+        out    10, r1
+		halt
+		
+__no_align:
+		$MOVEI   r1, 0xDDDD
+        out    10, r1
+		halt
 
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         ; Subrutina para limpiar la pantalla

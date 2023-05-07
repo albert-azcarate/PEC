@@ -50,6 +50,7 @@ ARCHITECTURE Structure OF proc IS
 			rd_in			: OUT STD_LOGIC;
 			wr_out			: OUT STD_LOGIC;
 			inta			: OUT STD_LOGIC;
+			exca		: OUT STd_LOGIC;
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -63,6 +64,7 @@ ARCHITECTURE Structure OF proc IS
  
 	component datapath IS
 	PORT (	clk				: IN  STD_LOGIC;
+			boot			: IN  STD_LOGIC;
 			wrd				: IN  STD_LOGIC;
 			wrd_s			: IN  STD_LOGIC;
 			u_s				: IN  STD_LOGIC;
@@ -71,6 +73,7 @@ ARCHITECTURE Structure OF proc IS
 			immed_or_reg	: IN  STD_LOGIC;
 			intr			: IN  STD_LOGIC;
 			inta			: IN  STD_LOGIC;
+			exca			: IN STd_LOGIC;
 			op				: IN  op_code_t;
 			f				: IN  f_code_t;
 			exc_code		: IN  exc_code_t;
@@ -108,6 +111,7 @@ signal int_e_conn			: STD_LOGIC;
 signal div_z_conn			: STD_LOGIC;
 signal no_al_conn			: STD_LOGIC;
 signal inta_conn			: STD_LOGIC;
+signal exca_conn			: STD_LOGIC;
 signal in_d_conn			: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal int_type_conn		: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal addr_a_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -151,12 +155,14 @@ BEGIN
 								int_type => int_type_conn,
 								intr => intr,
 								inta => inta_conn,
+								exca => exca_conn,
 								div_z => div_z_conn,
 								no_al => no_al_conn
 								);
 	
 	
 	PATH: datapath port map(clk => clk,
+							boot => boot,
 							datard_m => datard_m,
 							op => op_conn,
 							f => f_conn,
@@ -171,6 +177,7 @@ BEGIN
 							inta => inta_conn,
 							div_z => div_z_conn,
 							int_e => int_e_conn,
+							exca => exca_conn,
 							ins_dad => ins_dad_conn, 
 							in_d => in_d_conn, 
 							immed_x2 => immed_x2_conn,

@@ -6,11 +6,13 @@ use work.exc_code.all;
 
 ENTITY registers IS
     PORT (	clk    		: IN  STD_LOGIC;
+			boot		: IN  STD_LOGIC;
 			wrd    		: IN  STD_LOGIC;
 			wrd_s  		: IN  STD_LOGIC;
 			u_s 		: IN  STD_LOGIC;
 			intr		: IN  STD_LOGIC;
 			inta		: IN  STD_LOGIC;
+			exca		: IN STd_LOGIC;
 			exc_code	: IN  exc_code_t;
 			int_type	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -29,6 +31,7 @@ ARCHITECTURE Structure OF registers IS
 
 component regfile IS
     PORT (clk    : IN  STD_LOGIC;
+		  boot		: IN  STD_LOGIC;
           wrd    : IN  STD_LOGIC;
           d      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
           addr_a : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -41,9 +44,11 @@ component regfile IS
 
 component sysregfile IS
     PORT (	clk			: IN  STD_LOGIC;
+			boot		: IN  STD_LOGIC;
 			wrd			: IN  STD_LOGIC;
 			intr		: IN  STD_LOGIC;	
 			inta		: IN  STD_LOGIC;
+			exca		: IN STd_LOGIC;
 			exc_code	: IN  exc_code_t;
 		  	int_type	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -62,6 +67,7 @@ signal a_sys : STD_LOGIC_VECTOR(15 DOWNTO 0);
 BEGIN
 	
 	sys_register_bank : sysregfile port map (	clk => clk,
+												boot => boot,
 												wrd => wrd_s,
 												d => d,
 												addr_a => addr_a,
@@ -70,6 +76,7 @@ BEGIN
 												a => a_sys,
 												intr => intr,
 												inta => inta,
+												exca => exca,
 												PCup => PCup,
 												int_e => int_e,
 												addr_m => addr_m,
@@ -77,6 +84,7 @@ BEGIN
 												);
 	
 	register_bank : regfile port map (	clk => clk,
+										boot => boot,
 										wrd => wrd,
 										d => d,
 										addr_a => addr_a,

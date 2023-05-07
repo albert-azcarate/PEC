@@ -8,6 +8,7 @@ use work.all;
 
 ENTITY datapath IS
 	PORT (	clk				: IN  STD_LOGIC;
+			boot			: IN  STD_LOGIC;
 			wrd				: IN  STD_LOGIC;
 			wrd_s			: IN  STD_LOGIC;
 			u_s				: IN  STD_LOGIC;
@@ -16,6 +17,7 @@ ENTITY datapath IS
 			immed_or_reg	: IN  STD_LOGIC;
 			intr			: IN  STD_LOGIC;
 			inta			: IN  STD_LOGIC;
+			exca			: IN STd_LOGIC;
 			op				: IN  op_code_t;
 			f				: IN  f_code_t;
 			exc_code		: IN  exc_code_t;
@@ -57,11 +59,13 @@ ARCHITECTURE Structure OF datapath IS
 	
 	component registers is
 	PORT (	clk    		: IN  STD_LOGIC;
+			boot		: IN  STD_LOGIC;
 			wrd    		: IN  STD_LOGIC;
 			wrd_s  		: IN  STD_LOGIC;
 			u_s 		: IN  STD_LOGIC;
 			intr		: IN  STD_LOGIC;
 			inta		: IN  STD_LOGIC;
+			exca		: IN STd_LOGIC;
 			exc_code	: IN  exc_code_t;
 			int_type	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -90,6 +94,7 @@ signal addr_m_buffer			: std_logic_vector(15 downto 0);
 BEGIN
 
 	register_banks : registers port map (	clk => clk,
+											boot => boot,
 											wrd => wrd,
 											wrd_s => wrd_s,
 											u_s => u_s,
@@ -102,6 +107,7 @@ BEGIN
 											int_type => int_type,
 											intr => intr,
 											inta => inta,
+											exca => exca,
 											Pcup => pc,
 											int_e => int_e,
 											addr_m => addr_m_buffer,
@@ -135,13 +141,13 @@ BEGIN
 						
 	with ins_dad select
 		addr_m_buffer <= 	alu_out when '1',
-								pc when others;
+							pc when others;
 								
 	addr_m <= addr_m_buffer;
 
 	data_wr <= regbank_to_alu_b;
 	
-	alu_out_path <= alu_out; 
+	alu_out_path <= regbank_to_alu_a when exca = '1' or inta = '1' else alu_out; 
 
 	wr_io <= regbank_to_alu_b;
 	
