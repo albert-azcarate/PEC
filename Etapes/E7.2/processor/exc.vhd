@@ -35,20 +35,18 @@ begin
 				--lec_tlb_c 	when lec_tlb 	= '1' else
 				--protec_c		when protec 	= '1' else
 				--call_c 		when call 		= '1' else
-				interrupt_c		when interrupt 	= '1' else
+				--interrupt_c		when interrupt 	= '1' else
 				no_exc_c;
 
-	process (clk, exc_code_b) begin
-		if boot = '1' then
-			exc_code <= no_exc_c;
-		else
-			if rising_edge(clk) then
-				if exc_code_b /= no_exc_c then
-					exc_code <= exc_code_b;
-				end if;
-			end if;
-		end if;
-	end process;
+	--process (clk, exc_code_b) begin
+	--	if boot = '1' then
+	--		exc_code <= no_exc_c;
+	--	else
+	--		if exc_code_b /= no_exc_c then
+	--			exc_code <= exc_code_b;
+	--		end if;
+	--	end if;
+	--end process;
 
 
 

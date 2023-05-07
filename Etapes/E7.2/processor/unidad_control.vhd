@@ -221,7 +221,7 @@ BEGIN
 	-- Process per decidir el seguent IR
 	process (clk, load_ins, boot) begin		
 		if boot = '1' then 										--BOOT
-			new_ir <= x"5000";
+			new_ir <= x"C000";
 		else
 			if load_pc_out /= "011" then		-- Cas RUN
 				if load_ins = '1' or load_pc_out = "001"  then  	-- DECODE or JMP carreguem a ir el que ens ve de memoria
