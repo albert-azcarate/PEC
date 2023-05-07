@@ -21,7 +21,7 @@ begin
 
 	
 	exc_code <=	ill_ins_c 	when ill_ins 	= '1' else
-				no_al_c 		when no_al 		= '1' else
+				no_al_c 		when no_al 		= '1' and acces_mem = '1' else
 				--ovf_f_c		when ovf_f 		= '1' else
 				--div_z_f_c 	when div_z_f 	= '1' else
 				div_z_c 		when div_z 		= '1' else

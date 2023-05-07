@@ -110,7 +110,6 @@ signal wrd_s_conn			: STD_LOGIC;
 signal u_s_conn				: STD_LOGIC;
 signal int_e_conn			: STD_LOGIC;
 signal div_z_conn			: STD_LOGIC;
-signal no_al_conn			: STD_LOGIC;
 signal inta_conn			: STD_LOGIC;
 signal exca_conn			: STD_LOGIC;
 signal in_d_conn			: STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -158,7 +157,7 @@ BEGIN
 								exca => exca_conn,
 								div_z => div_z_conn,
 								exc_code => exc_code_conn,
-								no_al => no_al_conn
+								no_al => no_al
 								);
 	
 	
