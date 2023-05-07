@@ -92,6 +92,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			no_al		: IN  STD_LOGIC;
 			ill_ins_l	: IN STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			in_d_l		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -142,6 +143,7 @@ signal addr_io_conn			: std_logic_vector(7 downto 0);
 signal load_pc_connection	: std_logic_vector(2 downto 0);   
 signal load_pc_out			: std_logic_vector(2 downto 0);
 signal addr_a_conn			: std_logic_vector(2 downto 0);
+signal in_d_conn			: std_logic_vector(1 downto 0);
 signal int_type_conn		: std_logic_vector(1 downto 0);
 signal int_type_out			: std_logic_vector(1 downto 0);
 
@@ -252,6 +254,7 @@ BEGIN
 	f <=  f_out;
 	int_type <= int_type_out;
 	inta <= int_a_conn;
+	in_d <= in_d_conn;
 	
 	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL
 	pc <= old_2_Pc when load_pc_out = "001" and f_out = JAL_OP else
@@ -271,7 +274,7 @@ BEGIN
 										addr_d => addr_d,
 										immed => immed,
 										wr_m => word_mem,
-										in_d => in_d,
+										in_d => in_d_conn,
 										ill_ins => ill_ins_conn,
 										immed_x2 => immed_x2,
 										word_byte => word_byte_connection,
@@ -297,6 +300,7 @@ BEGIN
 								div_z => div_z,
 								no_al => no_al,
 								wr_m_l => word_mem,
+								in_d_l => in_d_conn,
 								addr_io_l => addr_io_conn,
 								rd_in_l => rd_in_conn,
 								wr_out_l => wr_out_conn,

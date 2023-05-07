@@ -218,7 +218,11 @@ inici:
         out     6, r1              ;activa los leds rojos con el valor de los interruptores
         $CALL  r6, __clear_screen  ;borra la pantalla (en R6 se almacena la direccion de retorno de la subrutina)
         ei                         ;activa las interrupciones	;C12C
-		ei
+		
+		$MOVEI	r1, 0x0000
+		div 	r1,r1,r1
+		;$MOVEI	r1, 0x0001
+		;ld		r1, 0(r1) ; C130
 
 binf:   
         $MOVEI r1, 0xA000          ;fila 0; columna 0

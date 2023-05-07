@@ -9,6 +9,7 @@ entity exc is
 			ill_ins		: IN  STD_LOGIC;
 			interrupt	: IN  STD_LOGIC;
 			div_z		: IN  STD_LOGIC;
+			acces_mem	: IN  STD_LOGIC;
 			exc_code	: OUT exc_code_t
 			);
 end entity;

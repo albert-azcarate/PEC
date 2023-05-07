@@ -17,8 +17,9 @@ entity multi is
 			int_e		: IN  STD_LOGIC;
 			div_z		: IN  STD_LOGIC;
 			no_al		: IN  STD_LOGIC;
-			ill_ins_l		: IN  STD_LOGIC;
+			ill_ins_l	: IN  STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			in_d_l		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -45,7 +46,8 @@ architecture Structure of multi is
 
 signal estat : std_logic_vector(1 downto 0) := "00";
 signal exc_code_b : exc_code_t := no_exc_c;
-signal exc_code_reg : exc_code_t := no_exc_c;
+signal exc_code_reg : exc_code_t;
+signal acces_mem_b : std_logic;
 
 component exc is
 	port(	clk 		: IN  STD_LOGIC;
@@ -54,6 +56,7 @@ component exc is
 			ill_ins		: IN  STD_LOGIC;
 			interrupt	: IN  STD_LOGIC;
 			div_z		: IN  STD_LOGIC;
+			acces_mem	: IN  STD_LOGIC;
 			exc_code	: OUT exc_code_t
 			);
 end component;
@@ -172,17 +175,23 @@ begin
 				'1';
 	
 	-- Ens guardem el codi d'excepcio quan no sigui No_exception i no estiguem a Boot per evitar un ill_ins al bootar
-	process (clk, estat, exc_code_b, boot) begin
-		--if rising_edge(clk) then
-			if exc_code_b /= no_exc_c and boot = '0' then
-				exc_code_reg <= exc_code_b;
+	process (exc_code_b, boot, ldpc_l) begin
+		if rising_edge(clk) then
+			if boot = '1' then
+				exc_code <= no_exc_c;
+			elsif exc_code_b /= no_exc_c then
+				exc_code <= exc_code_b;
 			elsif ldpc_l = "100" then 		-- Si es un RETI borrem la el codi de interupcio
-				exc_code_reg <= no_exc_c;
+				exc_code <= no_exc_c;
 			end if;
-		--end if;
+		end if;
 	end process;
 	
-	exc_code <= exc_code_reg;
+	-- Marquem que accedim a memoria en FETCH, en ST/B(wr_m_l indica wr_mem_enable) i LB/B(in_d_l es 01 en ST o STB)
+	acces_mem_b <= '1' when estat = "00" or (estat = "01" and (wr_m_l = '1' or in_d_l = "01")) else
+				'0';
+	
+	--exc_code <= exc_code_reg;
 				
 	exception_controller : exc port map(	clk			=> clk,
 											boot 		=> boot,
@@ -190,6 +199,7 @@ begin
 											no_al		=> no_al,
 											div_z		=> div_z,
 											interrupt	=> interrupt,
+											acces_mem	=> acces_mem_b,
 											exc_code	=> exc_code_b
 											);
 								
