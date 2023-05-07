@@ -173,13 +173,13 @@ begin
 	
 	-- Ens guardem el codi d'excepcio quan no sigui No_exception i no estiguem a Boot per evitar un ill_ins al bootar
 	process (clk, estat, exc_code_b, boot) begin
-		if rising_edge(clk) then
+		--if rising_edge(clk) then
 			if exc_code_b /= no_exc_c and boot = '0' then
 				exc_code_reg <= exc_code_b;
 			elsif ldpc_l = "100" then 		-- Si es un RETI borrem la el codi de interupcio
 				exc_code_reg <= no_exc_c;
 			end if;
-		end if;
+		--end if;
 	end process;
 	
 	exc_code <= exc_code_reg;

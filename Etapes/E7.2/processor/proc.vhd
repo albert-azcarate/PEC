@@ -100,6 +100,7 @@ ARCHITECTURE Structure OF proc IS
 	 
 signal	op_conn				: op_code_t;
 signal	f_conn				: f_code_t;
+signal exc_code_conn		: exc_code_t;
 signal wrd_conn				: STD_LOGIC;
 signal immed_x2_conn		: STD_LOGIC;
 signal ins_dad_conn			: STD_LOGIC;
@@ -117,7 +118,6 @@ signal int_type_conn		: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal addr_a_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
 signal addr_b_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
 signal addr_d_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
-signal exc_code_conn		: STD_LOGIC_VECTOR(3 DOWNTO 0);
 signal immed_conn			: STD_LOGIC_VECTOR(15 DOWNTO 0);
 signal pc_conn				: STD_LOGIC_VECTOR(15 DOWNTO 0);
 signal alu_out_conn			: STD_LOGIC_VECTOR(15 downto 0);
@@ -157,6 +157,7 @@ BEGIN
 								inta => inta_conn,
 								exca => exca_conn,
 								div_z => div_z_conn,
+								exc_code => exc_code_conn,
 								no_al => no_al_conn
 								);
 	

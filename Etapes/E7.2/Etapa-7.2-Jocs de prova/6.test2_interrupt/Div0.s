@@ -219,8 +219,8 @@ inici:
         $CALL  r6, __clear_screen  ;borra la pantalla (en R6 se almacena la direccion de retorno de la subrutina)
         ei                         ;activa las interrupciones
 		
-		$MOVEI	r1, 0x0001
-		ld		r1, 0(r1)
+		movi	r1, 0
+		div		r1,r1,r1
 
 binf:   
         $MOVEI r1, 0xA000          ;fila 0; columna 0
