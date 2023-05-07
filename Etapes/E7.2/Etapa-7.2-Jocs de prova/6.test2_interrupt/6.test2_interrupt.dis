@@ -7,16 +7,16 @@ start address 0x0000c000
 
 Program Header:
     LOAD off    0x00000000 vaddr 0x0000bf8c paddr 0x0000bf8c align 2**0
-         filesz 0x0000046e memsz 0x0000046e flags r-x
-    LOAD off    0x0000046e vaddr 0x00008000 paddr 0x0000c3fa align 2**0
+         filesz 0x00000498 memsz 0x00000498 flags r-x
+    LOAD off    0x00000498 vaddr 0x00008000 paddr 0x0000c424 align 2**0
          filesz 0x000000a2 memsz 0x000000a2 flags rw-
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn  Flags
-  0 .text         000003fa  0000c000  0000c000  00000074  2**0  CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         000000a2  00008000  0000c3fa  0000046e  2**1  CONTENTS, ALLOC, LOAD, DATA
-  2 .stab         00001248  00000000  00000000  00000510  2**2  CONTENTS, READONLY, DEBUGGING
-  3 .stabstr      00000057  00000000  00000000  00001758  2**0  CONTENTS, READONLY, DEBUGGING
+  0 .text         00000424  0000c000  0000c000  00000074  2**0  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         000000a2  00008000  0000c424  00000498  2**1  CONTENTS, ALLOC, LOAD, DATA
+  2 .stab         00001314  00000000  00000000  0000053c  2**2  CONTENTS, READONLY, DEBUGGING
+  3 .stabstr      00000057  00000000  00000000  00001850  2**0  CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 0000c000 l    d  .text	00000000 .text
 00008000 l    d  .data	00000000 .data
@@ -49,10 +49,10 @@ SYMBOL TABLE:
 0000c0e4 l       .text	00000000 __interrup_switch
 0000c0f4 l       .text	00000000 __interrup_keyboard
 00008082 l       .data	00000000 exceptions_vector
-0000c1e4 l       .text	00000000 __ilegal_ins
-0000c1f4 l       .text	00000000 __no_align
+0000c1f6 l       .text	00000000 __ilegal_ins
+0000c20e l       .text	00000000 __no_align
 0000c074 l       .text	00000000 RSE_default_halt
-0000c1ec l       .text	00000000 __div_zero
+0000c202 l       .text	00000000 __div_zero
 0000c072 l       .text	00000000 RSE_default_resume
 0000c010 l       .text	00000000 RSG
 0000c116 l       .text	00000000 inici
@@ -62,36 +62,37 @@ SYMBOL TABLE:
 0000c0c8 l       .text	00000000 __finreloj
 0000c10c l       .text	00000000 __distintas
 0000c10e l       .text	00000000 __fin_keyboard
-0000c1fc l       .text	00000000 __clear_screen
-0000c12e l       .text	00000000 binf
-0000c212 l       .text	00000000 __write_line
-0000c222 l       .text	00000000 __write_valor
-0000c256 l       .text	00000000 __mostrar_reloj
-0000c208 l       .text	00000000 __repe
-0000c212 l       .text	00000000 bucle_cad
-0000c220 l       .text	00000000 fin_bucle_cad
-0000c306 l       .text	00000000 __itoa
-0000c23e l       .text	00000000 bucle_val
-0000c24c l       .text	00000000 fin_bucle_val
-0000c272 l       .text	00000000 bcad_hora
-0000c280 l       .text	00000000 fin_bcad_hora
-0000c2b4 l       .text	00000000 bcad_min
-0000c2c2 l       .text	00000000 fin_bcad_min
-0000c2f6 l       .text	00000000 bcad_seg
-0000c304 l       .text	00000000 fin_bcad_seg
-0000c336 l       .text	00000000 __for1
-0000c36e l       .text	00000000 __condfor1
-0000c340 l       .text	00000000 __cosfor1
-0000c3d0 l       .text	00000000 __condfor2
-0000c3a6 l       .text	00000000 __cosfor2
+0000c226 l       .text	00000000 __clear_screen
+0000c140 l       .text	00000000 binf
+0000c23c l       .text	00000000 __write_line
+0000c24c l       .text	00000000 __write_valor
+0000c280 l       .text	00000000 __mostrar_reloj
+0000c224 l       .text	00000000 end_no_align
+0000c232 l       .text	00000000 __repe
+0000c23c l       .text	00000000 bucle_cad
+0000c24a l       .text	00000000 fin_bucle_cad
+0000c330 l       .text	00000000 __itoa
+0000c268 l       .text	00000000 bucle_val
+0000c276 l       .text	00000000 fin_bucle_val
+0000c29c l       .text	00000000 bcad_hora
+0000c2aa l       .text	00000000 fin_bcad_hora
+0000c2de l       .text	00000000 bcad_min
+0000c2ec l       .text	00000000 fin_bcad_min
+0000c320 l       .text	00000000 bcad_seg
+0000c32e l       .text	00000000 fin_bcad_seg
+0000c360 l       .text	00000000 __for1
+0000c398 l       .text	00000000 __condfor1
+0000c36a l       .text	00000000 __cosfor1
+0000c3fa l       .text	00000000 __condfor2
+0000c3d0 l       .text	00000000 __cosfor2
 0000c000 g       .text	00000000 __entry_point
-0000c3fa g       .text	00000000 _etext
-0000c49c g       *ABS*	00000000 __data_load_end
-0000c3fa g       *ABS*	00000000 __data_load_start
-0000c3fa g       .text	00000000 __dtors_end
-0000c3fa g       .text	00000000 __ctors_start
-0000c3fa g       .text	00000000 __dtors_start
-0000c3fa g       .text	00000000 __ctors_end
+0000c424 g       .text	00000000 _etext
+0000c4c6 g       *ABS*	00000000 __data_load_end
+0000c424 g       *ABS*	00000000 __data_load_start
+0000c424 g       .text	00000000 __dtors_end
+0000c424 g       .text	00000000 __ctors_start
+0000c424 g       .text	00000000 __dtors_start
+0000c424 g       .text	00000000 __ctors_end
 000080a2 g       .data	00000000 _edata
 000080a2 g       *ABS*	00000000 _end
 
@@ -108,7 +109,7 @@ Contents of section .data:
  8050 70657469 63696f6e 65733a20 00000000  peticiones: ....
  8060 00000000 00000000 00000000 00000000  ................
  8070 00000000 00000000 000076c0 cec0e4c0  ..........v.....
- 8080 f4c0e4c1 f4c174c0 74c0ecc1 72c074c0  ......t.t...r.t.
+ 8080 f4c0f6c1 0ec274c0 74c002c2 72c074c0  ......t.t...r.t.
  8090 74c074c0 74c074c0 74c074c0 74c074c0  t.t.t.t.t.t.t.t.
  80a0 72c0                                 r.              
 
@@ -291,414 +292,437 @@ Disassembly of section .text:
     c11e:	7305 	out	5, r1
     c120:	7208 	in	r1, 8
     c122:	7306 	out	6, r1
-    c124:	5cfc 	movi	r6, -4
-    c126:	5dc1 	movhi	r6, -63
+    c124:	5c26 	movi	r6, 38
+    c126:	5dc2 	movhi	r6, -62
     c128:	ad84 	jal	r6, r6
-    c12a:	f020 	ei	
-    c12c:	f020 	ei	
+    c12a:	5200 	movi	r1, 0
+    c12c:	5300 	movhi	r1, 0
+    c12e:	f870 	wrs	s4, r1
+    c130:	f020 	ei	
+    c132:	f020 	ei	
+    c134:	5200 	movi	r1, 0
+    c136:	5300 	movhi	r1, 0
+    c138:	8261 	div	r1, r1, r1
+    c13a:	5201 	movi	r1, 1
+    c13c:	5300 	movhi	r1, 0
+    c13e:	3240 	ld	r1, 0(r1)
 
-0000c12e <binf>:
-    c12e:	5200 	movi	r1, 0
-    c130:	53a0 	movhi	r1, -96
-    c132:	5400 	movi	r2, 0
-    c134:	5580 	movhi	r2, -128
-    c136:	5c12 	movi	r6, 18
-    c138:	5dc2 	movhi	r6, -62
-    c13a:	ad84 	jal	r6, r6
-    c13c:	521a 	movi	r1, 26
-    c13e:	53a0 	movhi	r1, -96
-    c140:	5468 	movi	r2, 104
-    c142:	5580 	movhi	r2, -128
-    c144:	3480 	ld	r2, 0(r2)
-    c146:	5c22 	movi	r6, 34
-    c148:	5dc2 	movhi	r6, -62
-    c14a:	ad84 	jal	r6, r6
-    c14c:	5232 	movi	r1, 50
-    c14e:	53a0 	movhi	r1, -96
-    c150:	540e 	movi	r2, 14
-    c152:	5580 	movhi	r2, -128
-    c154:	5c12 	movi	r6, 18
-    c156:	5dc2 	movhi	r6, -62
-    c158:	ad84 	jal	r6, r6
-    c15a:	523e 	movi	r1, 62
-    c15c:	53a0 	movhi	r1, -96
-    c15e:	5c56 	movi	r6, 86
-    c160:	5dc2 	movhi	r6, -62
-    c162:	ad84 	jal	r6, r6
-    c164:	52a0 	movi	r1, -96
-    c166:	53a0 	movhi	r1, -96
-    c168:	5415 	movi	r2, 21
-    c16a:	5580 	movhi	r2, -128
-    c16c:	5c12 	movi	r6, 18
-    c16e:	5dc2 	movhi	r6, -62
-    c170:	ad84 	jal	r6, r6
-    c172:	52b8 	movi	r1, -72
-    c174:	53a0 	movhi	r1, -96
-    c176:	546a 	movi	r2, 106
-    c178:	5580 	movhi	r2, -128
-    c17a:	3480 	ld	r2, 0(r2)
-    c17c:	5c22 	movi	r6, 34
-    c17e:	5dc2 	movhi	r6, -62
-    c180:	ad84 	jal	r6, r6
-    c182:	5240 	movi	r1, 64
-    c184:	53a1 	movhi	r1, -95
-    c186:	5422 	movi	r2, 34
-    c188:	5580 	movhi	r2, -128
-    c18a:	5c12 	movi	r6, 18
-    c18c:	5dc2 	movhi	r6, -62
-    c18e:	ad84 	jal	r6, r6
-    c190:	525e 	movi	r1, 94
-    c192:	53a1 	movhi	r1, -95
-    c194:	546c 	movi	r2, 108
-    c196:	5580 	movhi	r2, -128
-    c198:	3480 	ld	r2, 0(r2)
-    c19a:	5c22 	movi	r6, 34
-    c19c:	5dc2 	movhi	r6, -62
-    c19e:	ad84 	jal	r6, r6
-    c1a0:	52e0 	movi	r1, -32
-    c1a2:	53a1 	movhi	r1, -95
-    c1a4:	5432 	movi	r2, 50
-    c1a6:	5580 	movhi	r2, -128
-    c1a8:	5c12 	movi	r6, 18
-    c1aa:	5dc2 	movhi	r6, -62
-    c1ac:	ad84 	jal	r6, r6
-    c1ae:	5208 	movi	r1, 8
-    c1b0:	53a2 	movhi	r1, -94
-    c1b2:	546e 	movi	r2, 110
-    c1b4:	5580 	movhi	r2, -128
-    c1b6:	3480 	ld	r2, 0(r2)
-    c1b8:	5c22 	movi	r6, 34
-    c1ba:	5dc2 	movhi	r6, -62
-    c1bc:	ad84 	jal	r6, r6
-    c1be:	5212 	movi	r1, 18
-    c1c0:	53a2 	movhi	r1, -94
-    c1c2:	5447 	movi	r2, 71
-    c1c4:	5580 	movhi	r2, -128
-    c1c6:	5c12 	movi	r6, 18
-    c1c8:	5dc2 	movhi	r6, -62
-    c1ca:	ad84 	jal	r6, r6
-    c1cc:	523c 	movi	r1, 60
-    c1ce:	53a2 	movhi	r1, -94
-    c1d0:	5470 	movi	r2, 112
-    c1d2:	5580 	movhi	r2, -128
-    c1d4:	3480 	ld	r2, 0(r2)
-    c1d6:	5c22 	movi	r6, 34
-    c1d8:	5dc2 	movhi	r6, -62
-    c1da:	ad84 	jal	r6, r6
-    c1dc:	5c2e 	movi	r6, 46
-    c1de:	5dc1 	movhi	r6, -63
-    c1e0:	a183 	jmp	r6
-    c1e2:	ffff 	halt	
+0000c140 <binf>:
+    c140:	5200 	movi	r1, 0
+    c142:	53a0 	movhi	r1, -96
+    c144:	5400 	movi	r2, 0
+    c146:	5580 	movhi	r2, -128
+    c148:	5c3c 	movi	r6, 60
+    c14a:	5dc2 	movhi	r6, -62
+    c14c:	ad84 	jal	r6, r6
+    c14e:	521a 	movi	r1, 26
+    c150:	53a0 	movhi	r1, -96
+    c152:	5468 	movi	r2, 104
+    c154:	5580 	movhi	r2, -128
+    c156:	3480 	ld	r2, 0(r2)
+    c158:	5c4c 	movi	r6, 76
+    c15a:	5dc2 	movhi	r6, -62
+    c15c:	ad84 	jal	r6, r6
+    c15e:	5232 	movi	r1, 50
+    c160:	53a0 	movhi	r1, -96
+    c162:	540e 	movi	r2, 14
+    c164:	5580 	movhi	r2, -128
+    c166:	5c3c 	movi	r6, 60
+    c168:	5dc2 	movhi	r6, -62
+    c16a:	ad84 	jal	r6, r6
+    c16c:	523e 	movi	r1, 62
+    c16e:	53a0 	movhi	r1, -96
+    c170:	5c80 	movi	r6, -128
+    c172:	5dc2 	movhi	r6, -62
+    c174:	ad84 	jal	r6, r6
+    c176:	52a0 	movi	r1, -96
+    c178:	53a0 	movhi	r1, -96
+    c17a:	5415 	movi	r2, 21
+    c17c:	5580 	movhi	r2, -128
+    c17e:	5c3c 	movi	r6, 60
+    c180:	5dc2 	movhi	r6, -62
+    c182:	ad84 	jal	r6, r6
+    c184:	52b8 	movi	r1, -72
+    c186:	53a0 	movhi	r1, -96
+    c188:	546a 	movi	r2, 106
+    c18a:	5580 	movhi	r2, -128
+    c18c:	3480 	ld	r2, 0(r2)
+    c18e:	5c4c 	movi	r6, 76
+    c190:	5dc2 	movhi	r6, -62
+    c192:	ad84 	jal	r6, r6
+    c194:	5240 	movi	r1, 64
+    c196:	53a1 	movhi	r1, -95
+    c198:	5422 	movi	r2, 34
+    c19a:	5580 	movhi	r2, -128
+    c19c:	5c3c 	movi	r6, 60
+    c19e:	5dc2 	movhi	r6, -62
+    c1a0:	ad84 	jal	r6, r6
+    c1a2:	525e 	movi	r1, 94
+    c1a4:	53a1 	movhi	r1, -95
+    c1a6:	546c 	movi	r2, 108
+    c1a8:	5580 	movhi	r2, -128
+    c1aa:	3480 	ld	r2, 0(r2)
+    c1ac:	5c4c 	movi	r6, 76
+    c1ae:	5dc2 	movhi	r6, -62
+    c1b0:	ad84 	jal	r6, r6
+    c1b2:	52e0 	movi	r1, -32
+    c1b4:	53a1 	movhi	r1, -95
+    c1b6:	5432 	movi	r2, 50
+    c1b8:	5580 	movhi	r2, -128
+    c1ba:	5c3c 	movi	r6, 60
+    c1bc:	5dc2 	movhi	r6, -62
+    c1be:	ad84 	jal	r6, r6
+    c1c0:	5208 	movi	r1, 8
+    c1c2:	53a2 	movhi	r1, -94
+    c1c4:	546e 	movi	r2, 110
+    c1c6:	5580 	movhi	r2, -128
+    c1c8:	3480 	ld	r2, 0(r2)
+    c1ca:	5c4c 	movi	r6, 76
+    c1cc:	5dc2 	movhi	r6, -62
+    c1ce:	ad84 	jal	r6, r6
+    c1d0:	5212 	movi	r1, 18
+    c1d2:	53a2 	movhi	r1, -94
+    c1d4:	5447 	movi	r2, 71
+    c1d6:	5580 	movhi	r2, -128
+    c1d8:	5c3c 	movi	r6, 60
+    c1da:	5dc2 	movhi	r6, -62
+    c1dc:	ad84 	jal	r6, r6
+    c1de:	523c 	movi	r1, 60
+    c1e0:	53a2 	movhi	r1, -94
+    c1e2:	5470 	movi	r2, 112
+    c1e4:	5580 	movhi	r2, -128
+    c1e6:	3480 	ld	r2, 0(r2)
+    c1e8:	5c4c 	movi	r6, 76
+    c1ea:	5dc2 	movhi	r6, -62
+    c1ec:	ad84 	jal	r6, r6
+    c1ee:	5c40 	movi	r6, 64
+    c1f0:	5dc1 	movhi	r6, -63
+    c1f2:	a183 	jmp	r6
+    c1f4:	ffff 	halt	
 
-0000c1e4 <__ilegal_ins>:
-    c1e4:	52ad 	movi	r1, -83
-    c1e6:	53de 	movhi	r1, -34
-    c1e8:	730a 	out	10, r1
-    c1ea:	ffff 	halt	
+0000c1f6 <__ilegal_ins>:
+    c1f6:	f32c 	rds	r1, s4
+    c1f8:	2241 	addi	r1, r1, 1
+    c1fa:	f870 	wrs	s4, r1
+    c1fc:	5c52 	movi	r6, 82
+    c1fe:	5dc0 	movhi	r6, -64
+    c200:	a183 	jmp	r6
 
-0000c1ec <__div_zero>:
-    c1ec:	52ed 	movi	r1, -19
-    c1ee:	53de 	movhi	r1, -34
-    c1f0:	730a 	out	10, r1
-    c1f2:	ffff 	halt	
+0000c202 <__div_zero>:
+    c202:	f32c 	rds	r1, s4
+    c204:	2241 	addi	r1, r1, 1
+    c206:	f870 	wrs	s4, r1
+    c208:	5c52 	movi	r6, 82
+    c20a:	5dc0 	movhi	r6, -64
+    c20c:	a183 	jmp	r6
 
-0000c1f4 <__no_align>:
-    c1f4:	52dd 	movi	r1, -35
-    c1f6:	53dd 	movhi	r1, -35
-    c1f8:	730a 	out	10, r1
-    c1fa:	ffff 	halt	
+0000c20e <__no_align>:
+    c20e:	f32c 	rds	r1, s4
+    c210:	2241 	addi	r1, r1, 1
+    c212:	5603 	movi	r3, 3
+    c214:	165b 	cmpeq	r3, r1, r3
+    c216:	6706 	bnz	r3, 14
+    c218:	5207 	movi	r1, 7
+    c21a:	5300 	movhi	r1, 0
+    c21c:	7309 	out	9, r1
+    c21e:	5c52 	movi	r6, 82
+    c220:	5dc0 	movhi	r6, -64
+    c222:	a183 	jmp	r6
 
-0000c1fc <__clear_screen>:
-    c1fc:	5000 	movi	r0, 0
-    c1fe:	51a0 	movhi	r0, -96
-    c200:	5260 	movi	r1, 96
-    c202:	5309 	movhi	r1, 9
-    c204:	542e 	movi	r2, 46
-    c206:	5515 	movhi	r2, 21
+0000c224 <end_no_align>:
+    c224:	ffff 	halt	
 
-0000c208 <__repe>:
-    c208:	4400 	st	0(r0), r2
-    c20a:	2002 	addi	r0, r0, 2
-    c20c:	227f 	addi	r1, r1, -1
-    c20e:	63fc 	bnz	r1, -6
-    c210:	a183 	jmp	r6
+0000c226 <__clear_screen>:
+    c226:	5000 	movi	r0, 0
+    c228:	51a0 	movhi	r0, -96
+    c22a:	5260 	movi	r1, 96
+    c22c:	5309 	movhi	r1, 9
+    c22e:	542e 	movi	r2, 46
+    c230:	5515 	movhi	r2, 21
 
-0000c212 <__write_line>:
-    c212:	d880 	ldb	r4, 0(r2)
-    c214:	6805 	bz	r4, 12
-    c216:	590f 	movhi	r4, 15
-    c218:	4840 	st	0(r1), r4
-    c21a:	2242 	addi	r1, r1, 2
-    c21c:	2481 	addi	r2, r2, 1
-    c21e:	69f9 	bnz	r4, -12
+0000c232 <__repe>:
+    c232:	4400 	st	0(r0), r2
+    c234:	2002 	addi	r0, r0, 2
+    c236:	227f 	addi	r1, r1, -1
+    c238:	63fc 	bnz	r1, -6
+    c23a:	a183 	jmp	r6
 
-0000c220 <fin_bucle_cad>:
-    c220:	a183 	jmp	r6
+0000c23c <__write_line>:
+    c23c:	d880 	ldb	r4, 0(r2)
+    c23e:	6805 	bz	r4, 12
+    c240:	590f 	movhi	r4, 15
+    c242:	4840 	st	0(r1), r4
+    c244:	2242 	addi	r1, r1, 2
+    c246:	2481 	addi	r2, r2, 1
+    c248:	69f9 	bnz	r4, -12
 
-0000c222 <__write_valor>:
-    c222:	2ffe 	addi	r7, r7, -2
-    c224:	43c0 	st	0(r7), r1
-    c226:	585d 	movi	r4, 93
-    c228:	5980 	movhi	r4, -128
-    c22a:	2ffe 	addi	r7, r7, -2
-    c22c:	49c0 	st	0(r7), r4
-    c22e:	2ffe 	addi	r7, r7, -2
-    c230:	45c0 	st	0(r7), r2
-    c232:	5a06 	movi	r5, 6
-    c234:	5bc3 	movhi	r5, -61
-    c236:	ab44 	jal	r5, r5
-    c238:	2fc4 	addi	r7, r7, 4
-    c23a:	33c0 	ld	r1, 0(r7)
-    c23c:	2fc2 	addi	r7, r7, 2
+0000c24a <fin_bucle_cad>:
+    c24a:	a183 	jmp	r6
 
-0000c23e <bucle_val>:
-    c23e:	db00 	ldb	r5, 0(r4)
-    c240:	6a05 	bz	r5, 12
-    c242:	5b3c 	movhi	r5, 60
-    c244:	4a40 	st	0(r1), r5
-    c246:	2242 	addi	r1, r1, 2
-    c248:	2901 	addi	r4, r4, 1
-    c24a:	6bf9 	bnz	r5, -12
+0000c24c <__write_valor>:
+    c24c:	2ffe 	addi	r7, r7, -2
+    c24e:	43c0 	st	0(r7), r1
+    c250:	585d 	movi	r4, 93
+    c252:	5980 	movhi	r4, -128
+    c254:	2ffe 	addi	r7, r7, -2
+    c256:	49c0 	st	0(r7), r4
+    c258:	2ffe 	addi	r7, r7, -2
+    c25a:	45c0 	st	0(r7), r2
+    c25c:	5a30 	movi	r5, 48
+    c25e:	5bc3 	movhi	r5, -61
+    c260:	ab44 	jal	r5, r5
+    c262:	2fc4 	addi	r7, r7, 4
+    c264:	33c0 	ld	r1, 0(r7)
+    c266:	2fc2 	addi	r7, r7, 2
 
-0000c24c <fin_bucle_val>:
-    c24c:	5a2e 	movi	r5, 46
-    c24e:	5b15 	movhi	r5, 21
-    c250:	4a40 	st	0(r1), r5
-    c252:	4a41 	st	2(r1), r5
-    c254:	a183 	jmp	r6
+0000c268 <bucle_val>:
+    c268:	db00 	ldb	r5, 0(r4)
+    c26a:	6a05 	bz	r5, 12
+    c26c:	5b3c 	movhi	r5, 60
+    c26e:	4a40 	st	0(r1), r5
+    c270:	2242 	addi	r1, r1, 2
+    c272:	2901 	addi	r4, r4, 1
+    c274:	6bf9 	bnz	r5, -12
 
-0000c256 <__mostrar_reloj>:
-    c256:	2040 	addi	r0, r1, 0
-    c258:	585d 	movi	r4, 93
-    c25a:	5980 	movhi	r4, -128
-    c25c:	2ffe 	addi	r7, r7, -2
-    c25e:	49c0 	st	0(r7), r4
-    c260:	5678 	movi	r3, 120
-    c262:	5780 	movhi	r3, -128
-    c264:	36c0 	ld	r3, 0(r3)
-    c266:	2ffe 	addi	r7, r7, -2
-    c268:	47c0 	st	0(r7), r3
-    c26a:	5a06 	movi	r5, 6
-    c26c:	5bc3 	movhi	r5, -61
-    c26e:	ab44 	jal	r5, r5
-    c270:	2fc4 	addi	r7, r7, 4
+0000c276 <fin_bucle_val>:
+    c276:	5a2e 	movi	r5, 46
+    c278:	5b15 	movhi	r5, 21
+    c27a:	4a40 	st	0(r1), r5
+    c27c:	4a41 	st	2(r1), r5
+    c27e:	a183 	jmp	r6
 
-0000c272 <bcad_hora>:
-    c272:	db00 	ldb	r5, 0(r4)
-    c274:	6a05 	bz	r5, 12
-    c276:	5b03 	movhi	r5, 3
-    c278:	4a00 	st	0(r0), r5
-    c27a:	2002 	addi	r0, r0, 2
-    c27c:	2901 	addi	r4, r4, 1
-    c27e:	6bf9 	bnz	r5, -12
+0000c280 <__mostrar_reloj>:
+    c280:	2040 	addi	r0, r1, 0
+    c282:	585d 	movi	r4, 93
+    c284:	5980 	movhi	r4, -128
+    c286:	2ffe 	addi	r7, r7, -2
+    c288:	49c0 	st	0(r7), r4
+    c28a:	5678 	movi	r3, 120
+    c28c:	5780 	movhi	r3, -128
+    c28e:	36c0 	ld	r3, 0(r3)
+    c290:	2ffe 	addi	r7, r7, -2
+    c292:	47c0 	st	0(r7), r3
+    c294:	5a30 	movi	r5, 48
+    c296:	5bc3 	movhi	r5, -61
+    c298:	ab44 	jal	r5, r5
+    c29a:	2fc4 	addi	r7, r7, 4
 
-0000c280 <fin_bcad_hora>:
-    c280:	5a3a 	movi	r5, 58
-    c282:	5b0c 	movhi	r5, 12
-    c284:	4a00 	st	0(r0), r5
-    c286:	2002 	addi	r0, r0, 2
-    c288:	585d 	movi	r4, 93
-    c28a:	5980 	movhi	r4, -128
-    c28c:	2ffe 	addi	r7, r7, -2
-    c28e:	49c0 	st	0(r7), r4
-    c290:	5676 	movi	r3, 118
-    c292:	5780 	movhi	r3, -128
-    c294:	36c0 	ld	r3, 0(r3)
-    c296:	2ffe 	addi	r7, r7, -2
-    c298:	47c0 	st	0(r7), r3
-    c29a:	5a06 	movi	r5, 6
-    c29c:	5bc3 	movhi	r5, -61
-    c29e:	ab44 	jal	r5, r5
-    c2a0:	2fc4 	addi	r7, r7, 4
-    c2a2:	5209 	movi	r1, 9
-    c2a4:	12c9 	cmple	r1, r3, r1
-    c2a6:	6206 	bz	r1, 14
-    c2a8:	d700 	ldb	r3, 0(r4)
-    c2aa:	e701 	stb	1(r4), r3
-    c2ac:	5630 	movi	r3, 48
-    c2ae:	e700 	stb	0(r4), r3
-    c2b0:	5600 	movi	r3, 0
-    c2b2:	e702 	stb	2(r4), r3
+0000c29c <bcad_hora>:
+    c29c:	db00 	ldb	r5, 0(r4)
+    c29e:	6a05 	bz	r5, 12
+    c2a0:	5b03 	movhi	r5, 3
+    c2a2:	4a00 	st	0(r0), r5
+    c2a4:	2002 	addi	r0, r0, 2
+    c2a6:	2901 	addi	r4, r4, 1
+    c2a8:	6bf9 	bnz	r5, -12
 
-0000c2b4 <bcad_min>:
-    c2b4:	db00 	ldb	r5, 0(r4)
-    c2b6:	6a05 	bz	r5, 12
-    c2b8:	5b03 	movhi	r5, 3
-    c2ba:	4a00 	st	0(r0), r5
-    c2bc:	2002 	addi	r0, r0, 2
-    c2be:	2901 	addi	r4, r4, 1
-    c2c0:	6bf9 	bnz	r5, -12
+0000c2aa <fin_bcad_hora>:
+    c2aa:	5a3a 	movi	r5, 58
+    c2ac:	5b0c 	movhi	r5, 12
+    c2ae:	4a00 	st	0(r0), r5
+    c2b0:	2002 	addi	r0, r0, 2
+    c2b2:	585d 	movi	r4, 93
+    c2b4:	5980 	movhi	r4, -128
+    c2b6:	2ffe 	addi	r7, r7, -2
+    c2b8:	49c0 	st	0(r7), r4
+    c2ba:	5676 	movi	r3, 118
+    c2bc:	5780 	movhi	r3, -128
+    c2be:	36c0 	ld	r3, 0(r3)
+    c2c0:	2ffe 	addi	r7, r7, -2
+    c2c2:	47c0 	st	0(r7), r3
+    c2c4:	5a30 	movi	r5, 48
+    c2c6:	5bc3 	movhi	r5, -61
+    c2c8:	ab44 	jal	r5, r5
+    c2ca:	2fc4 	addi	r7, r7, 4
+    c2cc:	5209 	movi	r1, 9
+    c2ce:	12c9 	cmple	r1, r3, r1
+    c2d0:	6206 	bz	r1, 14
+    c2d2:	d700 	ldb	r3, 0(r4)
+    c2d4:	e701 	stb	1(r4), r3
+    c2d6:	5630 	movi	r3, 48
+    c2d8:	e700 	stb	0(r4), r3
+    c2da:	5600 	movi	r3, 0
+    c2dc:	e702 	stb	2(r4), r3
 
-0000c2c2 <fin_bcad_min>:
-    c2c2:	5a3a 	movi	r5, 58
-    c2c4:	5b0c 	movhi	r5, 12
-    c2c6:	4a00 	st	0(r0), r5
-    c2c8:	2002 	addi	r0, r0, 2
-    c2ca:	585d 	movi	r4, 93
-    c2cc:	5980 	movhi	r4, -128
-    c2ce:	2ffe 	addi	r7, r7, -2
-    c2d0:	49c0 	st	0(r7), r4
-    c2d2:	5674 	movi	r3, 116
-    c2d4:	5780 	movhi	r3, -128
-    c2d6:	36c0 	ld	r3, 0(r3)
-    c2d8:	2ffe 	addi	r7, r7, -2
-    c2da:	47c0 	st	0(r7), r3
-    c2dc:	5a06 	movi	r5, 6
-    c2de:	5bc3 	movhi	r5, -61
-    c2e0:	ab44 	jal	r5, r5
-    c2e2:	2fc4 	addi	r7, r7, 4
-    c2e4:	5209 	movi	r1, 9
-    c2e6:	12c9 	cmple	r1, r3, r1
-    c2e8:	6206 	bz	r1, 14
-    c2ea:	d700 	ldb	r3, 0(r4)
-    c2ec:	e701 	stb	1(r4), r3
-    c2ee:	5630 	movi	r3, 48
-    c2f0:	e700 	stb	0(r4), r3
-    c2f2:	5600 	movi	r3, 0
-    c2f4:	e702 	stb	2(r4), r3
+0000c2de <bcad_min>:
+    c2de:	db00 	ldb	r5, 0(r4)
+    c2e0:	6a05 	bz	r5, 12
+    c2e2:	5b03 	movhi	r5, 3
+    c2e4:	4a00 	st	0(r0), r5
+    c2e6:	2002 	addi	r0, r0, 2
+    c2e8:	2901 	addi	r4, r4, 1
+    c2ea:	6bf9 	bnz	r5, -12
 
-0000c2f6 <bcad_seg>:
-    c2f6:	db00 	ldb	r5, 0(r4)
-    c2f8:	6a05 	bz	r5, 12
-    c2fa:	5b03 	movhi	r5, 3
-    c2fc:	4a00 	st	0(r0), r5
-    c2fe:	2002 	addi	r0, r0, 2
-    c300:	2901 	addi	r4, r4, 1
-    c302:	6bf9 	bnz	r5, -12
+0000c2ec <fin_bcad_min>:
+    c2ec:	5a3a 	movi	r5, 58
+    c2ee:	5b0c 	movhi	r5, 12
+    c2f0:	4a00 	st	0(r0), r5
+    c2f2:	2002 	addi	r0, r0, 2
+    c2f4:	585d 	movi	r4, 93
+    c2f6:	5980 	movhi	r4, -128
+    c2f8:	2ffe 	addi	r7, r7, -2
+    c2fa:	49c0 	st	0(r7), r4
+    c2fc:	5674 	movi	r3, 116
+    c2fe:	5780 	movhi	r3, -128
+    c300:	36c0 	ld	r3, 0(r3)
+    c302:	2ffe 	addi	r7, r7, -2
+    c304:	47c0 	st	0(r7), r3
+    c306:	5a30 	movi	r5, 48
+    c308:	5bc3 	movhi	r5, -61
+    c30a:	ab44 	jal	r5, r5
+    c30c:	2fc4 	addi	r7, r7, 4
+    c30e:	5209 	movi	r1, 9
+    c310:	12c9 	cmple	r1, r3, r1
+    c312:	6206 	bz	r1, 14
+    c314:	d700 	ldb	r3, 0(r4)
+    c316:	e701 	stb	1(r4), r3
+    c318:	5630 	movi	r3, 48
+    c31a:	e700 	stb	0(r4), r3
+    c31c:	5600 	movi	r3, 0
+    c31e:	e702 	stb	2(r4), r3
 
-0000c304 <fin_bcad_seg>:
-    c304:	a183 	jmp	r6
+0000c320 <bcad_seg>:
+    c320:	db00 	ldb	r5, 0(r4)
+    c322:	6a05 	bz	r5, 12
+    c324:	5b03 	movhi	r5, 3
+    c326:	4a00 	st	0(r0), r5
+    c328:	2002 	addi	r0, r0, 2
+    c32a:	2901 	addi	r4, r4, 1
+    c32c:	6bf9 	bnz	r5, -12
 
-0000c306 <__itoa>:
-    c306:	2fe0 	addi	r7, r7, -32
-    c308:	4bcf 	st	30(r7), r5
-    c30a:	4dce 	st	28(r7), r6
-    c30c:	2ddc 	addi	r6, r7, 28
-    c30e:	2ffc 	addi	r7, r7, -4
-    c310:	41c3 	st	6(r7), r0
-    c312:	45c2 	st	4(r7), r2
-    c314:	47c1 	st	2(r7), r3
-    c316:	49c0 	st	0(r7), r4
-    c318:	5200 	movi	r1, 0
-    c31a:	43bd 	st	-6(r6), r1
-    c31c:	3582 	ld	r2, 4(r6)
-    c31e:	5200 	movi	r1, 0
-    c320:	1281 	cmplt	r1, r2, r1
-    c322:	6209 	bz	r1, 20
-    c324:	3383 	ld	r1, 6(r6)
-    c326:	542d 	movi	r2, 45
-    c328:	e440 	stb	0(r1), r2
-    c32a:	5201 	movi	r1, 1
-    c32c:	43bd 	st	-6(r6), r1
-    c32e:	3382 	ld	r1, 4(r6)
-    c330:	0258 	not	r1, r1
-    c332:	2241 	addi	r1, r1, 1
-    c334:	4382 	st	4(r6), r1
+0000c32e <fin_bcad_seg>:
+    c32e:	a183 	jmp	r6
 
-0000c336 <__for1>:
-    c336:	5200 	movi	r1, 0
-    c338:	43be 	st	-4(r6), r1
-    c33a:	5a6e 	movi	r5, 110
-    c33c:	5bc3 	movhi	r5, -61
-    c33e:	a143 	jmp	r5
+0000c330 <__itoa>:
+    c330:	2fe0 	addi	r7, r7, -32
+    c332:	4bcf 	st	30(r7), r5
+    c334:	4dce 	st	28(r7), r6
+    c336:	2ddc 	addi	r6, r7, 28
+    c338:	2ffc 	addi	r7, r7, -4
+    c33a:	41c3 	st	6(r7), r0
+    c33c:	45c2 	st	4(r7), r2
+    c33e:	47c1 	st	2(r7), r3
+    c340:	49c0 	st	0(r7), r4
+    c342:	5200 	movi	r1, 0
+    c344:	43bd 	st	-6(r6), r1
+    c346:	3582 	ld	r2, 4(r6)
+    c348:	5200 	movi	r1, 0
+    c34a:	1281 	cmplt	r1, r2, r1
+    c34c:	6209 	bz	r1, 20
+    c34e:	3383 	ld	r1, 6(r6)
+    c350:	542d 	movi	r2, 45
+    c352:	e440 	stb	0(r1), r2
+    c354:	5201 	movi	r1, 1
+    c356:	43bd 	st	-6(r6), r1
+    c358:	3382 	ld	r1, 4(r6)
+    c35a:	0258 	not	r1, r1
+    c35c:	2241 	addi	r1, r1, 1
+    c35e:	4382 	st	4(r6), r1
 
-0000c340 <__cosfor1>:
-    c340:	5409 	movi	r2, 9
-    c342:	33be 	ld	r1, -4(r6)
-    c344:	04a9 	sub	r2, r2, r1
-    c346:	45b6 	st	-20(r6), r2
-    c348:	3782 	ld	r3, 4(r6)
-    c34a:	520a 	movi	r1, 10
-    c34c:	8ae1 	div	r5, r3, r1
-    c34e:	0365 	add	r1, r5, r5
-    c350:	5402 	movi	r2, 2
-    c352:	0472 	sha	r2, r1, r2
-    c354:	0262 	add	r1, r1, r2
-    c356:	02e9 	sub	r1, r3, r1
-    c358:	5430 	movi	r2, 48
-    c35a:	0262 	add	r1, r1, r2
-    c35c:	2840 	addi	r4, r1, 0
-    c35e:	4b82 	st	4(r6), r5
-    c360:	21b0 	addi	r0, r6, -16
-    c362:	37b6 	ld	r3, -20(r6)
-    c364:	0223 	add	r1, r0, r3
-    c366:	e840 	stb	0(r1), r4
-    c368:	33be 	ld	r1, -4(r6)
-    c36a:	2241 	addi	r1, r1, 1
-    c36c:	43be 	st	-4(r6), r1
+0000c360 <__for1>:
+    c360:	5200 	movi	r1, 0
+    c362:	43be 	st	-4(r6), r1
+    c364:	5a98 	movi	r5, -104
+    c366:	5bc3 	movhi	r5, -61
+    c368:	a143 	jmp	r5
 
-0000c36e <__condfor1>:
-    c36e:	3382 	ld	r1, 4(r6)
-    c370:	5409 	movi	r2, 9
-    c372:	124a 	cmple	r1, r1, r2
-    c374:	5a40 	movi	r5, 64
-    c376:	5bc3 	movhi	r5, -61
-    c378:	a340 	jz	r1, r5
-    c37a:	5409 	movi	r2, 9
-    c37c:	33be 	ld	r1, -4(r6)
-    c37e:	08a9 	sub	r4, r2, r1
-    c380:	3382 	ld	r1, 4(r6)
+0000c36a <__cosfor1>:
+    c36a:	5409 	movi	r2, 9
+    c36c:	33be 	ld	r1, -4(r6)
+    c36e:	04a9 	sub	r2, r2, r1
+    c370:	45b6 	st	-20(r6), r2
+    c372:	3782 	ld	r3, 4(r6)
+    c374:	520a 	movi	r1, 10
+    c376:	8ae1 	div	r5, r3, r1
+    c378:	0365 	add	r1, r5, r5
+    c37a:	5402 	movi	r2, 2
+    c37c:	0472 	sha	r2, r1, r2
+    c37e:	0262 	add	r1, r1, r2
+    c380:	02e9 	sub	r1, r3, r1
     c382:	5430 	movi	r2, 48
     c384:	0262 	add	r1, r1, r2
-    c386:	2040 	addi	r0, r1, 0
-    c388:	27b0 	addi	r3, r6, -16
-    c38a:	47b5 	st	-22(r6), r3
-    c38c:	520f 	movi	r1, 15
-    c38e:	0258 	not	r1, r1
-    c390:	2241 	addi	r1, r1, 1
-    c392:	0731 	sha	r3, r4, r1
-    c394:	2300 	addi	r1, r4, 0
-    c396:	24c0 	addi	r2, r3, 0
-    c398:	37b5 	ld	r3, -22(r6)
-    c39a:	02e1 	add	r1, r3, r1
-    c39c:	e040 	stb	0(r1), r0
-    c39e:	33bd 	ld	r1, -6(r6)
-    c3a0:	43bf 	st	-2(r6), r1
-    c3a2:	5a00 	movi	r5, 0
-    c3a4:	6a15 	bz	r5, 44
+    c386:	2840 	addi	r4, r1, 0
+    c388:	4b82 	st	4(r6), r5
+    c38a:	21b0 	addi	r0, r6, -16
+    c38c:	37b6 	ld	r3, -20(r6)
+    c38e:	0223 	add	r1, r0, r3
+    c390:	e840 	stb	0(r1), r4
+    c392:	33be 	ld	r1, -4(r6)
+    c394:	2241 	addi	r1, r1, 1
+    c396:	43be 	st	-4(r6), r1
 
-0000c3a6 <__cosfor2>:
-    c3a6:	35bf 	ld	r2, -2(r6)
-    c3a8:	3383 	ld	r1, 6(r6)
-    c3aa:	04a1 	add	r2, r2, r1
-    c3ac:	45b7 	st	-18(r6), r2
-    c3ae:	5409 	movi	r2, 9
-    c3b0:	33be 	ld	r1, -4(r6)
-    c3b2:	04a9 	sub	r2, r2, r1
-    c3b4:	33bf 	ld	r1, -2(r6)
-    c3b6:	02a1 	add	r1, r2, r1
-    c3b8:	2440 	addi	r2, r1, 0
-    c3ba:	33bd 	ld	r1, -6(r6)
-    c3bc:	08a9 	sub	r4, r2, r1
-    c3be:	21b0 	addi	r0, r6, -16
-    c3c0:	2300 	addi	r1, r4, 0
-    c3c2:	0221 	add	r1, r0, r1
-    c3c4:	d240 	ldb	r1, 0(r1)
-    c3c6:	35b7 	ld	r2, -18(r6)
-    c3c8:	e280 	stb	0(r2), r1
-    c3ca:	33bf 	ld	r1, -2(r6)
-    c3cc:	2241 	addi	r1, r1, 1
-    c3ce:	43bf 	st	-2(r6), r1
+0000c398 <__condfor1>:
+    c398:	3382 	ld	r1, 4(r6)
+    c39a:	5409 	movi	r2, 9
+    c39c:	124a 	cmple	r1, r1, r2
+    c39e:	5a6a 	movi	r5, 106
+    c3a0:	5bc3 	movhi	r5, -61
+    c3a2:	a340 	jz	r1, r5
+    c3a4:	5409 	movi	r2, 9
+    c3a6:	33be 	ld	r1, -4(r6)
+    c3a8:	08a9 	sub	r4, r2, r1
+    c3aa:	3382 	ld	r1, 4(r6)
+    c3ac:	5430 	movi	r2, 48
+    c3ae:	0262 	add	r1, r1, r2
+    c3b0:	2040 	addi	r0, r1, 0
+    c3b2:	27b0 	addi	r3, r6, -16
+    c3b4:	47b5 	st	-22(r6), r3
+    c3b6:	520f 	movi	r1, 15
+    c3b8:	0258 	not	r1, r1
+    c3ba:	2241 	addi	r1, r1, 1
+    c3bc:	0731 	sha	r3, r4, r1
+    c3be:	2300 	addi	r1, r4, 0
+    c3c0:	24c0 	addi	r2, r3, 0
+    c3c2:	37b5 	ld	r3, -22(r6)
+    c3c4:	02e1 	add	r1, r3, r1
+    c3c6:	e040 	stb	0(r1), r0
+    c3c8:	33bd 	ld	r1, -6(r6)
+    c3ca:	43bf 	st	-2(r6), r1
+    c3cc:	5a00 	movi	r5, 0
+    c3ce:	6a15 	bz	r5, 44
 
-0000c3d0 <__condfor2>:
-    c3d0:	35be 	ld	r2, -4(r6)
-    c3d2:	33bd 	ld	r1, -6(r6)
+0000c3d0 <__cosfor2>:
+    c3d0:	35bf 	ld	r2, -2(r6)
+    c3d2:	3383 	ld	r1, 6(r6)
     c3d4:	04a1 	add	r2, r2, r1
-    c3d6:	33bf 	ld	r1, -2(r6)
-    c3d8:	1281 	cmplt	r1, r2, r1
-    c3da:	62e5 	bz	r1, -52
-    c3dc:	35bf 	ld	r2, -2(r6)
-    c3de:	3383 	ld	r1, 6(r6)
-    c3e0:	04a1 	add	r2, r2, r1
-    c3e2:	5200 	movi	r1, 0
-    c3e4:	e280 	stb	0(r2), r1
-    c3e6:	33bf 	ld	r1, -2(r6)
-    c3e8:	31c3 	ld	r0, 6(r7)
-    c3ea:	35c2 	ld	r2, 4(r7)
-    c3ec:	37c1 	ld	r3, 2(r7)
-    c3ee:	39c0 	ld	r4, 0(r7)
-    c3f0:	2f80 	addi	r7, r6, 0
-    c3f2:	3dc0 	ld	r6, 0(r7)
-    c3f4:	3bc1 	ld	r5, 2(r7)
-    c3f6:	2fc4 	addi	r7, r7, 4
-    c3f8:	a143 	jmp	r5
+    c3d6:	45b7 	st	-18(r6), r2
+    c3d8:	5409 	movi	r2, 9
+    c3da:	33be 	ld	r1, -4(r6)
+    c3dc:	04a9 	sub	r2, r2, r1
+    c3de:	33bf 	ld	r1, -2(r6)
+    c3e0:	02a1 	add	r1, r2, r1
+    c3e2:	2440 	addi	r2, r1, 0
+    c3e4:	33bd 	ld	r1, -6(r6)
+    c3e6:	08a9 	sub	r4, r2, r1
+    c3e8:	21b0 	addi	r0, r6, -16
+    c3ea:	2300 	addi	r1, r4, 0
+    c3ec:	0221 	add	r1, r0, r1
+    c3ee:	d240 	ldb	r1, 0(r1)
+    c3f0:	35b7 	ld	r2, -18(r6)
+    c3f2:	e280 	stb	0(r2), r1
+    c3f4:	33bf 	ld	r1, -2(r6)
+    c3f6:	2241 	addi	r1, r1, 1
+    c3f8:	43bf 	st	-2(r6), r1
+
+0000c3fa <__condfor2>:
+    c3fa:	35be 	ld	r2, -4(r6)
+    c3fc:	33bd 	ld	r1, -6(r6)
+    c3fe:	04a1 	add	r2, r2, r1
+    c400:	33bf 	ld	r1, -2(r6)
+    c402:	1281 	cmplt	r1, r2, r1
+    c404:	62e5 	bz	r1, -52
+    c406:	35bf 	ld	r2, -2(r6)
+    c408:	3383 	ld	r1, 6(r6)
+    c40a:	04a1 	add	r2, r2, r1
+    c40c:	5200 	movi	r1, 0
+    c40e:	e280 	stb	0(r2), r1
+    c410:	33bf 	ld	r1, -2(r6)
+    c412:	31c3 	ld	r0, 6(r7)
+    c414:	35c2 	ld	r2, 4(r7)
+    c416:	37c1 	ld	r3, 2(r7)
+    c418:	39c0 	ld	r4, 0(r7)
+    c41a:	2f80 	addi	r7, r6, 0
+    c41c:	3dc0 	ld	r6, 0(r7)
+    c41e:	3bc1 	ld	r5, 2(r7)
+    c420:	2fc4 	addi	r7, r7, 4
+    c422:	a143 	jmp	r5

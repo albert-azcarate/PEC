@@ -217,8 +217,14 @@ inici:
         in     r1, 8               ;leemos el valor de los interruptores
         out     6, r1              ;activa los leds rojos con el valor de los interruptores
         $CALL  r6, __clear_screen  ;borra la pantalla (en R6 se almacena la direccion de retorno de la subrutina)
+		$MOVEI r1, 0x0000
+		wrs		s4,r1
         ei                         ;activa las interrupciones	;C12C
 		ei
+		$MOVEI r1, 0x0000
+		div r1,r1,r1
+		$MOVEI r1, 0x0001
+		ld r1,0(r1)
 
 binf:   
         $MOVEI r1, 0xA000          ;fila 0; columna 0
@@ -273,18 +279,31 @@ binf:
 
 
 __ilegal_ins:
-		$MOVEI   r1, 0xDEAD
-        out    10, r1
-		halt
+		
+		rds   r1, s4
+        addi  r1, r1, 1
+		wrs	  s4 ,r1
+		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+        jmp    r6
 		
 __div_zero:
-		$MOVEI   r1, 0xDEED
-        out    10, r1
-		halt
+		rds   r1, s4
+        addi  r1, r1, 1
+		wrs	  s4 ,r1
+		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+        jmp    r6
 		
 __no_align:
-		$MOVEI   r1, 0xDDDD
-        out    10, r1
+		rds   r1, s4
+        addi  r1, r1, 1
+		movi r3, 3
+		cmpeq r3,r1,r3
+		bz r3,end_no_align
+		$MOVEI r1, 0x7
+		out		9,r1
+		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+        jmp    r6	
+end_no_align:
 		halt
 
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
