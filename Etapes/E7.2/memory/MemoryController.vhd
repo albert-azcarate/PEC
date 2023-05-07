@@ -10,6 +10,7 @@ entity MemoryController is
 			byte_m    	: in	std_logic;
 			addr      	: in	std_logic_vector(15 downto 0);
 			wr_data   	: in	std_logic_vector(15 downto 0);
+			no_al		: out   std_logic;
 			rd_data   	: out	std_logic_vector(15 downto 0);
 			-- senyales para la placa de desarrollo
 			SRAM_ADDR 	: out	std_logic_vector(17 downto 0);
@@ -56,6 +57,8 @@ begin
 
 	-- Permetem escriure a memoria en zona d'usuari
 	enable <= we when addr < x"c000" else '0';
+	
+	no_al <= addr(0);
 	
 	-----------------------------
 	-------- Control VGA --------

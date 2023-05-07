@@ -36,11 +36,12 @@ ARCHITECTURE Structure OF sisa IS
 
 	component MemoryController is
     port (	CLOCK_50  	: in  	std_logic;
-			addr      	: in  	std_logic_vector(15 downto 0);
-			wr_data   	: in  	std_logic_vector(15 downto 0);
-			rd_data   	: out 	std_logic_vector(15 downto 0);
 			we        	: in  	std_logic;
 			byte_m    	: in  	std_logic;
+			addr      	: in  	std_logic_vector(15 downto 0);
+			wr_data   	: in  	std_logic_vector(15 downto 0);
+			no_al		: out   std_logic;
+			rd_data   	: out 	std_logic_vector(15 downto 0);
 			-- senyales para la placa de desarrollo
 			SRAM_ADDR 	: out 	std_logic_vector(17 downto 0);
 			SRAM_DQ   	: inout std_logic_vector(15 downto 0);
@@ -61,6 +62,7 @@ ARCHITECTURE Structure OF sisa IS
     port (	clk			: IN  STD_LOGIC;
 			boot		: IN  STD_LOGIC;
 			intr		: IN  std_logic;
+			no_al		: IN  std_logic;
 			datard_m	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			rd_io 		: in  std_logic_vector(15 downto 0);
 			wr_m		: OUT STD_LOGIC;
@@ -129,8 +131,9 @@ ARCHITECTURE Structure OF sisa IS
 	signal wr_m_to_mem		: std_logic;
 	signal data_wr_to_mem	: std_logic_vector(15 DOWNTO 0);
 	signal rd_data_to_proc	: std_logic_vector(15 DOWNTO 0);
-	signal intr_to_proc		:std_logic;
-	signal inta_to_io		:std_logic;
+	signal intr_to_proc		: std_logic;
+	signal no_al_to_proc	: std_logic;
+	signal inta_to_io		: std_logic;
 	
 	signal clk : std_logic_vector(2 downto 0) := "000";
 	
@@ -157,12 +160,15 @@ BEGIN
 		end if;
 	END PROcess;
 	
+	
+	
 	MUC: memoryController port map(
 		cloCK_50 	=> CLOCK_50,
 		addr 		=> addr_proc_to_mem,
 		wr_data 	=> data_wr_to_mem,
 		rd_data		=> rd_data_to_proc,
 		we 			=> wr_m_to_mem,
+		no_al		=> no_al_to_proc,
 		byte_m 		=> word_byte_to_mem,
 		SRAM_ADDR 	=> SRAM_ADDR(17 downto 0),
 		SRAM_CE_N 	=> SRAM_CE_N,
@@ -191,8 +197,9 @@ BEGIN
 		rd_io 		=> rd_io_to_io,
 		wr_out 		=> wr_out_to_io,
 		rd_in 		=> rd_in_to_io,
-		intr			=> intr_to_proc,
-		inta			=> inta_to_io
+		intr		=> intr_to_proc,
+		inta		=> inta_to_io,
+		no_al		=> no_al_to_proc
 		);
 		
 	CIO : controladores_IO port map (

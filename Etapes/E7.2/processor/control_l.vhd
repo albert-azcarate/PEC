@@ -18,6 +18,7 @@ ENTITY control_l IS
 			halt_cont		: OUT STD_LOGIC;
 			rd_in			: OUT STD_LOGIC;
 			wr_out			: OUT STD_LOGIC;
+			ill_ins			: OUT STD_LOGIC;
 			ldpc			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -83,6 +84,9 @@ BEGIN
 
 	-- Assignem a la sortida de OP
 	op <= op_code_ir;
+	
+	-- instruccio ilegal si hem hagut de filtrar i posar un NOP
+	ill_ins <= '1' when op_code_ir /= op_code_ir_pre else '0';
 	
 	
 

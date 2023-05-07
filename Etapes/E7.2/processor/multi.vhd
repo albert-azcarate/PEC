@@ -1,5 +1,6 @@
 library ieee;
 USE ieee.std_logic_1164.all;
+use work.exc_code.all;
 
 entity multi is
 	port (	clk			: IN  STD_LOGIC;
@@ -13,7 +14,10 @@ entity multi is
 			halt_cont	: IN  STD_LOGIC;
 			rd_in_l		: IN  STD_LOGIC;
 			wr_out_l	: IN  STD_LOGIC;
-			int_e		: IN STD_LOGIC;
+			int_e		: IN  STD_LOGIC;
+			div_z		: IN  STD_LOGIC;
+			no_al		: IN  STD_LOGIC;
+			ill_ins_l		: IN  STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -27,10 +31,11 @@ entity multi is
 			word_byte	: OUT STD_LOGIC;
 			rd_in		: OUT STD_LOGIC;
 			wr_out		: OUT STD_LOGIC;
-			inta			: OUT STd_LOGIC;
+			inta		: OUT STd_LOGIC;
 			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-			addr_a		: OUT  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_a		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			exc_code	: OUT exc_code_t;
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
 end entity;
@@ -45,8 +50,10 @@ begin
 		if rising_edge(clk) then 
 			if boot = '0' then			-- Si estem a RUN
 				inta <= '0';
-			
-				if interrupt = '1' and estat = "01" and int_e = '1' then	-- Si hi ha interrup ens podem en estat interrupcio
+				
+				if exc_code /= no_exc_c and exc_code /= interrupt_c and estat = "01" then	-- Si salta una excepcio en Decode(sense comptar interrupcions anem a estat SYSTEM)
+					estat <= "10"
+				elsif interrupt = '1' and estat = "01" and int_e = '1' then	-- Si hi ha interrup en Decode i estan enable ens podem en estat SYSTEM
 					estat <= "10"; 
 					inta <= '1';
 				else
@@ -135,5 +142,25 @@ begin
 	ins_dad <= 	'0' when estat = "00" else 
 				'0' when estat = "10" else
 				'1';
+				
+	exc_code <=	ill_ins_c 	when ill_ins_l 	= '1' else
+				no_al_c 		when no_al 		= '1' else
+				--ovf_f_c		when ovf_f 		= '1' else
+				--div_z_f_c 	when div_z_f 	= '1' else
+				div_z_c 		when div_z 		= '1' else
+				--no_exc_c		when no_exc 	= '1' else
+				--m_tlb_i_c 	when m_tlb_i 	= '1' else
+				--m_tlb_d_c 	when m_tlb_d 	= '1' else
+				--i_tlb_i_c 	when i_tlb_i 	= '1' else
+				--i_tlb_d_c 	when i_tlb_d 	= '1' else
+				--pp_tlb_i_c 	when pp_tlb_i 	= '1' else
+				--pp_tlb_d_c 	when pp_tlb_d 	= '1' else
+				--lec_tlb_c 	when lec_tlb 	= '1' else
+				--protec_c	when protec 	= '1' else
+				--call_c 		when call 		= '1' else
+				interrupt_c	when interrupt = '1' else
+				no_exc_c;
+				
+				
 	 
 end Structure;

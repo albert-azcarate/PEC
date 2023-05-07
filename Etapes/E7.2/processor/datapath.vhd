@@ -3,6 +3,7 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 use work.op_code.all;
 use work.f_code.all;
+use work.exc_code.all;
 use work.all;
 
 ENTITY datapath IS
@@ -17,6 +18,7 @@ ENTITY datapath IS
 			inta			: IN  STD_LOGIC;
 			op				: IN  op_code_t;
 			f				: IN  f_code_t;
+			exc_code		: IN  exc_code_t;
 			in_d			: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -28,6 +30,7 @@ ENTITY datapath IS
 			rd_io			: IN  std_LOGIC_VECTOR(15 DOWNTO 0);
 			z				: OUT STD_LOGIC;
 			int_e			: OUT STD_LOGIC;
+			div_z			: OUT STD_LOGIC;
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			data_wr			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -47,7 +50,9 @@ ARCHITECTURE Structure OF datapath IS
           f  : IN  f_code_t;
 		  int : IN std_logic;
           w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		  z  : OUT std_logic);
+		  z  : OUT std_logic;
+		  div_z : OUT std_logic
+		  );
 	END component;
 	
 	component registers is
@@ -57,12 +62,14 @@ ARCHITECTURE Structure OF datapath IS
 			u_s 		: IN  STD_LOGIC;
 			intr		: IN  STD_LOGIC;
 			inta		: IN  STD_LOGIC;
+			exc_code	: IN  exc_code_t;
 			int_type	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			d			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			PCup		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			addr_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			int_e		: OUT STD_LOGIC;
 			a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			b			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
@@ -77,7 +84,8 @@ signal immed_y				: std_logic_vector(15 downto 0);
 signal input_d				: std_logic_vector(15 downto 0);
 signal regbank_to_alu_a		: std_logic_vector(15 downto 0);
 signal output_alu_or_mem	: std_logic_vector(15 downto 0);
-signal regbank_to_alu_b		: std_logic_vector(15 downto 0);	 
+signal regbank_to_alu_b		: std_logic_vector(15 downto 0);	
+signal addr_m_buffer			: std_logic_vector(15 downto 0);	 
 	 
 BEGIN
 
@@ -95,7 +103,9 @@ BEGIN
 											intr => intr,
 											inta => inta,
 											Pcup => pc,
-											int_e => int_e
+											int_e => int_e,
+											addr_m => addr_m_buffer,
+											exc_code => exc_code
 											);
 	
 	alu_unit : alu port map(x => regbank_to_alu_a,
@@ -104,7 +114,9 @@ BEGIN
 							f => f,
 							int => inta,
 							w => alu_out,
-							z => z);
+							z => z,
+							div_z => div_z
+							);
 		
 	
 	with immed_x2 select
@@ -122,13 +134,16 @@ BEGIN
 						rd_io when others;
 						
 	with ins_dad select
-		addr_m <= 	alu_out when '1',
-					pc when others;
+		addr_m_buffer <= 	alu_out when '1',
+								pc when others;
+								
+	addr_m <= addr_m_buffer;
 
 	data_wr <= regbank_to_alu_b;
 	
 	alu_out_path <= alu_out; 
 
 	wr_io <= regbank_to_alu_b;
+	
 	
 END Structure;

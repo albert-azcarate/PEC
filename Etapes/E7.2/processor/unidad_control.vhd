@@ -5,13 +5,16 @@ USE ieee.std_logic_unsigned.all;
 --use work.all;
 use work.op_code.all;
 use work.f_code.all;
+use work.exc_code.all;
 
 ENTITY unidad_control IS
 	PORT (	boot			: IN  std_logic;
 			clk				: IN  std_logic;
 			z				: IN  std_logic;
-			intr			: IN std_logic;
-			int_e		: IN STD_LOGIC;
+			intr			: IN  std_logic;
+			int_e			: IN  STD_LOGIC;
+			div_z			: IN  STD_LOGIC;
+			no_al			: IN  STD_LOGIC;
 			datard_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			alu_out			: IN  STD_LOGIC_VECTOR(15 downto 0);
 			op				: OUT op_code_t;
@@ -26,12 +29,13 @@ ENTITY unidad_control IS
 			immed_or_reg	: OUT std_logic;
 			rd_in			: OUT std_logic;
 			wr_out			: OUT std_logic;
-			inta		: OUT STD_LOGIC;
+			inta			: OUT STD_LOGIC;
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			exc_code		: OUT exc_code_t;
 			immed			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			pc				: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
@@ -54,6 +58,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			immed_or_reg	: OUT STD_LOGIC;
 			halt_cont		: OUT STD_LOGIC;
 			rd_in			: OUT STD_LOGIC;
+			ill_ins			: OUT STD_LOGIC;
 			wr_out			: OUT STD_LOGIC;
 			ldpc			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -81,7 +86,10 @@ ARCHITECTURE Structure OF unidad_control IS
 			halt_cont	: IN  STD_LOGIC;
 			rd_in_l		: IN  STD_LOGIC;
 			wr_out_l	: IN  STD_LOGIC;
-			int_e		: IN STD_LOGIC;
+			int_e		: IN  STD_LOGIC;
+			div_z		: IN  STD_LOGIC;
+			no_al		: IN  STD_LOGIC;
+			ill_ins_l	: IN STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -96,9 +104,10 @@ ARCHITECTURE Structure OF unidad_control IS
 			rd_in		: OUT STD_LOGIC;
 			wr_out		: OUT STD_LOGIC;
 			inta		: OUT STD_LOGIC;
-			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-			addr_a		: OUT  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			addr_a		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			exc_code	: OUT exc_code_t;
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
 	end component;
@@ -117,6 +126,7 @@ signal ins_dad_conn			: std_logic;
 signal wr_out_conn			: std_logic;
 signal rd_in_conn			: std_logic;
 signal int_a_conn			: std_logic;
+signal ill_ins_conn			: std_logic;
 signal f_out				: f_code_t;
 signal regPC				: std_logic_vector(15 downto 0) := x"C000";
 signal new_Pc				: std_logic_vector(15 downto 0) := x"0000";
@@ -144,7 +154,7 @@ BEGIN
 	process (boot, load_pc_out, clk) begin
 		if rising_edge(clk) then
 			
-			despla(15 downto 9) <= (others => datard_m(7));	-- Calculem el despla�ament dels Branches
+			despla(15 downto 9) <= (others => datard_m(7));	-- Calculem el desplaÃ¯Â¿Â½ament dels Branches
 			despla(8 downto 0) <= datard_m(7 downto 0)&'0';	-- Extenem el signe per els Branches relatius i x2 per alinear-ho
 
 			old_2_Pc <= regPC + 2;	-- Ens guardem el PC + 2 pels JALS
@@ -260,6 +270,7 @@ BEGIN
 										immed => immed,
 										wr_m => word_mem,
 										in_d => in_d,
+										ill_ins => ill_ins_conn,
 										immed_x2 => immed_x2,
 										word_byte => word_byte_connection,
 										halt_cont => halt_conn,
@@ -280,6 +291,9 @@ BEGIN
 								wrd_s_l => enable_sys,
 								u_s_l => user_sys,
 								int_e => int_e,
+								ill_ins_l => ill_ins_conn,
+								div_z => div_z,
+								no_al => no_al,
 								wr_m_l => word_mem,
 								addr_io_l => addr_io_conn,
 								rd_in_l => rd_in_conn,
@@ -301,6 +315,7 @@ BEGIN
 								rd_in => rd_in,
 								wr_out => wr_out,
 								addr_a => addr_a,
+								exc_code => exc_code,
 								int_type => int_type_out
 								);
 

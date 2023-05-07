@@ -13,7 +13,9 @@ ENTITY alu IS
           f  : IN  f_code_t;
 		  int : IN std_logic;
           w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		  z  : OUT std_logic);
+		  z  : OUT std_logic;
+		  div_z : OUT std_logic
+		  );
 END alu;
 
 
@@ -48,6 +50,10 @@ BEGIN
 	-- z es un bit per saber si y es 0 o no, per fer servir en BNs i JMPs
 	z <= '0' when y = "0" else '1';
 	
+	-- Indicadors de possibles excepcions
+	div_z <= '1' when (op = MULDIV and y = "0" and (f = DIV_OP  or f = DIVU_OP)) else '0';
+	
+	
 	-- Depen de quina OP i F seleccionem la sortida
 	w_temporal <= 	x and y 	when op = AL and f = AND_OP else	--AND
 					x or y 	when op = AL and f = OR_OP else			--OR
@@ -61,9 +67,9 @@ BEGIN
 					mulu(31 downto 16) when op = MULDIV and f = MULHU_OP else	--MULHU
 					
 					std_logic_vector(signed(x) / signed(y)) 	when op = MULDIV and f = DIV_OP and y /= "0" else	-- DIV
-					(others => 'X') 							when op = MULDIV and f = DIV_OP and y = "0" else	-- DIV ERROR /0
+					(others => 'X') 							when op = MULDIV and f = DIV_OP and y = "0" else	-- DIV Excepcio /0
 					std_logic_vector(unsigned(x) / unsigned(y))	when op = MULDIV and f = DIVU_OP and y /= "0" else	-- DIVU
-					(others => 'X')								when op = MULDIV and f = DIVU_OP and y = "0" else	-- DIVU ERROR /0
+					(others => 'X')								when op = MULDIV and f = DIVU_OP and y = "0" else	-- DIVU Excepcio /0
 				
 					std_logic_vector(shift_left(signed(x), conv_integer(y(4 downto 0)) )) when op = AL and f = SHA_OP and conv_integer(y(4 downto 0)) <= 15  else 	--SHA  >= 0 
 					std_logic_vector(shift_left(unsigned(x), conv_integer(y(4 downto 0)) )) when op = AL and f = SHL_OP and conv_integer(y(4 downto 0)) <= 15 else 	--SHL  >= 0
@@ -94,8 +100,9 @@ BEGIN
 					ext_signe 	 when op = MOVE and f = MOVI else	-- MOVI
 					movhi_signal when op = MOVE and f = MOVHI else  -- MOVHI
 					
-					x + y when op = ST or op = LD or op = STB or op = LDB or op = ADDI else		-- LDs, STs ADDi
+					x + y when op = ST or op = LD or op = STB or op = LDB else		-- LDs, STs
 					
+					x + y when op = ADDI else
 					-- En RETI treurem X, ens entra el Pc antic
 					x when op = HALT else
 					

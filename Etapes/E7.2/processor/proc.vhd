@@ -3,11 +3,13 @@ USE ieee.std_logic_1164.all;
 --use work.all;
 use work.op_code.all;
 use work.f_code.all;
+use work.exc_code.all;
 
 ENTITY proc IS
 	PORT (	clk			: IN  STD_LOGIC;
 			boot		: IN  STD_LOGIC;
 			intr		: IN  std_logic;
+			no_al		: IN  std_logic;
 			datard_m	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			rd_io 		: in  std_logic_vector(15 downto 0);
 			wr_m		: OUT STD_LOGIC;
@@ -30,10 +32,13 @@ ARCHITECTURE Structure OF proc IS
 			z				: IN  std_LOGIC;
 			intr 			: IN  std_logic;
 			int_e			: IN  STD_LOGIC;
+			div_z			: IN  STD_LOGIC;
+			no_al			: IN  STD_LOGIC;
 			datard_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			alu_out			: IN  STD_LOGIC_VECTOR(15 downto 0);
 			op				: out op_code_t;
 			f				: out f_code_t;
+			exc_code		: OUT exc_code_t;
 			wrd				: OUT STD_LOGIC;
 			wrd_s			: OUT STD_LOGIC;
 			u_s				: OUT STD_LOGIC;
@@ -68,6 +73,7 @@ ARCHITECTURE Structure OF proc IS
 			inta			: IN  STD_LOGIC;
 			op				: IN  op_code_t;
 			f				: IN  f_code_t;
+			exc_code		: IN  exc_code_t;
 			in_d			: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -79,6 +85,7 @@ ARCHITECTURE Structure OF proc IS
 			rd_io			: IN  std_LOGIC_VECTOR(15 DOWNTO 0);
 			z				: OUT STD_LOGIC;
 			int_e			: OUT STD_LOGIC;
+			div_z			: OUT STD_LOGIC;
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			data_wr			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -98,17 +105,23 @@ signal z_conn				: STD_LOGIC;
 signal wrd_s_conn			: STD_LOGIC;
 signal u_s_conn				: STD_LOGIC;
 signal int_e_conn			: STD_LOGIC;
+signal div_z_conn			: STD_LOGIC;
+signal no_al_conn			: STD_LOGIC;
 signal inta_conn			: STD_LOGIC;
 signal in_d_conn			: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal int_type_conn		: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal addr_a_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
 signal addr_b_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
 signal addr_d_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
+signal exc_code_conn		: STD_LOGIC_VECTOR(3 DOWNTO 0);
 signal immed_conn			: STD_LOGIC_VECTOR(15 DOWNTO 0);
 signal pc_conn				: STD_LOGIC_VECTOR(15 DOWNTO 0);
 signal alu_out_conn			: STD_LOGIC_VECTOR(15 downto 0);
 
 BEGIN
+	
+	
+	inta <= inta_conn;
 	
 	UC: unidad_control port map(boot => boot,
 								clk => clk,
@@ -137,9 +150,10 @@ BEGIN
 								wr_out => wr_out,
 								int_type => int_type_conn,
 								intr => intr,
-								inta => inta_conn
+								inta => inta_conn,
+								div_z => div_z_conn,
+								no_al => no_al_conn
 								);
-	inta <= inta_conn;
 	
 	
 	PATH: datapath port map(clk => clk,
@@ -154,8 +168,9 @@ BEGIN
 							addr_d => addr_d_conn,
 							immed => immed_conn, 
 							pc => pc_conn, 
-									int_e => int_e_conn,
-									inta => inta_conn,
+							inta => inta_conn,
+							div_z => div_z_conn,
+							int_e => int_e_conn,
 							ins_dad => ins_dad_conn, 
 							in_d => in_d_conn, 
 							immed_x2 => immed_x2_conn,
@@ -167,6 +182,7 @@ BEGIN
 							rd_io	=> rd_io,
 							wr_io => wr_io,
 							int_type => int_type_conn,	
+							exc_code => exc_code_conn,
 							intr => intr
 							);
 

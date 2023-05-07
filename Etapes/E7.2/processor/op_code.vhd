@@ -77,6 +77,33 @@ package f_code is
  
 end package f_code;
 
+library ieee;
+use ieee.std_logic_1164.all;
+
+
+package exc_code is
+  subtype exc_code_t is std_logic_vector(3 downto 0);
+
+  constant ill_ins_c	: exc_code_t := "0000"; -- 0
+  constant no_al_c		: exc_code_t := "0001"; -- 1
+  constant ovf_f_c		: exc_code_t := "0010"; -- 2
+  constant div_z_f_c	: exc_code_t := "0011"; -- 3
+  constant div_z_c		: exc_code_t := "0100"; -- 4
+  constant no_exc_c		: exc_code_t := "0101"; -- 5
+  constant m_tlb_i_c	: exc_code_t := "0110"; -- 6
+  constant m_tlb_d_c	: exc_code_t := "0111"; -- 7
+  constant i_tlb_i_c	: exc_code_t := "1000"; -- 8
+  constant i_tlb_d_c	: exc_code_t := "1001"; -- 9
+  constant pp_tlb_i_c	: exc_code_t := "1010"; -- A
+  constant pp_tlb_d_c	: exc_code_t := "1011"; -- B
+  constant lec_tlb_c	: exc_code_t := "1100"; -- C
+  constant protec_c		: exc_code_t := "1101"; -- D
+  constant call_c		: exc_code_t := "1110"; -- E
+  constant interrupt_c	: exc_code_t := "1111"; -- F;
+  
+  
+end package exc_code;
+
 
 
 
