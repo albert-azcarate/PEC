@@ -44,8 +44,8 @@ end entity;
 architecture Structure of multi is
 
 signal estat : std_logic_vector(1 downto 0) := "00";
-signal exc_code_b : exc_code_t;
-signal exc_code_reg : exc_code_t;
+signal exc_code_b : exc_code_t := no_exc_c;
+signal exc_code_reg : exc_code_t := no_exc_c;
 
 component exc is
 	port(	clk 		: IN  STD_LOGIC;
@@ -170,11 +170,14 @@ begin
 				'0' when estat = "10" else
 				'1' when estat = "11" else
 				'1';
-			
-	process (clk, estat, exc_code_b) begin
+	
+	-- Ens guardem el codi d'excepcio quan no sigui No_exception i no estiguem a Boot per evitar un ill_ins al bootar
+	process (clk, estat, exc_code_b, boot) begin
 		if rising_edge(clk) then
-			if exc_code_b /= no_exc_c then
+			if exc_code_b /= no_exc_c and boot = '0' then
 				exc_code_reg <= exc_code_b;
+			elsif ldpc_l = "100" then 		-- Si es un RETI borrem la el codi de interupcio
+				exc_code_reg <= no_exc_c;
 			end if;
 		end if;
 	end process;
