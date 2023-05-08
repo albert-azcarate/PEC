@@ -21,21 +21,27 @@ ARCHITECTURE Structure OF interruptores IS
 	
 begin
 
-	process(clk, boot) begin
-		if boot = '0' then
-			if rising_edge(clk) then
+	process(clk, boot, switches) begin
+		if rising_edge(clk) then
+			if boot = '1' then -- Si estem a boot
+				actual_state <= "000000000";
+				interrupt <= '0';
+			else -- RUN
 				interrupt <= interrupt;
 				
-				if actual_state /= switches then -- actualitzem el status i informem que hi ha una interrupciÃ³
+				if actual_state /= switches then -- actualitzem el status i informem que hi ha una interrupciÃƒÂ³
 					actual_state <= switches;
 					interrupt <= '1';
 					if inta = '1' then -- si hi ha una interrupcio i ack enviem la dada i apaguem el int
 						interrupt <= '0';
-						rd_switch <= switches;
+						rd_switch <= actual_state;
+					else
+						rd_switch <= "000000000";
 					end if;
 				end if;
 				
 			end if;
+			
 		end if;
 	end process;
 

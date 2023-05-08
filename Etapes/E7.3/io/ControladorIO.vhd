@@ -176,7 +176,7 @@ BEGIN
 					
 		elsif rising_edge(clk) then 			-- RUN
 			-- Llegim els Switchs i Keys
-			io_registers(8) <= "0000000"&SW;
+			io_registers(8) <= "0000000"&rd_switch_conn;
 			io_registers(7) <= x"000"&KEY;
 			clear <= '0';
 			

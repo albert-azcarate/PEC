@@ -21,21 +21,23 @@ ARCHITECTURE Structure OF pulsadores IS
 	
 begin
 
-		process(clk, boot) begin
-		if boot = '0' then
-			if rising_edge(clk) then
+	process(clk, boot, keys) begin
+		if rising_edge(clk) then
+			if boot = '1' then -- Si estem a boot
+				actual_state <= x"0";
+				interrupt <= '0';
+			else -- RUN
 				interrupt <= interrupt;
-				if actual_state /= keys then -- actualitzem el status i informem que hi ha una interrupció
+				
+				if actual_state /= keys then -- actualitzem el status i informem que hi ha una interrupciÃƒÂ³
 					actual_state <= keys;
 					interrupt <= '1';
-					if inta = '1' then -- si hi ha una interrupció i ack enviem la dada i apaguem el 
+					if inta = '1' then -- si hi ha una interrupciÃƒÂ³ i ack enviem la dada i apaguem el 
 						interrupt <= '0';
 						read_key <= keys;
 					else
 						read_key <= "0000";
 					end if;
-					
-					
 				end if;
 			
 			end if;
