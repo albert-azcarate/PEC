@@ -167,7 +167,7 @@ BEGIN
 	-- Llegim I/O excepte en adress = 0, que llegim IID
 	rd_io <= rd_io_conn when adress_reg /= 0 else x"00"&iid_reg;
 
-	process (clk, boot) begin
+	process (clk, boot, inta) begin
 		
 		if boot='1' then							-- BOOT estem a boot posem el reg 16 a 0 (si no no anava, era sempre 1); REVISAR buscar workaround( diria que amb el others others de io_reg ja esta)
 			io_registers(16) <= x"0000";
@@ -175,6 +175,7 @@ BEGIN
 			io_registers <= (others => (others => '0'));
 					
 		elsif rising_edge(clk) then 			-- RUN
+		
 			-- Llegim els Switchs i Keys
 			io_registers(8) <= "0000000"&rd_switch_conn;
 			io_registers(7) <= x"000"&KEY;
