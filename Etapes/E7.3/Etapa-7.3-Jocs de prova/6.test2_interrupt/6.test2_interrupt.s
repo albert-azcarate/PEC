@@ -220,11 +220,6 @@ inici:
 		$MOVEI r1, 0x0000
 		wrs		s4,r1
         ei                         ;activa las interrupciones	;C12C
-		ei
-		$MOVEI r1, 0x0000
-		div r1,r1,r1
-		$MOVEI r1, 0x0001
-		ld r1,0(r1)
 
 binf:   
         $MOVEI r1, 0xA000          ;fila 0; columna 0
@@ -296,15 +291,8 @@ __div_zero:
 __no_align:
 		rds   r1, s4
         addi  r1, r1, 1
-		movi r3, 3
-		cmpeq r3,r1,r3
-		bz r3,end_no_align
-		$MOVEI r1, 0x7
-		out		9,r1
 		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
-        jmp    r6	
-end_no_align:
-		halt
+        jmp    r6
 
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         ; Subrutina para limpiar la pantalla

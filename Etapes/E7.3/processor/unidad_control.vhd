@@ -90,9 +90,9 @@ ARCHITECTURE Structure OF unidad_control IS
 			int_e		: IN  STD_LOGIC;
 			div_z		: IN  STD_LOGIC;
 			no_al		: IN  STD_LOGIC;
-			ill_ins_l	: IN STD_LOGIC;
+			ill_ins_l	: IN  STD_LOGIC;
+			immed_x2_l	: IN  STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-			in_d_l		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -130,6 +130,7 @@ signal wr_out_conn			: std_logic;
 signal rd_in_conn			: std_logic;
 signal int_a_conn			: std_logic;
 signal ill_ins_conn			: std_logic;
+signal immed_x2_conn		: std_logic;
 signal f_out				: f_code_t;
 signal regPC				: std_logic_vector(15 downto 0) := x"C000";
 signal new_Pc				: std_logic_vector(15 downto 0) := x"0000";
@@ -254,7 +255,7 @@ BEGIN
 	f <=  f_out;
 	int_type <= int_type_out;
 	inta <= int_a_conn;
-	in_d <= in_d_conn;
+	immed_x2 <= immed_x2_conn;
 	
 	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL
 	pc <= old_2_Pc when load_pc_out = "001" and f_out = JAL_OP else
@@ -274,9 +275,9 @@ BEGIN
 										addr_d => addr_d,
 										immed => immed,
 										wr_m => word_mem,
-										in_d => in_d_conn,
+										in_d => in_d,
 										ill_ins => ill_ins_conn,
-										immed_x2 => immed_x2,
+										immed_x2 => immed_x2_conn,
 										word_byte => word_byte_connection,
 										halt_cont => halt_conn,
 										immed_or_reg => immed_or_reg,
@@ -300,7 +301,8 @@ BEGIN
 								div_z => div_z,
 								no_al => no_al,
 								wr_m_l => word_mem,
-								in_d_l => in_d_conn,
+								
+								immed_x2_l => immed_x2_conn,
 								addr_io_l => addr_io_conn,
 								rd_in_l => rd_in_conn,
 								wr_out_l => wr_out_conn,

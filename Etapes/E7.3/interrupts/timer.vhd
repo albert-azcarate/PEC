@@ -14,29 +14,31 @@ ENTITY timer IS
 END timer;
 
 ARCHITECTURE Structure OF timer IS
-
-	signal count : std_logic_vector(9 downto 0) :=(others => '0');
+	signal count : integer;
+	--signal count : std_logic_vector(23 downto 0) :=(others => '0');
 	signal interrupt : std_logic := '0';
 	
 begin
 
 	process(clk, boot) begin
-		if boot = '0' then
-			if rising_edge(clk) then
-				interrupt <= interrupt;
-				if interrupt = '0' then --si no hi ha una interrupció previa i les tractes diferent: actualitzem el status i informem que hi ha una interrupció
-					if count < x"03E8" then
-						count <= count + 1;
-					else 
+		if rising_edge(clk) then
+			if boot = '1' then -- Si estem a boot
+				count <= 0;--(others => '0');
+				interrupt <= '0';
+			else -- RUN
+				
+				if count = 2500000 then --x"2625a0" then		-- Si 20ns, count = 0, intr = 1
+						count <= 0;
+						--count <= (others => '0');
 						interrupt <= '1';
-						count <= (others => '0');
-					end if;
-				else --si hi ha una interrupció i ack enviem la dada i apaguem el int
-					if inta = '1' then
+				else 									-- else count += 1
+					count <= count + 1;
+					if inta = '1' and interrupt = '1' then -- si hi ha una interrupcio i ack apaguem el int
 						interrupt <= '0';
+					else 
+						interrupt <= interrupt;	
 					end if;
 				end if;
-				
 			end if;
 		end if;
 	end process;

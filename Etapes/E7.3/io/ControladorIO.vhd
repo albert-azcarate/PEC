@@ -77,7 +77,7 @@ ARCHITECTURE Structure OF controladores_IO IS
 	signal key_intr_conn : std_logic; 
 	signal switch_intr_conn : std_logic;
 	signal read_key_conn : STD_LOGIC_VECTOR (3 downto 0); 
-	signal rd_switch_conn : std_logic_vector(7 downto 0);
+	signal rd_switch_conn : std_logic_vector(8 downto 0);
 	signal rd_io_conn : std_logic_vector(15 downto 0);
 	signal iid_conn : std_logic_vector(7 downto 0);
 	signal iid_reg	: std_logic_vector(7 downto 0);
@@ -98,6 +98,7 @@ ARCHITECTURE Structure OF controladores_IO IS
 	
 	component BCD IS
 	PORT (	input		: in  std_logic_vector(15 downto 0);
+			on_off : in std_logic_vector(3 downto 0);
 			OUT_HEX0	: OUT std_logic_vector(6 downto 0);
 			OUT_HEX1	: OUT std_logic_vector(6 downto 0);
 			OUT_HEX2	: OUT std_logic_vector(6 downto 0);
@@ -119,9 +120,9 @@ ARCHITECTURE Structure OF controladores_IO IS
 				boot		: in std_logic;
 				clk		: in std_logic;
 				inta		: in std_logic;
-				switches	: in std_logic_vector(7 downto 0);
+				switches	: in std_logic_vector(8 downto 0);
 				intr 		: out std_logic;
-				rd_switch : out std_logic_vector(7 downto 0)
+				rd_switch : out std_logic_vector(8 downto 0)
 			);
 	end component;
 	
@@ -240,13 +241,13 @@ BEGIN
 	
 	
 	-- Bits 3 downto 0 del reg 9 encenen o apaguen els 7-segment; Input X l'apaga
-	input_disp(3 downto 0) 	 <= io_registers(10)(3 downto 0)   when io_registers(9)(0) = '1' else (others => '1');
-	input_disp(7 downto 4)   <= io_registers(10)(7 downto 4)   when io_registers(9)(1) = '1' else (others => '1');
-	input_disp(11 downto 8)  <= io_registers(10)(11 downto 8)  when io_registers(9)(2) = '1' else (others => '1');
-	input_disp(15 downto 12) <= io_registers(10)(15 downto 12) when io_registers(9)(3) = '1' else (others => '1');
+	input_disp(3 downto 0) 	 <= io_registers(10)(3 downto 0);
+	input_disp(7 downto 4)   <= io_registers(10)(7 downto 4);
+	input_disp(11 downto 8)  <= io_registers(10)(11 downto 8);
+	input_disp(15 downto 12) <= io_registers(10)(15 downto 12);
+
 	
-	
-	driver : BCD port map(input => input_disp, out_HEX0 => HEX0, out_HEX1 => HEX1, out_HEX2 => HEX2, out_HEX3 => HEX3);
+	driver : BCD port map(input => input_disp, out_HEX0 => HEX0, out_HEX1 => HEX1, out_HEX2 => HEX2, out_HEX3 => HEX3, on_off => io_registers(9)(3 downto 0));
 	
 	KEYBOARD: keyboard_controller port map(
 		clk 		=> CLOCK_50, 			
@@ -278,7 +279,7 @@ BEGIN
 				boot			=> boot,
 				clk			=> CLOCK_50,
 				inta			=> switch_inta_conn,
-				switches		=> sw(7 downto 0),
+				switches		=> sw(8 downto 0),
 				intr 			=> switch_intr_conn,
 				rd_switch 	=> rd_switch_conn );
 	

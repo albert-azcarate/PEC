@@ -25,11 +25,10 @@ begin
 		if boot = '0' then
 			if rising_edge(clk) then
 				interrupt <= interrupt;
-				if interrupt = '0' and actual_state /= keys then --si no hi ha una interrupció previa i les tractes diferent: actualitzem el status i informem que hi ha una interrupció
+				if actual_state /= keys then -- actualitzem el status i informem que hi ha una interrupció
 					actual_state <= keys;
 					interrupt <= '1';
-				elsif interrupt = '1' then --si hi ha una interrupció i ack enviem la dada i apaguem el int
-					if inta = '1' then
+					if inta = '1' then -- si hi ha una interrupció i ack enviem la dada i apaguem el 
 						interrupt <= '0';
 						read_key <= keys;
 					else

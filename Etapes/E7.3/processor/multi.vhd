@@ -18,8 +18,8 @@ entity multi is
 			div_z		: IN  STD_LOGIC;
 			no_al		: IN  STD_LOGIC;
 			ill_ins_l	: IN  STD_LOGIC;
+			immed_x2_l	: IN  STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-			in_d_l		: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -187,8 +187,8 @@ begin
 		end if;
 	end process;
 	
-	-- Marquem que accedim a memoria en FETCH, en ST/B(wr_m_l indica wr_mem_enable) i LB/B(in_d_l es 01 en ST o STB)
-	acces_mem_b <= '1' when estat = "00" or (estat = "01" and (wr_m_l = '1' or in_d_l = "01")) else
+	-- Marquem que accedim a memoria en FETCH, en immed_x2 = 1 en ST i LB
+	acces_mem_b <= '1' when estat = "00" or (estat = "01" and immed_x2_l = '1') else
 				'0';
 	
 	--exc_code <= exc_code_reg;
