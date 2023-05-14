@@ -193,13 +193,13 @@ BEGIN
 						if regPC < x"FFFE" then
 							regPC <= regPC + 2;
 						else 
-							regPC <= regPC;		-- REVISAR, aixo hauria de ser un HALT
+							regPC <= regPC;		-- REVISAR, aixo hauria de ser un HALT; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
 						end if;
 					elsif load_pc_out = "001" then							-- Cas JMP's
 						if f_out = JMP_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 					-- JMP; alu_out >= x"C000" i alu_out < x"FFFE" per evitar que saltem a la ROM
 							regPC <= alu_out;																			-- alu_out < FFFE perque si no el seguent PC + 2 fa overflow
 						elsif z = '0' and f_out = JZ_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 		-- JZ i saltem
-							regPC <= alu_out;																			-- REVISAR s'ha de mira si la adressa es aligned?
+							regPC <= alu_out;																			-- REVISAR s'ha de mira si la adressa es aligned? ; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
 						elsif z = '1' and f_out = JNZ_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 	-- JNZ i saltem
 							regPC <= alu_out;	
 						elsif f_out = JAL_OP and alu_out >= x"C000" and alu_out < x"FFFE" then							-- JAL
@@ -208,7 +208,7 @@ BEGIN
 							if regPC < x"FFFE" then
 								regPC <= regPC + 2;
 							else 
-								regPC <= regPC;	-- REVISAR, aixo hauria de ser un HALT
+								regPC <= regPC;	-- REVISAR, aixo hauria de ser un HALT; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
 							end if;
 						end if;
 						
@@ -220,7 +220,7 @@ BEGIN
 						elsif regPC + 2 < x"FFFE" then																									-- Else no saltem (pc <= pc + 2)
 							regPC <= regPC + 2;
 						else
-							regPC <= regPC; 	-- aixo ha de ser un HALT REVISAR
+							regPC <= regPC; 	-- aixo ha de ser un HALT REVISAR; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
 						end if;
 							
 					elsif load_pc_out = "100" and alu_out >= x"C000" and alu_out < x"FFFE" then	-- Cas RET; alu_out < FFFE perque si no el seguent PC + 2 fa overflow
@@ -228,7 +228,7 @@ BEGIN
 					elsif load_pc_out = "111" and alu_out >= x"C000" and alu_out < x"FFFE" then	-- Cas CALLS; alu_out < FFFE perque si no el seguent PC + 2 fa overflow
 						regPC <= alu_out;
 					else 
-						regPC <= regPC;	-- aixo ha de ser un HALT REVISAR
+						regPC <= regPC;	-- aixo ha de ser un HALT REVISAR; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
 					end if;
 				end if;
 			end if;

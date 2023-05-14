@@ -70,7 +70,7 @@ begin
 	-----------------------------
 	
 	-- Calculem el offset entre la nostre memoria i la direccio real de la VGA
-	-- si no es el cas posem direccio 0x0 pero no pasa res perque tindrem el enable a 0 ; REVISAR, aixo podria ser directe sempre addr(12 downto 0)
+	-- si no es el cas posem direccio 0x0 pero no pasa res perque tindrem el enable a 0 ; REV, aixo podria ser directe sempre addr(12 downto 0)
 	vga_addr <= addr(12 downto 0); -- when addr >= x"A000" and addr < x"c000" else (others => '0');
 	
 	-- Nomes escribim quan son les addreces correctes
