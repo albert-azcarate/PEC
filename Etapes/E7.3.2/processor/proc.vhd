@@ -77,7 +77,8 @@ ARCHITECTURE Structure OF proc IS
 			immed_or_reg	: IN  STD_LOGIC;
 			intr			: IN  STD_LOGIC;
 			inta			: IN  STD_LOGIC;
-			exca			: IN STd_LOGIC;
+			exca			: IN  STd_LOGIC;
+			privilege_lvl	: IN  std_LOGIC;
 			op				: IN  op_code_t;
 			f				: IN  f_code_t;
 			exc_code		: IN  exc_code_t;
@@ -115,6 +116,7 @@ signal u_s_conn				: STD_LOGIC;
 signal int_e_conn			: STD_LOGIC;
 signal div_z_conn			: STD_LOGIC;
 signal inta_conn			: STD_LOGIC;
+signal priv_conn			: STD_LOGIC;
 signal exca_conn			: STD_LOGIC;
 signal in_d_conn			: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal int_type_conn		: STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -129,6 +131,7 @@ BEGIN
 	
 	
 	inta <= inta_conn;
+	privilege_lvlx <= priv_conn;
 	
 	UC: unidad_control port map(boot => boot,
 								clk => clk,
@@ -162,7 +165,7 @@ BEGIN
 								exca => exca_conn,
 								div_z => div_z_conn,
 								exc_code => exc_code_conn,
-								privilege_lvlz => privilege_lvlx,
+								privilege_lvlz => priv_conn,
 								no_al => no_al
 								);
 	
@@ -187,6 +190,7 @@ BEGIN
 							ins_dad => ins_dad_conn, 
 							in_d => in_d_conn, 
 							immed_x2 => immed_x2_conn,
+							privilege_lvl => priv_conn,
 							data_wr => data_wr, 
 							addr_m => addr_m,
 							immed_or_reg => immed_or_reg_conn,

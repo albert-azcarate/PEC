@@ -17,7 +17,8 @@ ENTITY datapath IS
 			immed_or_reg	: IN  STD_LOGIC;
 			intr			: IN  STD_LOGIC;
 			inta			: IN  STD_LOGIC;
-			exca			: IN STd_LOGIC;
+			exca			: IN  STd_LOGIC;
+			privilege_lvl	: IN  std_LOGIC;
 			op				: IN  op_code_t;
 			f				: IN  f_code_t;
 			exc_code		: IN  exc_code_t;
@@ -65,7 +66,8 @@ ARCHITECTURE Structure OF datapath IS
 			u_s 		: IN  STD_LOGIC;
 			intr		: IN  STD_LOGIC;
 			inta		: IN  STD_LOGIC;
-			exca		: IN STd_LOGIC;
+			exca		: IN  STd_LOGIC;
+			privilege_lvl	: IN  std_LOGIC;
 			exc_code	: IN  exc_code_t;
 			int_type	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -105,6 +107,7 @@ BEGIN
 											addr_b => addr_b,
 											b => regbank_to_alu_b, 
 											int_type => int_type,
+											privilege_lvl => privilege_lvl,
 											intr => intr,
 											inta => inta,
 											exca => exca,

@@ -36,6 +36,7 @@ ENTITY sysregfile IS
 			intr		: IN  STD_LOGIC;	
 			inta		: IN  STD_LOGIC;
 			exca		: IN STd_LOGIC;
+			priv_lvl	: IN STd_LOGIC;
 			exc_code	: IN  exc_code_t;
 		  	int_type	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -74,13 +75,14 @@ BEGIN
 				if exc_code /= no_exc_c and exc_code /= interrupt_c and exca = '1' then -- Si es una excepcio i estan enabled
 					reg_vector(0) <= reg_vector(7);
 					reg_vector(1) <= PCup;
-					reg_vector(3) <= addr_m;
 					
-					if exc_code = call_c then
-						reg_vector(2) <= x"000E";					--S2<-14
+					if exc_code = call_c and priv_lvl = '0' then -- Si CALL, guardem el codi de CALL, i al seguent cicle(priv = 1) guardem la resta
+						reg_vector(2) <= x"000E";
+						reg_vector(3) <= d;
 						reg_vector(7)(1 downto 0) <= "01";		--S7<-0x01
-					else
+					elsif exc_code /= call_c then
 						reg_vector(2) <= x"000"&exc_code;
+						reg_vector(3) <= addr_m;
 						reg_vector(7)(1) <= '0';
 					end if;
 					

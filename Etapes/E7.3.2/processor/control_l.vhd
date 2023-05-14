@@ -188,15 +188,14 @@ BEGIN
 						or (op_code_ir = HALT and f_temp = EI_OP) 
 						or (op_code_ir = HALT and f_temp = DI_OP)
 						or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024") -- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix f_code
-						--or (op_code_ir = JMP and f_temp = CALLS_OP) escribirem al SREGFILE sense comprovar wrd_S
+						or (op_code_ir = JMP and f_temp = CALLS_OP)
 						else 
 						'0';	
 	
 	-- u_s ens indica si llegim de user o system al banc de registres 
 	-- Sempre user excepte RDS, RETI
 	u_s <= 	'1' when (op_code_ir = HALT and f_temp = RDS_OP)
-			or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024")-- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix f_code
-			else
+			or (op_code_ir = HALT and f_temp = RETI_OP and ir_interna = x"f024") else -- Aixo es per evitar que en HALT, wrd_s = 1, ja que NOP i RETI tenen el mateix f_code
 			'0';
 
 
@@ -219,6 +218,7 @@ BEGIN
 
 	-- addr_d adreca D al banc de registres;				
 	addr_d <= 	"000" when 	(op_code_ir = NOP and op_code_ir_pre /= ADDI and f_temp /= GETIID_OP) else -- Si es un NOP i el prefiltrat no era ADDI addr_d = 0; NOP i ADDI comparteixen OP_CODE aixi que ho detectem aixi
+				"011" when op_code_ir = JMP and f_temp = CALLS_OP else
 				ir_interna(11 downto 9);
 	
 	-- wr_m indica si escribim a memoria o no (1 si)

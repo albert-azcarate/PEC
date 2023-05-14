@@ -189,6 +189,15 @@ begin
 				'1' when estat = "11" else
 				'1';
 	
+	
+	
+	
+	
+	-----------------------------
+	----- Control Excecions -----
+	-----------------------------
+	
+	
 	-- Ens guardem el codi d'excepcio quan no sigui No_exception i no estiguem a Boot per evitar un ill_ins al bootar
 	process (exc_code_b, boot, ldpc_l, clk) begin
 		if rising_edge(clk) then
@@ -209,6 +218,7 @@ begin
 			
 		end if;
 	end process;
+	
 	
 	-- Marquem que accedim a memoria en FETCH, en immed_x2 = 1 en ST i LB
 	acces_mem_b <= '1' when estat = "00" or (estat = "01" and immed_x2_l = '1') else '0';
