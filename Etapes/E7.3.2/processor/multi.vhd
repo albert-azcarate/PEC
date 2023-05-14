@@ -169,6 +169,7 @@ begin
 	with estat select
 		rd_in <=  	'0' when "00",
 					'0' when "10",
+					'0' when "11",
 					rd_in_l when others;
 				
 	with estat select
