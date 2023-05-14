@@ -169,8 +169,8 @@ BEGIN
 
 	process (clk, boot, inta) begin
 		
-		if boot='1' then							-- BOOT estem a boot posem el reg 16 a 0 (si no no anava, era sempre 1); REVISAR buscar workaround( diria que amb el others others de io_reg ja esta)
-			io_registers(16) <= x"0000";
+		if boot='1' then							-- BOOT estem a boot posem el reg 16 a 0 (si no no anava, era sempre 1)
+			---io_registers(16) <= x"0000"; REVISAR buscar workaround( diria que amb el others others de io_reg ja esta)
 			-- Posem tots els registres a 0 (others => (others => '0'))
 			io_registers <= (others => (others => '0'));
 					

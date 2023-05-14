@@ -305,26 +305,26 @@ __no_align:
         jmp    r6
 		
 __protect:
-		$MOVEI r1, 0xde0d
-		movi 	r2, 0xF
-		out 9, r2
-		out 10, r1
+		;$MOVEI r1, 0xde0d
+		;movi 	r2, 0xF
+		;out 9, r2
+		;out 10, r1
 		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 
 __calls:
-		$MOVEI r1, 0xd00d
-		movi 	r2, 0xF
-		out 9, r2
-		out 10, r1
+		;$MOVEI r1, 0xd00d
+		;movi 	r2, 0xF
+		;out 9, r2
+		;out 10, r1
 		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
 __pp_tlb_dat:
-		$MOVEI r1, 0xdddd
-		movi 	r2, 0xF
-		out 9, r2
-		out 10, r1
+		;$MOVEI r1, 0xdddd
+		;movi 	r2, 0xF
+		;out 9, r2
+		;out 10, r1
 		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 
