@@ -1,0 +1,286 @@
+
+reti.exe:     file format elf32-sisa
+reti.exe
+architecture: sisa:3, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x0000c000
+
+Program Header:
+    LOAD off    0x00000000 vaddr 0x0000bf8c paddr 0x0000bf8c align 2**0
+         filesz 0x000001ba memsz 0x000001ba flags r-x
+    LOAD off    0x000001ba vaddr 0x00008000 paddr 0x0000c146 align 2**0
+         filesz 0x00000038 memsz 0x00000038 flags rw-
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn  Flags
+  0 .text         00000146  0000c000  0000c000  00000074  2**0  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000038  00008000  0000c146  000001ba  2**1  CONTENTS, ALLOC, LOAD, DATA
+  2 .stab         000005a0  00000000  00000000  000001f4  2**2  CONTENTS, READONLY, DEBUGGING
+  3 .stabstr      0000003f  00000000  00000000  00000794  2**0  CONTENTS, READONLY, DEBUGGING
+SYMBOL TABLE:
+0000c000 l    d  .text	00000000 .text
+00008000 l    d  .data	00000000 .data
+00000000 l    d  .stab	00000000 .stab
+00000000 l    d  .stabstr	00000000 .stabstr
+00000000 l    d  *ABS*	00000000 .shstrtab
+00000000 l    d  *ABS*	00000000 .symtab
+00000000 l    d  *ABS*	00000000 .strtab
+00004000 l       *ABS*	00000000 PILA
+00008000 l       .data	00000000 interrupts_vector
+0000c094 l       .text	00000000 __interrup_timer
+0000c09a l       .text	00000000 __interrup_key
+0000c0a0 l       .text	00000000 __interrup_switch
+0000c0a6 l       .text	00000000 __interrup_keyboard
+00008008 l       .data	00000000 exceptions_vector
+0000c0e6 l       .text	00000000 __ilegal_ins
+0000c106 l       .text	00000000 __no_align
+0000c090 l       .text	00000000 RSE_default_halt
+0000c0f6 l       .text	00000000 __div_zero
+0000c08e l       .text	00000000 RSE_default_resume
+0000c136 l       .text	00000000 __pp_tlb_dat
+0000c116 l       .text	00000000 __protect
+0000c126 l       .text	00000000 __calls
+00008028 l       .data	00000000 call_sys_vector
+0000c012 l       .text	00000000 RSG
+0000c0ac l       .text	00000000 inici
+0000c04c l       .text	00000000 __call_sistema
+0000c060 l       .text	00000000 __interrupcion
+0000c03e l       .text	00000000 __excepcion
+0000c06e l       .text	00000000 __finRSG
+0000c092 l       .text	00000000 RSE_excepcion_TLB
+0000c0b8 l       .text	00000000 bucle_inf
+0000c0c8 l       .text	00000000 bucle_inf_2
+0000c0d8 l       .text	00000000 bucle_inf_3
+0000c000 g       .text	00000000 __entry_point
+0000c146 g       .text	00000000 _etext
+0000c17e g       *ABS*	00000000 __data_load_end
+0000c146 g       *ABS*	00000000 __data_load_start
+0000c146 g       .text	00000000 __dtors_end
+0000c146 g       .text	00000000 __ctors_start
+0000c146 g       .text	00000000 __dtors_start
+0000c146 g       .text	00000000 __ctors_end
+00008038 g       .data	00000000 _edata
+00008038 g       *ABS*	00000000 _end
+
+
+
+reti.exe:     file format elf32-sisa
+
+Contents of section .data:
+ 8000 94c09ac0 a0c0a6c0 e6c006c1 90c090c0  ................
+ 8010 f6c08ec0 90c090c0 90c090c0 90c036c1  ..............6.
+ 8020 90c016c1 26c18ec0 26c126c1 26c126c1  ....&...&.&.&.&.
+ 8030 26c126c1 26c126c1                    &.&.&.&.        
+
+reti.exe:     file format elf32-sisa
+
+Disassembly of section .text:
+
+0000c000 <__entry_point>:
+    c000:	5212 	movi	r1, 18
+    c002:	53c0 	movhi	r1, -64
+    c004:	fa70 	wrs	s5, r1
+    c006:	5e00 	movi	r7, 0
+    c008:	5f40 	movhi	r7, 64
+    c00a:	5cac 	movi	r6, -84
+    c00c:	5dc0 	movhi	r6, -64
+    c00e:	f3b0 	wrs	s1, r6
+    c010:	f024 	reti	
+
+0000c012 <RSG>:
+    c012:	2ff2 	addi	r7, r7, -14
+    c014:	41c6 	st	12(r7), r0
+    c016:	43c5 	st	10(r7), r1
+    c018:	45c4 	st	8(r7), r2
+    c01a:	47c3 	st	6(r7), r3
+    c01c:	49c2 	st	4(r7), r4
+    c01e:	4bc1 	st	2(r7), r5
+    c020:	4dc0 	st	0(r7), r6
+    c022:	f22c 	rds	r1, s0
+    c024:	f46c 	rds	r2, s1
+    c026:	f6ec 	rds	r3, s3
+    c028:	2ffa 	addi	r7, r7, -6
+    c02a:	43c2 	st	4(r7), r1
+    c02c:	45c1 	st	2(r7), r2
+    c02e:	47c0 	st	0(r7), r3
+    c030:	f2ac 	rds	r1, s2
+    c032:	540e 	movi	r2, 14
+    c034:	165a 	cmpeq	r3, r1, r2
+    c036:	670a 	bnz	r3, 22
+    c038:	540f 	movi	r2, 15
+    c03a:	165a 	cmpeq	r3, r1, r2
+    c03c:	6711 	bnz	r3, 36
+
+0000c03e <__excepcion>:
+    c03e:	5408 	movi	r2, 8
+    c040:	5580 	movhi	r2, -128
+    c042:	0261 	add	r1, r1, r1
+    c044:	04a1 	add	r2, r2, r1
+    c046:	3480 	ld	r2, 0(r2)
+    c048:	ac84 	jal	r6, r2
+    c04a:	6611 	bz	r3, 36
+
+0000c04c <__call_sistema>:
+    c04c:	f2ec 	rds	r1, s3
+    c04e:	5407 	movi	r2, 7
+    c050:	0242 	and	r1, r1, r2
+    c052:	0261 	add	r1, r1, r1
+    c054:	5428 	movi	r2, 40
+    c056:	5580 	movhi	r2, -128
+    c058:	04a1 	add	r2, r2, r1
+    c05a:	3480 	ld	r2, 0(r2)
+    c05c:	ac84 	jal	r6, r2
+    c05e:	6707 	bnz	r3, 16
+
+0000c060 <__interrupcion>:
+    c060:	f228 	getiid	r1
+    c062:	0261 	add	r1, r1, r1
+    c064:	5400 	movi	r2, 0
+    c066:	5580 	movhi	r2, -128
+    c068:	04a1 	add	r2, r2, r1
+    c06a:	3480 	ld	r2, 0(r2)
+    c06c:	ac84 	jal	r6, r2
+
+0000c06e <__finRSG>:
+    c06e:	37c0 	ld	r3, 0(r7)
+    c070:	35c1 	ld	r2, 2(r7)
+    c072:	33c2 	ld	r1, 4(r7)
+    c074:	2fc6 	addi	r7, r7, 6
+    c076:	f6f0 	wrs	s3, r3
+    c078:	f2b0 	wrs	s1, r2
+    c07a:	f070 	wrs	s0, r1
+    c07c:	3dc0 	ld	r6, 0(r7)
+    c07e:	3bc1 	ld	r5, 2(r7)
+    c080:	39c2 	ld	r4, 4(r7)
+    c082:	37c3 	ld	r3, 6(r7)
+    c084:	35c4 	ld	r2, 8(r7)
+    c086:	33c5 	ld	r1, 10(r7)
+    c088:	31c6 	ld	r0, 12(r7)
+    c08a:	2fce 	addi	r7, r7, 14
+    c08c:	f024 	reti	
+
+0000c08e <RSE_default_resume>:
+    c08e:	a183 	jmp	r6
+
+0000c090 <RSE_default_halt>:
+    c090:	ffff 	halt	
+
+0000c092 <RSE_excepcion_TLB>:
+    c092:	a183 	jmp	r6
+
+0000c094 <__interrup_timer>:
+    c094:	5c6e 	movi	r6, 110
+    c096:	5dc0 	movhi	r6, -64
+    c098:	a183 	jmp	r6
+
+0000c09a <__interrup_key>:
+    c09a:	5c6e 	movi	r6, 110
+    c09c:	5dc0 	movhi	r6, -64
+    c09e:	a183 	jmp	r6
+
+0000c0a0 <__interrup_switch>:
+    c0a0:	5c6e 	movi	r6, 110
+    c0a2:	5dc0 	movhi	r6, -64
+    c0a4:	a183 	jmp	r6
+
+0000c0a6 <__interrup_keyboard>:
+    c0a6:	5c6e 	movi	r6, 110
+    c0a8:	5dc0 	movhi	r6, -64
+    c0aa:	a183 	jmp	r6
+
+0000c0ac <inici>:
+    c0ac:	520f 	movi	r1, 15
+    c0ae:	7309 	out	9, r1
+    c0b0:	5000 	movi	r0, 0
+    c0b2:	5100 	movhi	r0, 0
+    c0b4:	5200 	movi	r1, 0
+    c0b6:	5380 	movhi	r1, -128
+
+0000c0b8 <bucle_inf>:
+    c0b8:	2001 	addi	r0, r0, 1
+    c0ba:	1419 	cmpeq	r2, r0, r1
+    c0bc:	64fd 	bz	r2, -4
+    c0be:	f4b0 	wrs	s2, r2
+    c0c0:	5000 	movi	r0, 0
+    c0c2:	5100 	movhi	r0, 0
+    c0c4:	5200 	movi	r1, 0
+    c0c6:	5380 	movhi	r1, -128
+
+0000c0c8 <bucle_inf_2>:
+    c0c8:	2001 	addi	r0, r0, 1
+    c0ca:	1419 	cmpeq	r2, r0, r1
+    c0cc:	64fd 	bz	r2, -4
+    c0ce:	a087 	calls	r2
+    c0d0:	5000 	movi	r0, 0
+    c0d2:	5100 	movhi	r0, 0
+    c0d4:	5200 	movi	r1, 0
+    c0d6:	5380 	movhi	r1, -128
+
+0000c0d8 <bucle_inf_3>:
+    c0d8:	2001 	addi	r0, r0, 1
+    c0da:	1419 	cmpeq	r2, r0, r1
+    c0dc:	64fd 	bz	r2, -4
+    c0de:	5402 	movi	r2, 2
+    c0e0:	5580 	movhi	r2, -128
+    c0e2:	4480 	st	0(r2), r2
+    c0e4:	ffff 	halt	
+
+0000c0e6 <__ilegal_ins>:
+    c0e6:	52ad 	movi	r1, -83
+    c0e8:	53de 	movhi	r1, -34
+    c0ea:	540f 	movi	r2, 15
+    c0ec:	7509 	out	9, r2
+    c0ee:	730a 	out	10, r1
+    c0f0:	5c6e 	movi	r6, 110
+    c0f2:	5dc0 	movhi	r6, -64
+    c0f4:	a183 	jmp	r6
+
+0000c0f6 <__div_zero>:
+    c0f6:	52ad 	movi	r1, -83
+    c0f8:	53de 	movhi	r1, -34
+    c0fa:	540f 	movi	r2, 15
+    c0fc:	7509 	out	9, r2
+    c0fe:	730a 	out	10, r1
+    c100:	5c6e 	movi	r6, 110
+    c102:	5dc0 	movhi	r6, -64
+    c104:	a183 	jmp	r6
+
+0000c106 <__no_align>:
+    c106:	52ad 	movi	r1, -83
+    c108:	53de 	movhi	r1, -34
+    c10a:	540f 	movi	r2, 15
+    c10c:	7509 	out	9, r2
+    c10e:	730a 	out	10, r1
+    c110:	5c6e 	movi	r6, 110
+    c112:	5dc0 	movhi	r6, -64
+    c114:	a183 	jmp	r6
+
+0000c116 <__protect>:
+    c116:	520d 	movi	r1, 13
+    c118:	53de 	movhi	r1, -34
+    c11a:	540f 	movi	r2, 15
+    c11c:	7509 	out	9, r2
+    c11e:	730a 	out	10, r1
+    c120:	5c6e 	movi	r6, 110
+    c122:	5dc0 	movhi	r6, -64
+    c124:	a183 	jmp	r6
+
+0000c126 <__calls>:
+    c126:	520d 	movi	r1, 13
+    c128:	53d0 	movhi	r1, -48
+    c12a:	540f 	movi	r2, 15
+    c12c:	7509 	out	9, r2
+    c12e:	730a 	out	10, r1
+    c130:	5c6e 	movi	r6, 110
+    c132:	5dc0 	movhi	r6, -64
+    c134:	a183 	jmp	r6
+
+0000c136 <__pp_tlb_dat>:
+    c136:	52dd 	movi	r1, -35
+    c138:	53dd 	movhi	r1, -35
+    c13a:	540f 	movi	r2, 15
+    c13c:	7509 	out	9, r2
+    c13e:	730a 	out	10, r1
+    c140:	5c6e 	movi	r6, 110
+    c142:	5dc0 	movhi	r6, -64
+    c144:	a183 	jmp	r6
