@@ -54,6 +54,7 @@
         $MOVEI r7, PILA    ;inicializamos R7 como puntero a la pila
         $MOVEI r6, inici   ;direccion de la rutina principal
         wrs		s1, r6 
+		;ei
 		reti	; saltem a mode user c016
 		;jmp    r6
 
@@ -152,13 +153,49 @@ __interrup_keyboard:
         jmp    r6
 
 
+        ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+        ; Rutina principal
+        ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+inici: 
+        movi   r1, 0xF
+        out     9, r1              ;activa todos los visores hexadecimales
+		$MOVEI r0, 0
+		$MOVEI r1 , 0xffff
+bucle_inf:	
+		addi	r0, r0, 1
+		cmpeq 	r2,r0,r1
+		bz		r2, bucle_inf
+		$MOVEI	r2 jmp_bucle
+		addi	r2, r2, 1
+		jmp		r2				; no_al 7seg = dead
+		halt
+		addi 	r0, r0,0
+jmp_bucle:
+		$MOVEI r0, 0
+		$MOVEI r1 , 0xffff
+bucle_inf_2:	
+		addi	r0, r0, 1
+		cmpeq 	r2,r0,r1
+		bz		r2, bucle_inf_2
+		$MOVEI  r2, 1
+		calls 	r2				; calls inception 7seg = d00d
+		$MOVEI r0, 0
+		$MOVEI r1 , 0xffff
+bucle_inf_3:	
+		addi	r0, r0, 1
+		cmpeq 	r2,r0,r1
+		bz		r2, bucle_inf_3
+		$MOVEI 	r2, 0x0000
+		jmp 	r2
+end_test:	
+		halt
 
 __ilegal_ins:
-		$MOVEI r1, 0x1111
+		
+		$MOVEI r1, 0xd00d
 		movi 	r2, 0xF
 		out 9, r2
 		out 10, r1
-		halt
 		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
@@ -171,7 +208,14 @@ __div_zero:
         jmp    r6
 		
 __no_align:
-		halt
+		movhi r3, 0xc0
+		rds		r5, s3				; mirem si > a c000
+		$CMPGEU r3, r5, r3			
+		bz	r3, end_no_al			; si es major restem 1 al pc i ho posem a la pila
+		addi r5, r5, -1
+		st		2(r7), r5
+		
+end_no_al:							; else no cal fer res
 		$MOVEI r1, 0xdead
 		movi 	r2, 0xF
 		out 9, r2
@@ -184,11 +228,16 @@ __protect:
 		movi 	r2, 0xF
 		out 9, r2
 		out 10, r1
+		movhi r3, 0xc0
+		rds		r5, s3				; mirem si < a c000
+		cmpltu r3, r5, r3			
+		bz	r3, end_no_p			
 		halt
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
-        jmp    r6
+end_no_p:
+		halt
 
 __calls:
+		calls 	r1
 		$MOVEI r1, 0xd00d
 		movi 	r2, 0xF
 		out 9, r2
@@ -203,38 +252,3 @@ __pp_tlb_dat:
 		out 10, r1
 		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
-
-
-
-
-        ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-        ; Rutina principal
-        ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-inici: 
-        movi   r1, 0xF
-        out     9, r1              ;activa todos los visores hexadecimales
-		$MOVEI r0, 0
-		$MOVEI r1 , 0xffff
-bucle_inf:	
-		addi	r0, r0, 1
-		cmpeq 	r2,r0,r1
-		bz		r2, bucle_inf
-		wrs 	s2,r2
-		$MOVEI r0, 0
-		$MOVEI r1 , 0xffff
-bucle_inf_2:	
-		addi	r0, r0, 1
-		cmpeq 	r2,r0,r1
-		bz		r2, bucle_inf_2
-		$MOVEI  r2, 1
-		calls 	r2
-		$MOVEI r0, 0
-		$MOVEI r1 , 0xffff
-bucle_inf_3:	
-		addi	r0, r0, 1
-		cmpeq 	r2,r0,r1
-		bz		r2, bucle_inf_3
-		$MOVEI 	r2, 0x8002
-		st 	 0(r2), r2
-        halt
-

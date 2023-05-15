@@ -65,12 +65,17 @@ BEGIN
 	int_e <= reg_vector(7)(1);
 	
 	process (clk, inta, boot, exca) begin
+	
 		if boot = '1' then
 			-- Posem tots els registres a 0 (others => (others => '0'))
 			reg_vector <= (others => (others => '0'));
+			reg_vector(7)(0) <= '1'; -- System_Mode
 		else 
 			-- escriptura sinc
 			if rising_edge(clk) then
+				
+				reg_vector(7)(0) <= priv_lvl;
+			
 				-- exc i int separats per discriminar millor
 				if exc_code /= no_exc_c and exc_code /= interrupt_c and exca = '1' then -- Si es una excepcio i estan enabled
 					reg_vector(0) <= reg_vector(7);
@@ -85,6 +90,8 @@ BEGIN
 						reg_vector(2) <= x"000"&exc_code;
 						reg_vector(3) <= addr_m;
 						reg_vector(7)(1) <= '0';
+					else
+						reg_vector(2) <= x"000"&exc_code;
 					end if;
 					
 				elsif inta = '1'and reg_vector(7)(1) = '1' then -- Es una interrupcio i estan enabled

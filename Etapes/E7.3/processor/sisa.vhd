@@ -15,7 +15,7 @@ ENTITY sisa IS
 			SRAM_OE_N 	: out 	std_logic := '1';
 			SRAM_WE_N 	: out 	std_logic := '1';
 			LEDG		: OUT 	std_logic_vector(7 DOWNTO 0);
-			LEDR		: OUT 	std_logic_vector(7 DOWNTO 0);
+			LEDR		: OUT 	std_logic_vector(8 DOWNTO 0);
 			HEX0		: OUT 	std_logic_vector(6 DOWNTO 0);
 			HEX1		: OUT 	std_logic_vector(6 DOWNTO 0);
 			HEX2		: OUT 	std_logic_vector(6 DOWNTO 0);
@@ -96,7 +96,7 @@ ARCHITECTURE Structure OF sisa IS
 			ps2_clk 	: inout std_logic;
 			ps2_data 	: inout std_logic;
 			led_verdes	: OUT	std_logic_vector(7 DOWNTO 0);
-			led_rojos 	: OUT	std_logic_vector(7 DOWNTO 0);
+			led_rojos 	: OUT	std_logic_vector(8 DOWNTO 0);
 			HEX0 		: OUT	std_logic_vector(6 DOWNTO 0);
 			HEX1 		: OUT	std_logic_vector(6 DOWNTO 0);
 			HEX2 		: OUT	std_logic_vector(6 DOWNTO 0);

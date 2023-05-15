@@ -29,7 +29,7 @@ ENTITY controladores_IO IS
 			ps2_clk 	: inout std_logic;
 			ps2_data 	: inout std_logic;
 			led_verdes	: OUT	std_logic_vector(7 DOWNTO 0);
-			led_rojos 	: OUT	std_logic_vector(7 DOWNTO 0);
+			led_rojos 	: OUT	std_logic_vector(8 DOWNTO 0);
 			HEX0 		: OUT	std_logic_vector(6 DOWNTO 0);
 			HEX1 		: OUT	std_logic_vector(6 DOWNTO 0);
 			HEX2 		: OUT	std_logic_vector(6 DOWNTO 0);
@@ -158,7 +158,7 @@ ARCHITECTURE Structure OF controladores_IO IS
 BEGIN
 
 	-- Assignem els 8 bits de menor pes als leds corresponents
-	led_rojos <= io_registers(6)(7 downto 0);
+	led_rojos <= io_registers(6)(8 downto 0);
 	led_verdes <= io_registers(5)(7 downto 0);
 	
 	-- Quin port IO volem accedir

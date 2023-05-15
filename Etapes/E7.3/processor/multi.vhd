@@ -81,15 +81,13 @@ begin
 				inta <= '0';
 				exca <= '0';
 				
-				-- if exc_code_b = no_al_c and estat = "00" then	-- Rutina addr_m si pertany a ins fem pc-1 i jmp pc
-				--	estat <= "10";
-				--	exca <= '1';
-				-- elsif
-				
-				if exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01" then	-- Si salta una excepcio en Decode(sense comptar interrupcions anem a estat SYSTEM) -- REVISAR Execpcio no alineat en FETCH, saltar directe a excepcio, no esperar al decODE
+				-- excepcio de instruccio pocha REVISAR
+				if (exc_code_b = no_al_c or exc_code_b = protec_c) and estat = "00" then	-- Rutina addr_m si pertany a ins fem pc-1 i jmp pc
 					estat <= "10";
 					exca <= '1';
-					
+				elsif exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01" then	-- Si salta una excepcio en Decode(sense comptar interrupcions anem a estat SYSTEM) -- 
+					estat <= "10";
+					exca <= '1';
 				elsif interrupt = '1' and estat = "01" and int_e = '1' then	-- Si hi ha interrup en Decode i estan enable ens podem en estat SYSTEM
 					estat <= "10"; 
 					inta <= '1';
@@ -212,7 +210,9 @@ begin
 				privilege_lvl <= '1';
 			elsif exc_code_b /= no_exc_c then		-- Exc /= no_exc
 				exc_code <= exc_code_b;
-				if exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01" then -- Si hi ha excepci i li fem cas posem priv_level = 1
+				
+				-- Si hi ha excepci i li fem cas posem priv_level = 1. En cas de no_al o protec(REVISAR) pot saltar en estat 00
+				if (exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01") or ((exc_code_b = no_al_c or exc_code_b = protec_c) and estat = "00") then 
 					privilege_lvl <= '1';
 				end if;
 			elsif ldpc_l = "100" then 		-- Si es un RETI borrem la el codi de interupcio i priv_level = 0
@@ -231,7 +231,7 @@ begin
 	
 	-- Marquem que accedim a pagina protegida en DECODE, ST/B i LB/B
 	pp_tlb_b <= pp_tlb_d_l when estat = "01" and (immed_x2_l = '1' or w_b = '1') else '0';
-	--exc_code <= exc_code_reg;
+
 				
 	exception_controller : exc port map(	clk			=> clk,
 											boot 		=> boot,
