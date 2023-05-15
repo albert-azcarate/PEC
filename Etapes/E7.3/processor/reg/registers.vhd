@@ -12,7 +12,8 @@ ENTITY registers IS
 			u_s 		: IN  STD_LOGIC;
 			intr		: IN  STD_LOGIC;
 			inta		: IN  STD_LOGIC;
-			exca		: IN STd_LOGIC;
+			exca		: IN  STd_LOGIC;
+			privilege_lvl	: IN  std_LOGIC;
 			exc_code	: IN  exc_code_t;
 			int_type	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -38,8 +39,7 @@ component regfile IS
           addr_b : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_d : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-          b      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
-		  );
+          b      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
 	END component;
 
 component sysregfile IS
@@ -48,12 +48,13 @@ component sysregfile IS
 			wrd			: IN  STD_LOGIC;
 			intr		: IN  STD_LOGIC;	
 			inta		: IN  STD_LOGIC;
-			exca		: IN STd_LOGIC;
+			exca		: IN  STd_LOGIC;
+			priv_lvl	: IN  std_LOGIC;
 			exc_code	: IN  exc_code_t;
 		  	int_type	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-			d			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			d			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0); --from REGfile std
 			PCup		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			int_e 		: OUT STD_LOGIC;
@@ -78,6 +79,7 @@ BEGIN
 												inta => inta,
 												exca => exca,
 												PCup => PCup,
+												priv_lvl => privilege_lvl,
 												int_e => int_e,
 												addr_m => addr_m,
 												exc_code => exc_code

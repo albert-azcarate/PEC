@@ -166,11 +166,19 @@ BEGIN
 
 	-- Llegim I/O excepte en adress = 0, que llegim IID
 	rd_io <= rd_io_conn when adress_reg /= 0 else x"00"&iid_reg;
+	
+	
+	
+	-- lectura asincrona
+	-- Es pot treure el else i llegir a pelo perque despres filtrem amb el in_d REVISAR
+	rd_io_conn <=  io_registers(adress_reg) when rd_in = '1' else (others => '0');
+
+	
 
 	process (clk, boot, inta) begin
 		
-		if boot='1' then							-- BOOT estem a boot posem el reg 16 a 0 (si no no anava, era sempre 1); REVISAR buscar workaround( diria que amb el others others de io_reg ja esta)
-			io_registers(16) <= x"0000";
+		if boot='1' then							-- BOOT estem a boot posem el reg 16 a 0 (si no no anava, era sempre 1)
+			---io_registers(16) <= x"0000"; REV buscar workaround( diria que amb el others others de io_reg ja esta)
 			-- Posem tots els registres a 0 (others => (others => '0'))
 			io_registers <= (others => (others => '0'));
 					
@@ -178,7 +186,7 @@ BEGIN
 		
 			-- Llegim els Switchs i Keys
 			io_registers(8) <= "0000000"&rd_switch_conn;
-			io_registers(7) <= x"000"&KEY;
+			io_registers(7) <= x"000"&read_key_conn;
 			clear <= '0';
 			
 			
@@ -196,13 +204,9 @@ BEGIN
 					end if;
 
 				elsif rd_in = '1' then											-- IN
-				
-					rd_io_conn <=  io_registers(adress_reg);
 					if adress_reg = 16 then										-- Si llegim el port 16, el posem a 0, conforme ja hem llegit
 						io_registers(16) <= x"0000";
 					end if;
-				--else 															-- OUT a port 7 o 8; Ho deixo comentat perque no caldria avisar al usuari, ja que es un write
-				--	rd_io <= X"DEAD"; 
 				end if;
 			end if;
 			

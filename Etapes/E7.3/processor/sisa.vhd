@@ -28,6 +28,7 @@ ENTITY sisa IS
 			VGA_G		: out 	std_logic_vector (7 downto 0);
 			VGA_B		: out 	std_logic_vector (7 downto 0);
 			VGA_HS		: out 	std_logic;
+
 			VGA_VS		: out 	std_logic
 			);
 END sisa;
@@ -38,9 +39,11 @@ ARCHITECTURE Structure OF sisa IS
     port (	CLOCK_50  	: in  	std_logic;
 			we        	: in  	std_logic;
 			byte_m    	: in  	std_logic;
+			privilege_lvl : in std_logic;
 			addr      	: in  	std_logic_vector(15 downto 0);
 			wr_data   	: in  	std_logic_vector(15 downto 0);
 			no_al		: out   std_logic;
+			pp_tlb_d	: out std_logic; --exc
 			rd_data   	: out 	std_logic_vector(15 downto 0);
 			-- senyales para la placa de desarrollo
 			SRAM_ADDR 	: out 	std_logic_vector(17 downto 0);
@@ -63,6 +66,7 @@ ARCHITECTURE Structure OF sisa IS
 			boot		: IN  STD_LOGIC;
 			intr		: IN  std_logic;
 			no_al		: IN  std_logic;
+			pp_tlb_dx	: in std_logic; --exc
 			datard_m	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			rd_io 		: in  std_logic_vector(15 downto 0);
 			wr_m		: OUT STD_LOGIC;
@@ -73,6 +77,7 @@ ARCHITECTURE Structure OF sisa IS
 			addr_io 	: out std_logic_vector(7 downto 0);
 			wr_io 		: out std_logic_vector(15 downto 0);
 			addr_m		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			privilege_lvlx : out std_logic;
 			data_wr		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 	END component;
@@ -123,8 +128,8 @@ ARCHITECTURE Structure OF sisa IS
 			vga_cursor_enable	: in  std_logic);						-- simplemente lo ignoramos, este controlador no lo tiene implementado
 	end component;
 
-
-
+	signal privilege_lvl_to_mem : std_LOGIC;
+	signal pp_tlb_d_to_proc: std_LOGIC;
 
 	signal addr_proc_to_mem	: std_logic_vector(15 DOWNTO 0);
 	signal word_byte_to_mem	: std_logic;
@@ -169,6 +174,8 @@ BEGIN
 		rd_data		=> rd_data_to_proc,
 		we 			=> wr_m_to_mem,
 		no_al		=> no_al_to_proc,
+		pp_tlb_d 	=> pp_tlb_d_to_proc,
+		privilege_lvl => privilege_lvl_to_mem,
 		byte_m 		=> word_byte_to_mem,
 		SRAM_ADDR 	=> SRAM_ADDR(17 downto 0),
 		SRAM_CE_N 	=> SRAM_CE_N,
@@ -199,13 +206,15 @@ BEGIN
 		rd_in 		=> rd_in_to_io,
 		intr		=> intr_to_proc,
 		inta		=> inta_to_io,
+		privilege_lvlx => privilege_lvl_to_mem,
+		pp_tlb_dx 	=> pp_tlb_d_to_proc,
 		no_al		=> no_al_to_proc
 		);
 		
 	CIO : controladores_IO port map (
 		boot 		=> SW(9),
 		CloCK_50 	=> CLOCK_50,
-		clk => clk(2),
+		clk 		=> clk(2),
 		addr_io 	=> addr_io_to_io,
 		wr_io 		=> wr_io_to_io,
 		rd_io 		=> rd_io_to_io,
@@ -222,7 +231,7 @@ BEGIN
 		PS2_CLK 	=> PS2_CLK,
 		PS2_DATA 	=> PS2_DAT,
 		intr		=> intr_to_proc,
-		inta			=> inta_to_io
+		inta		=> inta_to_io
 		);	
 	
 	Display : vga_controller port map(

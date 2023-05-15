@@ -10,6 +10,7 @@ ENTITY proc IS
 			boot		: IN  STD_LOGIC;
 			intr		: IN  std_logic;
 			no_al		: IN  std_logic;
+			pp_tlb_dx	: in std_logic; --exc
 			datard_m	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			rd_io 		: in  std_logic_vector(15 downto 0);
 			wr_m		: OUT STD_LOGIC;
@@ -17,6 +18,7 @@ ENTITY proc IS
 			wr_out 		: out std_logic;
 			rd_in 		: out std_logic;
 			inta		: out std_logic;
+			privilege_lvlx : out std_logic;
 			addr_io 	: out std_logic_vector(7 downto 0);
 			wr_io 		: out std_logic_vector(15 downto 0);
 			addr_m		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -34,6 +36,7 @@ ARCHITECTURE Structure OF proc IS
 			int_e			: IN  STD_LOGIC;
 			div_z			: IN  STD_LOGIC;
 			no_al			: IN  STD_LOGIC;
+			pp_tlb_dx		: in std_logic; --exc
 			datard_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			alu_out			: IN  STD_LOGIC_VECTOR(15 downto 0);
 			op				: out op_code_t;
@@ -50,7 +53,7 @@ ARCHITECTURE Structure OF proc IS
 			rd_in			: OUT STD_LOGIC;
 			wr_out			: OUT STD_LOGIC;
 			inta			: OUT STD_LOGIC;
-			exca		: OUT STd_LOGIC;
+			exca			: OUT STd_LOGIC;
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -58,6 +61,7 @@ ARCHITECTURE Structure OF proc IS
 			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			immed			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			privilege_lvlz	: out std_LOGIC;
 			pc				: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 	END component;
@@ -73,7 +77,8 @@ ARCHITECTURE Structure OF proc IS
 			immed_or_reg	: IN  STD_LOGIC;
 			intr			: IN  STD_LOGIC;
 			inta			: IN  STD_LOGIC;
-			exca			: IN STd_LOGIC;
+			exca			: IN  STd_LOGIC;
+			privilege_lvl	: IN  std_LOGIC;
 			op				: IN  op_code_t;
 			f				: IN  f_code_t;
 			exc_code		: IN  exc_code_t;
@@ -111,6 +116,7 @@ signal u_s_conn				: STD_LOGIC;
 signal int_e_conn			: STD_LOGIC;
 signal div_z_conn			: STD_LOGIC;
 signal inta_conn			: STD_LOGIC;
+signal priv_conn			: STD_LOGIC;
 signal exca_conn			: STD_LOGIC;
 signal in_d_conn			: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal int_type_conn		: STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -125,6 +131,7 @@ BEGIN
 	
 	
 	inta <= inta_conn;
+	privilege_lvlx <= priv_conn;
 	
 	UC: unidad_control port map(boot => boot,
 								clk => clk,
@@ -147,6 +154,7 @@ BEGIN
 								wr_m => wr_m,
 								word_byte => word_byte,
 								immed_or_reg => immed_or_reg_conn,
+								pp_tlb_dx => pp_tlb_dx,
 								z => z_conn,
 								addr_io => addr_io,
 								rd_in => rd_in,
@@ -157,6 +165,7 @@ BEGIN
 								exca => exca_conn,
 								div_z => div_z_conn,
 								exc_code => exc_code_conn,
+								privilege_lvlz => priv_conn,
 								no_al => no_al
 								);
 	
@@ -181,6 +190,7 @@ BEGIN
 							ins_dad => ins_dad_conn, 
 							in_d => in_d_conn, 
 							immed_x2 => immed_x2_conn,
+							privilege_lvl => priv_conn,
 							data_wr => data_wr, 
 							addr_m => addr_m,
 							immed_or_reg => immed_or_reg_conn,

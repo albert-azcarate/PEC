@@ -15,7 +15,7 @@ package op_code is
   constant IO			: op_code_t := "0111"; -- 7
   constant MULDIV 		: op_code_t := "1000"; -- 8
   constant FLOAT		: op_code_t := "1001"; -- 9
-  constant JMP	 		: op_code_t := "1010"; -- A
+  constant JMP	 		: op_code_t := "1010"; -- A --inclou CALLS
   constant LDF			: op_code_t := "1011"; -- B
   constant STF			: op_code_t := "1100"; -- C
   constant LDB 			: op_code_t := "1101"; -- D
@@ -61,7 +61,7 @@ package f_code is
  constant JNZ_OP    : f_code_t := "001";
  constant JMP_OP    : f_code_t := "011";
  constant JAL_OP    : f_code_t := "100";
- --constant CALLS_OP 	: f_code_t := "111";
+ constant CALLS_OP  : f_code_t := "111"; --new
  constant NOP_OP    : f_code_t := "100";
  
  constant IN_OP     : f_code_t := "000";
