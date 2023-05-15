@@ -54,7 +54,9 @@
         $MOVEI r7, PILA    ;inicializamos R7 como puntero a la pila
         $MOVEI r6, inici   ;direccion de la rutina principal
         wrs		s1, r6 
-		;ei
+		ei
+		rds 	r6, s7
+		wrs 	s0, r6
 		reti	; saltem a mode user c016
 		;jmp    r6
 
@@ -186,7 +188,7 @@ bucle_inf_3:
 		cmpeq 	r2,r0,r1
 		bz		r2, bucle_inf_3
 		$MOVEI 	r2, 0x0000
-		jmp 	r2
+		jmp 	r2				; deod
 end_test:	
 		halt
 

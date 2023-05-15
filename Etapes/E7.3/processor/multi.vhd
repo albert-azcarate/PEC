@@ -53,8 +53,9 @@ architecture Structure of multi is
 signal estat : std_logic_vector(1 downto 0) := "00";
 signal exc_code_b : exc_code_t := no_exc_c;
 signal exc_code_reg : exc_code_t;
+signal priv_level : std_logic;
 signal acces_mem_b : std_logic;
-signal protect_b : std_logic;
+signal ill_ins_b : std_logic;
 signal pp_tlb_b : std_logic;
 
 component exc is
@@ -131,10 +132,10 @@ begin
 						w_b when others;
 						
 	with estat select
-		wr_m <=  '0' when "00",
-					'0' when "10",
-					'0' when "11",
-					wr_m_l when others;
+		wr_m <=	'0' when "00",
+				'0' when "10",
+				'0' when "11",
+				wr_m_l when others;
 								
 	with estat select
 		wrd <=  '0' when "00",
@@ -201,31 +202,32 @@ begin
 	----- Control Excecions -----
 	-----------------------------
 	
+	privilege_lvl <= priv_level;
 	
 	-- Ens guardem el codi d'excepcio quan no sigui No_exception i no estiguem a Boot per evitar un ill_ins al bootar
 	process (exc_code_b, boot, ldpc_l, clk) begin
 		if rising_edge(clk) then
 			if boot = '1' then						-- Boot
 				exc_code <= no_exc_c;
-				privilege_lvl <= '1';
+				priv_level <= '1';
 			elsif exc_code_b /= no_exc_c then		-- Exc /= no_exc
 				exc_code <= exc_code_b;
 				
 				-- Si hi ha excepci i li fem cas posem priv_level = 1. En cas de no_al o protec(REVISAR) pot saltar en estat 00
 				if (exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01") or ((exc_code_b = no_al_c or exc_code_b = protec_c) and estat = "00") then 
-					privilege_lvl <= '1';
+					priv_level <= '1';
 				end if;
 			elsif ldpc_l = "100" then 		-- Si es un RETI borrem la el codi de interupcio i priv_level = 0
-				privilege_lvl <= '0';
+				priv_level <= '0';
 				exc_code <= no_exc_c;
 			elsif interrupt = '1' and estat = "01" and int_e = '1' then		-- Si entrem a una interrupcio priv_level = 1
-				privilege_lvl <= '1';
+				priv_level <= '1';
 			end if;
 			
 		end if;
 	end process;
 	
-	
+	ill_ins_b <= '1' when call_l = '1' and priv_level = '1' else ill_ins_l;
 	-- Marquem que accedim a memoria en FETCH, en immed_x2 = 1 en ST i LB
 	acces_mem_b <= '1' when estat = "00" or (estat = "01" and immed_x2_l = '1') else '0';
 	
@@ -235,7 +237,7 @@ begin
 				
 	exception_controller : exc port map(	clk			=> clk,
 											boot 		=> boot,
-											ill_ins 	=> ill_ins_l,
+											ill_ins 	=> ill_ins_b,
 											no_al		=> no_al,
 											div_z		=> div_z,
 											interrupt	=> interrupt,

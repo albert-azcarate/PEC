@@ -139,22 +139,24 @@ BEGIN
 	f <= f_temp;
 	
 	--EXEPCION de la instruccions CALLS
-	call <= '1' when (f_temp = CALLS_OP and op_code_ir = JMP and privilege_lvl_l = '0') else '0';
+	--call <= '1' when (f_temp = CALLS_OP and op_code_ir = JMP and privilege_lvl_l = '0') else '0';
+	call <= '1' when (f_temp = CALLS_OP and op_code_ir = JMP and estat_multi = "01") else '0';
 	
-	--EXEPCION de protección con instruccions CALLS
+	--EXEPCION de protección
 	protect <= 	'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = GETIID_OP) else
 				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = RDS_OP) else
 				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = WRS_OP) else
 				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = RETI_OP) else
 				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = EI_OP) else
 				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = DI_OP) else
-				'1' when (privilege_lvl_l = '1' and op_code_ir = JMP and f_temp = CALLS_OP) else -- INS que nomes es pot executar en mode user
 				'0';
 				-- Tecnicament, HALT, IN, OUT tambe pero ens deixen deixar-ho per fer els jocs de proba mes facils
 				--las operaciones {RDS, WRS, EI, DI, RETI y GETIID} solo se pueden ejecutar en modo SISTEMA
 				
 	--EXEPCION de instruccio ilegal si hem hagut de filtrar i posar un NOP
-	ill_ins <= '1' when op_code_ir /= op_code_ir_pre else '0';
+	ill_ins <= 	'1' when op_code_ir /= op_code_ir_pre else
+				'1' when (privilege_lvl_l = '1' and estat_multi = "01" and op_code_ir = JMP and f_temp = CALLS_OP) else -- INS que nomes es pot executar en mode user	
+				'0';
 	
 	
 	-- ldpc ens indica d'on carregar el nou PC

@@ -192,15 +192,7 @@ BEGIN
 				else						-- RUN
 				
 					if load_pc_out = "000" and ins_dad_conn = '1' then		-- RUN; ins_dad_conn fa de proxy de l'estat del multi
-					
 						regPC <= regPC + 2;
-						
-						--if regPC < x"FFFE" then
-						--	regPC <= regPC + 2;
-						--else 
-						--	regPC <= regPC;		-- REVISAR, aixo hauria de ser un HALT; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
-						--end if;
-						
 					elsif load_pc_out = "001" then							-- Cas JMP's
 					
 						if f_out = JMP_OP then					-- JMP;
@@ -214,23 +206,6 @@ BEGIN
 						else									-- Else no saltem (pc <= pc + 2)
 							regPC <= regPC + 2;
 						end if;
-						
-						--if f_out = JMP_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 					-- JMP; alu_out >= x"C000" i alu_out < x"FFFE" per evitar que saltem a la ROM
-						--	regPC <= alu_out;																			-- alu_out < FFFE perque si no el seguent PC + 2 fa overflow
-						--elsif z = '0' and f_out = JZ_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 		-- JZ i saltem
-						--	regPC <= alu_out;																			-- REVISAR s'ha de mira si la adressa es aligned? ; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
-						--elsif z = '1' and f_out = JNZ_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 	-- JNZ i saltem
-						--	regPC <= alu_out;	
-						--elsif f_out = JAL_OP and alu_out >= x"C000" and alu_out < x"FFFE" then							-- JAL
-						--	regPC <= alu_out;
-						--else												-- Else no saltem (pc <= pc + 2)
-						--	if regPC < x"FFFE" then
-						--		regPC <= regPC + 2;
-						--	else 
-						--		regPC <= regPC;	-- REVISAR, aixo hauria de ser un HALT; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
-						--	end if;
-						--end if;
-						
 					elsif load_pc_out = "010" then								-- Cas BZ's
 					
 						if z = '0' and f_out = BZ_OP then				-- BZ i saltem
@@ -240,34 +215,13 @@ BEGIN
 						else											-- Else no saltem (pc <= pc + 2)
 							regPC <= regPC + 2;						
 						end if;
-						
-						--if z = '0' and f_out = BZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) < x"FFFE" then 					-- BZ i saltem
-						--	regPC <= regPC + 2 + despla;																								-- @ < FFFE perque si no el seguent PC + 2 fa overflow
-						--elsif z = '1' and f_out = BNZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) < x"FFFE" then 				-- BNZ i saltem
-						--	regPC <= regPC + 2 +  despla;
-						--elsif regPC + 2 < x"FFFE" then																									-- Else no saltem (pc <= pc + 2)
-						--	regPC <= regPC + 2;
-						--else
-						--	regPC <= regPC; 	-- aixo ha de ser un HALT REVISAR; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
-						--end if;
-
-
 					elsif load_pc_out = "100" then						-- Cas RET
 						regPC <= alu_out;
 					elsif load_pc_out = "111" then						-- Cas CALLS
 						regPC <= regPC;
-					else
+					else						--- REVISAR (Inception)
 						regPC <= regPC;
 					end if;
-					
-					--elsif load_pc_out = "100" and alu_out >= x"C000" and alu_out < x"FFFE" then	-- Cas RET; alu_out < FFFE perque si no el seguent PC + 2 fa overflow
-					--	regPC <= alu_out;
-					--elsif load_pc_out = "111" and alu_out >= x"C000" and alu_out < x"FFFE" then	-- Cas CALLS; alu_out < FFFE perque si no el seguent PC + 2 fa overflow
-					--	regPC <= alu_out;
-					--else 
-					--	regPC <= regPC;	-- aixo ha de ser un HALT REVISAR; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
-					--end if;
-					
 				end if;
 			end if;
 			
