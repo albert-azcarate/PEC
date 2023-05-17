@@ -16,6 +16,7 @@ ENTITY unidad_control IS
 			div_z			: IN  STD_LOGIC;
 			no_al			: IN  STD_LOGIC;
 			pp_tlb_dx		: IN  STD_LOGIC;
+			sys_priv_lvl	: IN  std_logic;
 			datard_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			alu_out			: IN  STD_LOGIC_VECTOR(15 downto 0);
 			op				: OUT op_code_t;
@@ -97,9 +98,10 @@ ARCHITECTURE Structure OF unidad_control IS
 			div_z		: IN  STD_LOGIC; --exc signal
 			no_al		: IN  STD_LOGIC; --exc signal
 			ill_ins_l	: IN  STD_LOGIC; --exc signal
-			call_l			: IN std_LOGIC; --exc signal
-			protect_l 		: IN std_LOGIC; --exc signal
-			pp_tlb_d_l		: in std_LOGIC; --exc signal
+			call_l		: IN std_LOGIC; --exc signal
+			protect_l 	: IN std_LOGIC; --exc signal
+			pp_tlb_d_l	: in std_LOGIC; --exc signal
+			sys_priv_lvl: IN  std_logic;
 			immed_x2_l	: IN  STD_LOGIC;
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -237,16 +239,16 @@ BEGIN
 			new_ir <= x"5000";
 		else
 			if load_pc_out /= "011" then						-- Cas RUN
-				if load_ins = '1' or load_pc_out = "001" then  	-- DECODE or JMP carreguem a ir el que ens ve de memoria
+			
+				if regPC < x"c000" then	-- excepcio de instruccio pocha REVISAR
+					protect_pc <= '1';
+				end if;
+			
+				-- DECODE or JMP carreguem el Seguent IR el que ens ve de memoria; En cas de CALL, nomes ho fem en el cycle de system o ens entra merda a IR
+				if protect_pc = '0' and (load_ins = '1' or (load_pc_out = "001" and (op_out /= JMP and f_out /= CALLS_OP)) or (op_out = JMP and f_out = CALLS_OP and load_pc_out = "101"))  then  
 					new_ir <= datard_m ;
-					if regPC < x"c000" then	-- excepcio de instruccio pocha REVISAR
-						protect_pc <= '1';
-					end if;
-				else											-- Cas FETCH 
+				elsif protect_pc = '0' then 	-- Cas FETCH, mantenim el IR per al DECODE 
 					new_ir <= ir_reg;
-					if regPC < x"c000" then -- excepcio de instruccio pocha REVISAR
-						protect_pc <= '1';
-					end if;
 				end if;
 			else
 				new_ir <= x"FFFF";								-- Cas HALT, ens quedem a HALT
@@ -296,7 +298,7 @@ BEGIN
 										ill_ins => ill_ins_conn, --exc
 										call => call_conn, --exc
 										protect => protect_conn_b, --exc
-										privilege_lvl_l => privilege_lvl_conn,
+										privilege_lvl_l => sys_priv_lvl,
 										immed_x2 => immed_x2_conn,
 										word_byte => word_byte_connection,
 										halt_cont => halt_conn,
@@ -327,6 +329,7 @@ BEGIN
 								wr_m_l => word_mem,
 								privilege_lvl => privilege_lvl_conn,
 								immed_x2_l => immed_x2_conn,
+								sys_priv_lvl => sys_priv_lvl,
 								addr_io_l => addr_io_conn,
 								rd_in_l => rd_in_conn,
 								wr_out_l => wr_out_conn,
@@ -351,6 +354,6 @@ BEGIN
 								exc_code => exc_code,
 								int_type => int_type_out
 								);
-	privilege_lvlz <= privilege_lvl_conn;
+	privilege_lvlz <= sys_priv_lvl;
 
 END Structure;

@@ -22,6 +22,7 @@ ENTITY registers IS
 			d			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			PCup		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			sys_priv_lvl: OUT std_logic;
 			int_e		: OUT STD_LOGIC;
 			a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			b			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
@@ -58,6 +59,7 @@ component sysregfile IS
 			PCup		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			int_e 		: OUT STD_LOGIC;
+			sys_priv_lvl: OUT std_logic;
 			a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 	END component;
@@ -80,6 +82,7 @@ BEGIN
 												exca => exca,
 												PCup => PCup,
 												priv_lvl => privilege_lvl,
+												sys_priv_lvl => sys_priv_lvl,
 												int_e => int_e,
 												addr_m => addr_m,
 												exc_code => exc_code

@@ -138,8 +138,7 @@ BEGIN
 	-- Assignem f
 	f <= f_temp;
 	
-	--EXEPCION de la instruccions CALLS
-	--call <= '1' when (f_temp = CALLS_OP and op_code_ir = JMP and privilege_lvl_l = '0') else '0';
+	--EXEPCION de la instruccions CALLS en decode. No hi ha conflictes amb ill_ins
 	call <= '1' when (f_temp = CALLS_OP and op_code_ir = JMP and estat_multi = "01") else '0';
 	
 	--EXEPCION de protección
@@ -151,9 +150,9 @@ BEGIN
 				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = DI_OP) else
 				'0';
 				-- Tecnicament, HALT, IN, OUT tambe pero ens deixen deixar-ho per fer els jocs de proba mes facils
-				--las operaciones {RDS, WRS, EI, DI, RETI y GETIID} solo se pueden ejecutar en modo SISTEMA
+				-- las operaciones {RDS, WRS, EI, DI, RETI y GETIID} solo se pueden ejecutar en modo SISTEMA
 				
-	--EXEPCION de instruccio ilegal si hem hagut de filtrar i posar un NOP
+	--EXEPCION de instruccio ilegal si hem hagut de filtrar i posar un NOP o Call en Sysmode
 	ill_ins <= 	'1' when op_code_ir /= op_code_ir_pre else
 				'1' when (privilege_lvl_l = '1' and estat_multi = "01" and op_code_ir = JMP and f_temp = CALLS_OP) else -- INS que nomes es pot executar en mode user	
 				'0';

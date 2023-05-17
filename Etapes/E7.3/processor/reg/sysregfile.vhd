@@ -45,6 +45,7 @@ ENTITY sysregfile IS
 			PCup		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			int_e 		: OUT STD_LOGIC;
+			sys_priv_lvl: OUT std_logic;
 			a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 END sysregfile;
@@ -63,6 +64,7 @@ BEGIN
 			reg_vector(conv_integer(addr_a));
 			
 	int_e <= reg_vector(7)(1);
+	sys_priv_lvl <= reg_vector(7)(0);
 	
 	process (clk, inta, boot, exca) begin
 	
@@ -74,23 +76,30 @@ BEGIN
 			-- escriptura sinc
 			if rising_edge(clk) then
 				
-				reg_vector(7)(0) <= priv_lvl;
 			
 				-- exc i int separats per discriminar millor
 				if exc_code /= no_exc_c and exc_code /= interrupt_c and exca = '1' then -- Si es una excepcio i estan enabled
+					
+					-- Marquem que estem en una excepcio recursiva; Nomes passa en Calls en mode System
+					if reg_vector(7)(0) = '1' then
+						reg_vector(7)(15) <= '1';
+					else 	
+						reg_vector(7)(15) <= '0';		-- Else no hi ha recursivitat
+					end if;
+					
 					reg_vector(0) <= reg_vector(7);
 					reg_vector(1) <= PCup;
-					reg_vector(7)(0) <= priv_lvl;
+					reg_vector(7)(0) <= '1';	-- SystemMode
+					reg_vector(7)(1) <= '0';	-- DI
 					
-					if exc_code = call_c and priv_lvl = '0' then -- Si CALL, guardem el codi de CALL, i al seguent cicle(priv = 1) guardem la resta
+					
+					--En ppi tot aixo es pot unificar REVISAR
+					if exc_code = call_c and reg_vector(7)(0) = '0' then -- Si CALL, guardem el codi de CALL, i al seguent cicle(priv = 1) guardem la resta
 						reg_vector(2) <= x"000E";
-						reg_vector(3) <= d;
-						reg_vector(7)(1) <= '0';		--S7<-0x01
 					elsif exc_code /= call_c then
 						reg_vector(2) <= x"000"&exc_code;
 						reg_vector(3) <= addr_m;
-						reg_vector(7)(1) <= '0';
-					else
+					else		-- Aqui nomes entra CALLS en el 2n cicle de systema --REVISAR, aixo diria que es useless
 						reg_vector(2) <= x"000"&exc_code;
 					end if;
 					
@@ -98,6 +107,7 @@ BEGIN
 					reg_vector(0) <= reg_vector(7);
 					reg_vector(1) <= PCup;
 					reg_vector(2) <= x"000F";
+					reg_vector(7)(0) <= '1';	-- SystemMode
 					reg_vector(7)(1) <= '0';
 				else
 					if int_type = "00" then			-- EI
@@ -105,7 +115,13 @@ BEGIN
 					elsif int_type = "01" then		-- DI
 						reg_vector(7)(1) <= '0';
 					elsif int_type = "10" then		-- RETI
-						reg_vector(7) <= reg_vector(0);
+						if reg_vector(7)(15) = '0'  then	-- Cas general, restaurem la PSW
+							reg_vector(7) <= reg_vector(0);	
+						elsif reg_vector(7)(15) = '1' then	-- Cas Call recursiu, posem la PSW en mode sistema i restaurem sys0 a com estaba
+							reg_vector(7)(1 downto 0) <= "01";
+							reg_vector(0)(1 downto 0) <= "10";
+						end if;
+						reg_vector(7)(15) <= '0';	-- Desmarquem que era recursiu, en cas general no passa res, en cas recursiu, el 1r reti ens retorna a on estavem
 					else							-- USUAL WRITE
 						if wrd = '1' then
 							reg_vector(conv_integer(addr_d)) <= d;

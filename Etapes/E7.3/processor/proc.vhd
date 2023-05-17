@@ -37,6 +37,7 @@ ARCHITECTURE Structure OF proc IS
 			div_z			: IN  STD_LOGIC;
 			no_al			: IN  STD_LOGIC;
 			pp_tlb_dx		: in std_logic; --exc
+			sys_priv_lvl	: IN  std_logic;
 			datard_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			alu_out			: IN  STD_LOGIC_VECTOR(15 downto 0);
 			op				: out op_code_t;
@@ -94,6 +95,7 @@ ARCHITECTURE Structure OF proc IS
 			z				: OUT STD_LOGIC;
 			int_e			: OUT STD_LOGIC;
 			div_z			: OUT STD_LOGIC;
+			sys_priv_lvl	: OUT  std_logic;
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			data_wr			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -118,6 +120,7 @@ signal div_z_conn			: STD_LOGIC;
 signal inta_conn			: STD_LOGIC;
 signal priv_conn			: STD_LOGIC;
 signal exca_conn			: STD_LOGIC;
+signal sys_priv_lvl_conn	: STD_LOGIC;
 signal in_d_conn			: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal int_type_conn		: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal addr_a_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -131,7 +134,7 @@ BEGIN
 	
 	
 	inta <= inta_conn;
-	privilege_lvlx <= priv_conn;
+	privilege_lvlx <= sys_priv_lvl_conn;
 	
 	UC: unidad_control port map(boot => boot,
 								clk => clk,
@@ -151,6 +154,7 @@ BEGIN
 								ins_dad => ins_dad_conn,
 								in_d => in_d_conn,
 								immed_x2 => immed_x2_conn,
+								sys_priv_lvl => sys_priv_lvl_conn,
 								wr_m => wr_m,
 								word_byte => word_byte,
 								immed_or_reg => immed_or_reg_conn,
@@ -189,6 +193,7 @@ BEGIN
 							exca => exca_conn,
 							ins_dad => ins_dad_conn, 
 							in_d => in_d_conn, 
+							sys_priv_lvl => sys_priv_lvl_conn,
 							immed_x2 => immed_x2_conn,
 							privilege_lvl => priv_conn,
 							data_wr => data_wr, 

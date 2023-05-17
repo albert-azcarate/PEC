@@ -53,11 +53,11 @@
         wrs    s5, r1      ;inicializamos en S5 la direccion de la rutina de antencion a la interrupcion
         $MOVEI r7, PILA    ;inicializamos R7 como puntero a la pila
         $MOVEI r6, inici   ;direccion de la rutina principal
-        wrs		s1, r6 
-		ei
-		rds 	r6, s7
-		wrs 	s0, r6
-		reti	; saltem a mode user c016
+        wrs	s1, r6 
+	ei
+	$MOVEI 	r6, 0x02
+	wrs 	s0, r6
+	reti	; saltem a mode user c016
 		;jmp    r6
 
 
@@ -78,6 +78,10 @@ RSG: ; Salvar el estado
 			cmpeq R3, R1, R2 ;si es igual a 15 es una interrupción
 			bnz R3, __interrupcion ;saltamos a las interrupciones si S2 es igual a 15
 	__excepcion:
+			rds r6, s4
+			addi r6,r6,1
+			out 10, r6
+			wrs s4, r6
 			movi R2, lo(exceptions_vector)
 			movhi R2, hi(exceptions_vector)
 			add R1, R1, R1 ;R1 contiene el identificador de excepción
@@ -86,6 +90,10 @@ RSG: ; Salvar el estado
 			jal R6, R2
 			bz R3, __finRSG
 	__call_sistema:
+			rds r6, s4
+			addi r6,r6,1
+			out 10, r6
+			wrs s4, r6
 			rds R1, S3 ;S3 contiene el identificador de la llamada a sistema
 			movi R2,7
 			and R1, R1, R2 ;nos quedamos con los 3 bits de menor peso limitar el número de servicios definidos en el S.O.
@@ -196,16 +204,16 @@ __ilegal_ins:
 		
 		$MOVEI r1, 0xd00d
 		movi 	r2, 0xF
-		out 9, r2
-		out 10, r1
+		;out 9, r2
+		;out 10, r1
 		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
 __div_zero:
 		$MOVEI r1, 0xdead
 		movi 	r2, 0xF
-		out 9, r2
-		out 10, r1
+		;out 9, r2
+		;out 10, r1
 		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
@@ -220,16 +228,16 @@ __no_align:
 end_no_al:							; else no cal fer res
 		$MOVEI r1, 0xdead
 		movi 	r2, 0xF
-		out 9, r2
-		out 10, r1
+		;out 9, r2
+		;out 10, r1
 		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
 __protect:
 		$MOVEI r1, 0xde0d
 		movi 	r2, 0xF
-		out 9, r2
-		out 10, r1
+		;out 9, r2
+		;out 10, r1
 		movhi r3, 0xc0
 		rds		r5, s3				; mirem si < a c000
 		cmpltu r3, r5, r3			
@@ -244,6 +252,7 @@ __calls:
 		movi 	r2, 0xF
 		out 9, r2
 		out 10, r1
+		;addi r7,r7,6
 		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
