@@ -52,6 +52,8 @@ ARCHITECTURE Structure OF unidad_control IS
 	component control_l is
 	PORT (	ir				: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			privilege_lvl_l : in std_LOGIC;
+			boot			: IN  STD_LOGIC;
+			clk				: IN  STD_LOGIC;
 			estat_multi		: IN std_logic_vector(1 downto 0);
 			op				: OUT op_code_t;
 			f				: OUT f_code_t;
@@ -218,7 +220,11 @@ BEGIN
 							regPC <= regPC + 2;						
 						end if;
 					elsif load_pc_out = "100" then						-- Cas RET
-						regPC <= alu_out;
+						if protect_conn_b = '0' then					
+							regPC <= alu_out;				-- Si esten en mode systema	saltem
+						else
+							regPc <= regPC + 2;				-- Si estem en mode user no saltem ja que es protegida
+						end if;
 					elsif load_pc_out = "111" then						-- Cas CALLS
 						regPC <= regPC;
 					else						--- REVISAR (Inception)
@@ -283,7 +289,9 @@ BEGIN
 	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
   	 
 	control_ins : control_l port map (	ir => ir_connection,
+										clk => clk, 
 										op => op_out,
+										boot => boot,
 										f => f_out,
 										ldpc=> load_pc_connection,
 										wrd => enable,

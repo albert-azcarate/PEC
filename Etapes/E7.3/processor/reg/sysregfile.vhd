@@ -53,6 +53,7 @@ END sysregfile;
 ARCHITECTURE Structure OF sysregfile IS
 
 signal reg_vector : slv_array_t := (others => x"0000");
+signal prev_addr : std_logic_vector(15 downto 0) := (others => '0');
 
 
 BEGIN
@@ -75,7 +76,7 @@ BEGIN
 		else 
 			-- escriptura sinc
 			if rising_edge(clk) then
-				
+				prev_addr <= addr_m;
 			
 				-- exc i int separats per discriminar millor
 				if exc_code /= no_exc_c and exc_code /= interrupt_c and exca = '1' then -- Si es una excepcio i estan enabled
@@ -96,9 +97,13 @@ BEGIN
 					--En ppi tot aixo es pot unificar REVISAR
 					if exc_code = call_c and reg_vector(7)(0) = '0' then -- Si CALL, guardem el codi de CALL, i al seguent cicle(priv = 1) guardem la resta
 						reg_vector(2) <= x"000E";
-					elsif exc_code /= call_c then
+						-- aqui la lectura de quin codi d'execpio es es fa en estat Sys amb un wrs fake
+					elsif exc_code = no_al_c and reg_vector(7)(0) = '0' then -- Si CALL, guardem el codi de CALL, i al seguent cicle(priv = 1) guardem la resta
+						reg_vector(3) <= prev_addr;
+						reg_vector(2) <= x"0001";
+					elsif exc_code /= call_c and exc_code /= no_al_c then
 						reg_vector(2) <= x"000"&exc_code;
-						reg_vector(3) <= addr_m;
+						reg_vector(3) <= prev_addr;
 					else		-- Aqui nomes entra CALLS en el 2n cicle de systema --REVISAR, aixo diria que es useless
 						reg_vector(2) <= x"000"&exc_code;
 					end if;
@@ -110,11 +115,11 @@ BEGIN
 					reg_vector(7)(0) <= '1';	-- SystemMode
 					reg_vector(7)(1) <= '0';
 				else
-					if int_type = "00" then			-- EI
+					if int_type = "00" and wrd = '1' then			-- EI
 						reg_vector(7)(1) <= '1';
-					elsif int_type = "01" then		-- DI
+					elsif int_type = "01" and wrd = '1' then		-- DI
 						reg_vector(7)(1) <= '0';
-					elsif int_type = "10" then		-- RETI
+					elsif int_type = "10" and wrd = '1' then		-- RETI
 						if reg_vector(7)(15) = '0'  then	-- Cas general, restaurem la PSW
 							reg_vector(7) <= reg_vector(0);	
 						elsif reg_vector(7)(15) = '1' then	-- Cas Call recursiu, posem la PSW en mode sistema i restaurem sys0 a com estaba

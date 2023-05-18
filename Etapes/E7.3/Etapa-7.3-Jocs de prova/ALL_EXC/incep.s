@@ -16,20 +16,20 @@
 			.word __interrup_keyboard ; 3 Teclado PS/2
 			
 		exceptions_vector:
-			.word __ilegal_ins 			; 0 Instrucción ilegal
-			.word __no_align 			; 1 Acceso a memoria no alineado
-			.word RSE_default_halt 		; 2 Overflow en coma flotante
-			.word RSE_default_halt 		; 3 División por cero flotante
-			.word __div_zero	 		; 4 División por cero
+			.word RSE_default_resume	; 0 Instrucción ilegal
+			.word __no_align	; 1 Acceso a memoria no alineado
+			.word RSE_default_resume	; 2 Overflow en coma flotante
+			.word RSE_default_resume	; 3 División por cero flotante
+			.word RSE_default_resume	; 4 División por cero
 			.word RSE_default_resume 	; 5 No excepcion
 			.word RSE_default_halt	 	; 6 Miss TLB pag ins
 			.word RSE_default_halt 		; 7 Miss TLB pag dat
 			.word RSE_default_halt 		; 8 Pagina invalida TLB ins
 			.word RSE_default_halt 		; 9 Pagina invalida TLB dat
 			.word RSE_default_halt 		; A Pagina protegida TLB ins
-			.word __pp_tlb_dat 			; B Pagina protegida TLB dat
-			.word RSE_default_halt 		; C Pagina de solo lectura
-			.word __protect 			; D Proteccion IO o user
+			.word RSE_default_resume	; B Pagina protegida TLB dat
+			.word RSE_default_resume	; C Pagina de solo lectura
+			.word RSE_default_resume	; D Proteccion IO o user
 			.word __calls	 			; E Call
 			.word RSE_default_resume 	; F Interrupcion
 			
@@ -54,10 +54,12 @@
         $MOVEI r7, PILA    ;inicializamos R7 como puntero a la pila
         $MOVEI r6, inici   ;direccion de la rutina principal
         wrs	s1, r6 
-		ei
-		$MOVEI 	r6, 0x02
-		wrs 	s0, r6
-		reti	; saltem a mode user c016
+	ei
+	$MOVEI 	r6, 0x02
+	wrs 	s0, r6
+	reti	; saltem a mode user c016
+		;jmp    r6
+
 
 ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ; Rutina de servicio de interrupción
@@ -130,7 +132,7 @@ RSE_excepcion_TLB: JMP R6; fragmento de código
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 __interrup_timer:
        
-        $MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+        ;$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 
 
@@ -139,7 +141,7 @@ __interrup_timer:
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 __interrup_key:
         
-        $MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+        ;$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 
 
@@ -148,7 +150,7 @@ __interrup_key:
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 __interrup_switch:
        
-        $MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+        ;$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 
 
@@ -157,7 +159,7 @@ __interrup_switch:
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 __interrup_keyboard:
        
-        $MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+        ;$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 
 
@@ -166,98 +168,106 @@ __interrup_keyboard:
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 inici: 
         movi   r1, 0xF
-        out     9, r1              ;activa todos los visores hexadecimales
-		$MOVEI r0, 0
-		$MOVEI r1 , 0xffff
-bucle_inf:	
-		addi	r0, r0, 1
-		cmpeq 	r2,r0,r1
-		bz		r2, bucle_inf
-		$MOVEI	r2 jmp_bucle
-		addi	r2, r2, 1
-		jmp		r2				; no_al 7seg = dead
-		halt
-		addi 	r0, r0,0
-jmp_bucle:
-		$MOVEI r0, 0
-		$MOVEI r1 , 0xffff
-bucle_inf_2:	
-		addi	r0, r0, 1
-		cmpeq 	r2,r0,r1
-		bz		r2, bucle_inf_2
-		$MOVEI  r2, 1
-		calls 	r2				; calls inception 7seg = d00d
-		$MOVEI r0, 0
-		$MOVEI r1 , 0xffff
-bucle_inf_3:	
-		addi	r0, r0, 1
-		cmpeq 	r2,r0,r1
-		bz		r2, bucle_inf_3
-		$MOVEI 	r2, 0x0000
-		jmp 	r2				; deod
-end_test:	
+        out     9, r1				;activa todos los visores hexadecimales
+		halt						; cmp no implementat 0x1010 rev
+		halt						; mul no implementat 0x8018 rev
+		halt						; jmp no implementat 0xA002 OK
+		$MOVEI r0, end_all
+		halt						; jmp no implementat 0xA00f
+		halt						; stf no implementat 0xB000
+		halt						; special no implementat 0xf004 (fake reti)
+		halt						; special no implementat 0xfe10 (fake wrd)
+		$MOVEI r0, 0					
+		div r0,r0,r0				; div 0
+		
+		$MOVEI r0, end_jmp
+		addi r0,r0,1
+		jmp r0						; no al, fetch
+		
+		addi r0,r0,1
+end_jmp:
+		$MOVEI r0, 0x1
+		st	0(r0), r0				; no al, en st, ld
+		
+		$MOVEI r0, 0x8000
+		st	0(r0), r0				; st > 0x8000 en mode user
+		
+		addi r0,r0, 1
+		ld  r0, 0(r0)				; ld > 0x8000 en mode user
+		
+		wrs	s0, r0
+		rds r0, s0
+		reti
+		getiid r0
+		ei
+		di							; instruccio protegida
+		$MOVEI r2, 1
+		calls r2					; calls ; calls recursive 
+									; en ppi posara 0x14
 		halt
 
 __ilegal_ins:
 		
-		$MOVEI r1, 0xd00d
-		movi 	r2, 0xF
 		;out 9, r2
 		;out 10, r1
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+		;$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
 __div_zero:
-		$MOVEI r1, 0xdead
-		movi 	r2, 0xF
+		;$MOVEI r1, 0xdead
+		;movi 	r2, 0xF
 		;out 9, r2
 		;out 10, r1
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+		;$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
 __no_align:
-		movhi r3, 0xc0
-		rds		r5, s3				; mirem si > a c000
-		$CMPGEU r3, r5, r3			
-		bz	r3, end_no_al			; si es major restem 1 al pc i ho posem a la pila
+		rds		r5, s3				; mirem si s3 i s1 son iguals, si no ho son, es una fallada en fetch
+		rds		r4, s1
+		cmpeq r4, r5, r4			
+		bz	r4, end_no_al			; si son iguals restem 1 al pc i ho posem a la pila
 		addi r5, r5, -1
 		st		2(r7), r5
 		
 end_no_al:							; else no cal fer res
-		$MOVEI r1, 0xdead
-		movi 	r2, 0xF
+		;$MOVEI r1, 0xdead
+		;movi 	r2, 0xF
 		;out 9, r2
 		;out 10, r1
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+		;$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
 __protect:
-		$MOVEI r1, 0xde0d
-		movi 	r2, 0xF
-		;out 9, r2
-		;out 10, r1
-		movhi r3, 0xc0
-		rds		r5, s3				; mirem si < a c000
-		cmpltu r3, r5, r3			
-		bz	r3, end_no_p			
-		halt
+		;$MOVEI r1, 0xde0d
+		;movi 	r2, 0xF
+		;;out 9, r2
+		;;out 10, r1
+		;movhi r3, 0xc0
+		;rds		r5, s3				; mirem si < a c000
+		;cmpltu r3, r5, r3			
+		;bz	r3, end_no_p			
+		;halt
 end_no_p:
-		halt
+		;halt
+		jmp r6
 
 __calls:
 		calls 	r1
-		$MOVEI r1, 0xd00d
-		movi 	r2, 0xF
-		out 9, r2
-		out 10, r1
-		;addi r7,r7,6
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+		;$MOVEI r1, 0xd00d
+		;movi 	r2, 0xF
+		;out 9, r2
+		;out 10, r1
+		;;addi r7,r7,6
+		;$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
 __pp_tlb_dat:
-		$MOVEI r1, 0xdddd
-		movi 	r2, 0xF
-		out 9, r2
-		out 10, r1
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+		;$MOVEI r1, 0xdddd
+		;movi 	r2, 0xF
+		;out 9, r2
+		;out 10, r1
+		;$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
+end_all:	
+		halt
+		

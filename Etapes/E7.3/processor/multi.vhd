@@ -84,8 +84,11 @@ begin
 				inta <= '0';
 				exca <= '0';
 				
+				if halt_cont = '1' then	-- Si HALT -> HALT
+						estat <= "11";
+				
 				-- excepcio de instruccio pocha REVISAR
-				if (exc_code_b = no_al_c or exc_code_b = protec_c) and estat = "00" then			-- A la Rutina de no_al si es una instruccio fem pc-1 i reexecutem
+				elsif (exc_code_b = no_al_c or exc_code_b = protec_c) and estat = "00" then			-- A la Rutina de no_al si es una instruccio fem pc-1 i reexecutem
 					estat <= "10";
 					exca <= '1';
 				elsif exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01" then	-- Si salta una excepcio en Decode
@@ -106,17 +109,19 @@ begin
 					end if;
 				end if;
 			else 						-- Si estem a BOOT
-				if halt_cont = '1' then	-- REVISAR aixo
-					estat <= "01";		
-				else					
-					estat <= "00";
-				end if;
+				--halt_cont <= '0';
+				estat <= "00";
+				--if halt_cont = '1' then	-- REVISAR aixo
+				--	estat <= "01";		
+				--else					
+				--	estat <= "00";
+				--end if;
 			end if;
 		end if;
 	end process;
 	
 	-- HALT quan ens diuen de parar, ldpc_l quan estem a DECODE, else RUN
-	ldpc <= "011" when estat = "00" and halt_cont = '1' else 
+	ldpc <= "011" when estat = "00" and halt_cont = '1' else -- pot ser estat 01?
 			ldpc_l when estat = "01" else 
 			"101" when estat = "10" else -- SYSTEM
 			"011" when estat = "11" else
