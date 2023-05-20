@@ -178,11 +178,11 @@ BEGIN
 				
 	-- TLB_Com es pasarà a la TLB per executar aquelles instruccions pertinents al TLB
 	-- Es in vector de 3 bits:
-	TLB_Com	<= 	"000" when op_code_ir = HALT and ir_interna(5 downto 0) = "110100" else	--	wrpi
-				"001" when op_code_ir = HALT and ir_interna(5 downto 0) = "110101" else	--	wrvi
-				"010" when op_code_ir = HALT and ir_interna(5 downto 0) = "110110" else	--	wrpd
-				"011" when op_code_ir = HALT and ir_interna(5 downto 0) = "110111" else	--	wrvd
-				"100" when op_code_ir = HALT and ir_interna(5 downto 0) = "111000" else	--	flush
+	TLB_Com	<= 	"000" when op_code_ir = HALT and privilege_lvl_l = '1' and ir_interna(5 downto 0) = "110100" else	--	wrpi
+				"001" when op_code_ir = HALT and privilege_lvl_l = '1' and ir_interna(5 downto 0) = "110101" else	--	wrvi
+				"010" when op_code_ir = HALT and privilege_lvl_l = '1' and ir_interna(5 downto 0) = "110110" else	--	wrpd
+				"011" when op_code_ir = HALT and privilege_lvl_l = '1' and ir_interna(5 downto 0) = "110111" else	--	wrvd
+				"100" when op_code_ir = HALT and privilege_lvl_l = '1' and ir_interna(5 downto 0) = "111000" else	--	flush
 				"111";												--	NOP TLB
 
 
