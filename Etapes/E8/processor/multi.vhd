@@ -24,10 +24,11 @@ entity multi is
 			pp_tlb_d_l	: in  std_LOGIC; --exc signal
 			immed_x2_l	: IN  STD_LOGIC;
 			sys_priv_lvl: IN  std_logic;
-			exc_tlb		: IN  std_logic_vector(3 downto 0);	
-			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			TLB_Com_l	: IN  std_LOGIC_VECTOR(2 downto 0);
+			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			exc_tlb		: IN  std_logic_vector(3 downto 0);	
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
 			wrd			: OUT STD_LOGIC;
 			wrd_s		: OUT STD_LOGIC;
@@ -41,12 +42,13 @@ entity multi is
 			wr_out		: OUT STD_LOGIC;
 			inta		: OUT STd_LOGIC;
 			exca		: OUT STd_LOGIC;
-			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-			addr_a		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			estat_out	: OUT std_logic_vector(1 downto 0);
 			exc_code	: OUT exc_code_t;
 			privilege_lvl : out std_logic;
+			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			estat_out	: OUT std_logic_vector(1 downto 0);
+			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			TLB_Com		: OUT std_LOGIC_VECTOR(2 downto 0);
+			addr_a		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
 end entity;
@@ -211,6 +213,8 @@ begin
 				'1' when estat = "11" else
 				'1';
 	
+	TLB_Com <= 	TLB_Com_l when estat = "01" else -- En decode posem el codi de TLB, si no, NOP_TLB(111)
+				"111";
 	
 	
 	

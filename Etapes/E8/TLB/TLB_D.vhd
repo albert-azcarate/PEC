@@ -46,11 +46,11 @@ BEGIN
 	
 	exc_tlb_D(0) <= '1' when adress_reg = -1 and (ld_m = '1' or wre = '1') else '0';									-- MISS_TLB_D
 	exc_tlb_D(1) <= '1' when Valid_bits(adress_reg) = '0' and (ld_m = '1' or wre = '1') else '0';						--Pagina Invalida 
-	exc_tlb_D(2) <= '1' when adress_reg > 2 and priv_lvl = '0' and (ld_m = '1' or wre = '1') else '0';					--Pagina Invalida 
+	exc_tlb_D(2) <= '1' when adress_reg > 2 and priv_lvl = '0' and (ld_m = '1' or wre = '1') else '0';					--Pagina protegida
 	exc_tlb_D(3) <= '1' when adress_reg /= -1 and Read_bits(adress_reg) = '1' and wre = '1' else '0';					--Pagina solo lectura
 
 	--read asincron TLB, treball standard de la TLB
-	std_output <= PTags(adress_reg)&std_input(11 downto 0) when adress_reg /= -1 and Valid_bits(adress_reg) = '1' else x"0FFF";
+	std_output <= PTags(adress_reg)&std_input(11 downto 0) when adress_reg /= -1 and Valid_bits(adress_reg) = '1' else x"0FFE";
 	
 	
 	process (boot, CLOCK) begin

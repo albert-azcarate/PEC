@@ -203,7 +203,7 @@ BEGIN
 				"000" ; 			 													-- 000 RUN;
 
 	-- wrd habilita l'escriptura al banc de registres
-	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL), BRANCHES, OUT, NOP, EI, DI, RETI, WRS, CALLS
+	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL), BRANCHES, OUT, NOP, EI, DI, RETI, WRS, CALLS, WRPD/I, WRVD/I
 	wrd <= '0' when (op_code_ir = HALT and ir_interna(11 downto 0) = x"fff")
 					or op_code_ir = ST 
 					or op_code_ir = STB 
@@ -215,6 +215,7 @@ BEGIN
 					or (op_code_ir = HALT and f_temp = DI_OP)
 					or (op_code_ir = HALT and f_temp = RETI_OP)
 					or (op_code_ir = HALT and f_temp = WRS_OP)
+					or (op_code_ir = HALT and f_temp = TLB_OP)
 					else
 		   '1';
 
@@ -276,28 +277,6 @@ BEGIN
 			"11" when (op_code_ir = IO and f_temp = IN_OP) or (op_code_ir = HALT and f_temp = GETIID_OP) else
 			"00";
 
-	-- halt_cont indica si estem en HALT; REVISAR US
-	--halt_cont <= '1' when op_code_ir = HALT and ir_interna(11 downto 0) = x"fff"  and estat_multi = "01" else 
-	--			 '0';
-	process (clk) begin
-	-- halt_cont indica si estem en HALT; REVISAR US
-		if boot = '1' then
-			halt_cont <= '0';
-			halt_cont_b <= '0';
-		else
-			if rising_edge(clk) then
-				if halt_cont_b = '0' then
-					if op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" and estat_multi = "01" then
-						halt_cont_b <= '1';
-						halt_cont <= '1';
-					else
-						halt_cont_b <= '0';
-						halt_cont <= '0';
-					end if;
-				end if;
-			end if;
-		end if;
-	end process;
 	
 	-- immed_x2 indica si hem de multiplicar l'immediat x2 per accedir a memoria
 	immed_x2 <= '1' when op_code_ir = LD or op_code_ir = ST else 
@@ -331,6 +310,28 @@ BEGIN
 				"10" when (op_code_ir = HALT and f_temp = RETI_OP and op_code_ir_pre /= ADDI) else
 				"11";	-- No es interrupcio, posem 11 de forma arbitraria
 
+
+	process (clk) begin
+	-- halt_cont indica si estem en HALT; REVISAR US
+		if boot = '1' then
+			halt_cont <= '0';
+			halt_cont_b <= '0';
+		else
+			if rising_edge(clk) then
+				if halt_cont_b = '0' then
+					if op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" and estat_multi = "01" then
+						halt_cont_b <= '1';
+						halt_cont <= '1';
+					else
+						halt_cont_b <= '0';
+						halt_cont <= '0';
+					end if;
+				end if;
+			end if;
+		end if;
+	end process;
+	
+	
 
 -- MODELSIM SIGNALS	
 --	Instruccio <=   "ALU " when op_code_ir = AL else 

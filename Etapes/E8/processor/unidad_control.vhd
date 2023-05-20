@@ -112,10 +112,11 @@ ARCHITECTURE Structure OF unidad_control IS
 			pp_tlb_d_l	: in  std_LOGIC; --exc signal
 			sys_priv_lvl: IN  std_logic;
 			immed_x2_l	: IN  STD_LOGIC;
-			exc_tlb		: IN  std_logic_vector(3 downto 0);	
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			TLB_Com_l	: IN  std_LOGIC_VECTOR(2 downto 0);	
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			exc_tlb		: IN  std_logic_vector(3 downto 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
 			privilege_lvl : out std_LOGIC;
 			wrd			: OUT STD_LOGIC;
@@ -133,6 +134,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			exc_code	: OUT exc_code_t;
 			estat_out 	: OUT std_logic_vector(1 downto 0);
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			TLB_Com		: OUT std_LOGIC_VECTOR(2 downto 0);
 			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_a		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
@@ -174,6 +176,7 @@ signal in_d_conn			: std_logic_vector(1 downto 0);
 signal int_type_conn		: std_logic_vector(1 downto 0);
 signal int_type_out			: std_logic_vector(1 downto 0);
 signal estat_conn			: std_logic_vector(1 downto 0);
+signal TLB_Com_conn			: std_logic_vector(2 downto 0);
 
 signal protect_conn: std_LOGIC := '0';
 signal protect_conn_b: std_LOGIC := '0';
@@ -318,7 +321,7 @@ BEGIN
 										ill_ins => ill_ins_conn, --exc
 										call => call_conn, --exc
 										protect => protect_conn_b, --exc
-										TLB_Com => TLB_Com,
+										TLB_Com => TLB_Com_conn,
 										privilege_lvl_l => sys_priv_lvl,
 										immed_x2 => immed_x2_conn,
 										word_byte => word_byte_connection,
@@ -346,6 +349,7 @@ BEGIN
 								no_al => no_al,			--exc
 								call_l => call_conn,    --exc
 								protect_l => protect_conn, --exc
+								TLB_Com_l => TLB_Com_conn,
 								exc_tlb => exc_tlb,
 								pp_tlb_d_l => pp_tlb_dx,
 								wr_m_l => word_mem,
@@ -359,6 +363,7 @@ BEGIN
 								addr_a_l => addr_a_conn,
 								int_type_l => int_type_conn,
 								w_b => word_byte_connection,
+								TLB_Com => TLB_Com,
 								ldpc => load_pc_out,
 								wrd => wrd,
 								wrd_s => wrd_s,

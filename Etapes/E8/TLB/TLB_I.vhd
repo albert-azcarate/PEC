@@ -49,7 +49,7 @@ BEGIN
 	exc_tlb_I(2) <= '1' when adress_reg > 2 and (priv_lvl = '0' and estat = "01") else '0';		-- Pagina Protegida 
 	
 	--read asincron TLB, treball standard de la TLB
-	std_output <= PTags(adress_reg)&std_input(11 downto 0) when adress_reg /= -1 and Valid_bits(adress_reg) = '1' else x"0FFF";
+	std_output <= PTags(adress_reg)&std_input(11 downto 0) when adress_reg /= -1 and Valid_bits(adress_reg) = '1' else x"0FFE";
 	
 	
 	process (boot, CLOCK) begin
