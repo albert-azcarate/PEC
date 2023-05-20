@@ -109,13 +109,7 @@ begin
 					end if;
 				end if;
 			else 						-- Si estem a BOOT
-				--halt_cont <= '0';
 				estat <= "00";
-				--if halt_cont = '1' then	-- REVISAR aixo
-				--	estat <= "01";		
-				--else					
-				--	estat <= "00";
-				--end if;
 			end if;
 		end if;
 	end process;

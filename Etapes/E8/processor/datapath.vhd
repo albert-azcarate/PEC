@@ -34,11 +34,12 @@ ENTITY datapath IS
 			z				: OUT STD_LOGIC;
 			int_e			: OUT STD_LOGIC;
 			div_z			: OUT STD_LOGIC;
-			sys_priv_lvl	: OUT  std_logic;
+			sys_priv_lvl	: OUT std_logic;
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			data_wr			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			alu_out_path	: out std_LOGIC_VECTOR(15 downto 0)
+			alu_out_path	: out std_LOGIC_VECTOR(15 downto 0);
+			a				: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 END datapath;
 
@@ -156,6 +157,9 @@ BEGIN
 	alu_out_path <= regbank_to_alu_a when exca = '1' or inta = '1' else alu_out; 
 
 	wr_io <= regbank_to_alu_b;
+	a <= regbank_to_alu_a;
+	
+	
 	
 	
 END Structure;

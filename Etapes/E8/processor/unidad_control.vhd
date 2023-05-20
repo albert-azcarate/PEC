@@ -17,32 +17,36 @@ ENTITY unidad_control IS
 			no_al			: IN  STD_LOGIC;
 			pp_tlb_dx		: IN  STD_LOGIC;
 			sys_priv_lvl	: IN  std_logic;
+			exc_tlb			: IN  std_logic_vector(3 downto 0);	
 			datard_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			alu_out			: IN  STD_LOGIC_VECTOR(15 downto 0);
 			op				: OUT op_code_t;
 			f				: OUT f_code_t;
+			exc_code		: OUT exc_code_t;
 			wrd				: OUT std_logic;
 			wrd_s			: OUT std_logic;
 			u_s				: OUT std_logic;
 			ins_dad			: OUT std_logic;
 			immed_x2		: OUT std_logic;
 			wr_m			: OUT std_logic;
+			ld_m			: OUT STD_LOGIC;
 			word_byte		: OUT std_logic;
 			immed_or_reg	: OUT std_logic;
 			rd_in			: OUT std_logic;
 			wr_out			: OUT std_logic;
 			inta			: OUT STD_LOGIC;
 			exca			: OUT STd_LOGIC;
+			privilege_lvlz	: out std_LOGIC;
+			estat_multi		: OUT std_logic_vector(1 downto 0);
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			TLB_Com			: out std_LOGIC_VECTOR(2 downto 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			exc_code		: OUT exc_code_t;
+			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			immed			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			pc				: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			privilege_lvlz	: out std_LOGIC;
-			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+			pc				: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 END unidad_control;
 
@@ -51,16 +55,17 @@ ARCHITECTURE Structure OF unidad_control IS
 	
 	component control_l is
 	PORT (	ir				: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			privilege_lvl_l : in std_LOGIC;
+			privilege_lvl_l : in  std_LOGIC;
 			boot			: IN  STD_LOGIC;
 			clk				: IN  STD_LOGIC;
-			estat_multi		: IN std_logic_vector(1 downto 0);
+			estat_multi		: IN  std_logic_vector(1 downto 0);
 			op				: OUT op_code_t;
 			f				: OUT f_code_t;
 			wrd				: OUT STD_LOGIC;
 			wrd_s			: OUT STD_LOGIC;
 			u_s				: OUT STD_LOGIC;
 			wr_m			: OUT STD_LOGIC;
+			ld_m			: OUT STD_LOGIC;
 			immed_x2		: OUT STD_LOGIC;
 			word_byte		: OUT STD_LOGIC;
 			immed_or_reg	: OUT STD_LOGIC;
@@ -75,6 +80,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			TLB_Com			: out std_LOGIC_VECTOR(2 downto 0);
 			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			immed			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -92,6 +98,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			wrd_s_l		: IN  STD_LOGIC;
 			u_s_l		: IN  STD_LOGIC;
 			wr_m_l		: IN  STD_LOGIC;
+			ld_m_l		: IN STD_LOGIC;
 			w_b			: IN  STD_LOGIC;
 			halt_cont	: IN  STD_LOGIC;
 			rd_in_l		: IN  STD_LOGIC;
@@ -100,21 +107,22 @@ ARCHITECTURE Structure OF unidad_control IS
 			div_z		: IN  STD_LOGIC; --exc signal
 			no_al		: IN  STD_LOGIC; --exc signal
 			ill_ins_l	: IN  STD_LOGIC; --exc signal
-			call_l		: IN std_LOGIC; --exc signal
-			protect_l 	: IN std_LOGIC; --exc signal
-			pp_tlb_d_l	: in std_LOGIC; --exc signal
+			call_l		: IN  std_LOGIC; --exc signal
+			protect_l 	: IN  std_LOGIC; --exc signal
+			pp_tlb_d_l	: in  std_LOGIC; --exc signal
 			sys_priv_lvl: IN  std_logic;
 			immed_x2_l	: IN  STD_LOGIC;
-			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			exc_tlb		: IN  std_logic_vector(3 downto 0);	
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
-			estat_out 	: OUT std_logic_vector(1 downto 0);
 			privilege_lvl : out std_LOGIC;
 			wrd			: OUT STD_LOGIC;
 			wrd_s		: OUT STD_LOGIC;
 			u_s			: OUT STD_LOGIC;
 			wr_m		: OUT STD_LOGIC;
+			ld_m		: OUT STD_LOGIC;
 			ldir		: OUT STD_LOGIC;
 			ins_dad		: OUT STD_LOGIC;
 			word_byte	: OUT STD_LOGIC;
@@ -122,10 +130,11 @@ ARCHITECTURE Structure OF unidad_control IS
 			wr_out		: OUT STD_LOGIC;
 			inta		: OUT STD_LOGIC;
 			exca		: OUT STd_LOGIC;
+			exc_code	: OUT exc_code_t;
+			estat_out 	: OUT std_logic_vector(1 downto 0);
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_a		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			exc_code	: OUT exc_code_t;
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
 	end component;
@@ -136,6 +145,7 @@ signal enable				: std_logic;
 signal enable_sys			: std_logic;
 signal user_sys				: std_logic;
 signal word_mem				: std_logic;
+signal read_mem				: std_logic;
 signal word_byte_connection	: std_logic;
 signal load_ins				: std_logic;
 signal z_reg				: std_logic;
@@ -281,6 +291,7 @@ BEGIN
 	int_type <= int_type_out;
 	inta <= int_a_conn;
 	immed_x2 <= immed_x2_conn;
+	estat_multi <= estat_conn;
 	
 	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL, CALL
 	pc <= old_2_Pc when (load_pc_out = "001" and f_out = JAL_OP) or (op_out = JMP and f_out = CALLS_OP) else
@@ -301,11 +312,13 @@ BEGIN
 										addr_d => addr_d,
 										immed => immed,
 										wr_m => word_mem,
+										ld_m => read_mem,
 										in_d => in_d,
 										estat_multi => estat_conn,
 										ill_ins => ill_ins_conn, --exc
 										call => call_conn, --exc
 										protect => protect_conn_b, --exc
+										TLB_Com => TLB_Com,
 										privilege_lvl_l => sys_priv_lvl,
 										immed_x2 => immed_x2_conn,
 										word_byte => word_byte_connection,
@@ -333,8 +346,10 @@ BEGIN
 								no_al => no_al,			--exc
 								call_l => call_conn,    --exc
 								protect_l => protect_conn, --exc
+								exc_tlb => exc_tlb,
 								pp_tlb_d_l => pp_tlb_dx,
 								wr_m_l => word_mem,
+								ld_m_l => read_mem,
 								privilege_lvl => privilege_lvl_conn,
 								immed_x2_l => immed_x2_conn,
 								sys_priv_lvl => sys_priv_lvl,
@@ -351,6 +366,7 @@ BEGIN
 								exca => exca,
 								u_s => u_s, 
 								wr_m => wr_m,
+								ld_m => ld_m,
 								ldir => load_ins,
 								ins_dad => ins_dad_conn,
 								word_byte => word_byte,

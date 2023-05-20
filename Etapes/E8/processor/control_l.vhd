@@ -6,16 +6,18 @@ use work.f_code.all;
 
 ENTITY control_l IS
 	PORT (	ir				: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			privilege_lvl_l : in std_LOGIC;
+			privilege_lvl_l : in  std_LOGIC;
 			boot			: IN  STD_LOGIC;
 			clk				: IN  STD_LOGIC;
-			estat_multi		: IN std_logic_vector(1 downto 0);
+			estat_multi		: IN  std_logic_vector(1 downto 0);
+			exc_tlb			: IN  std_logic_vector(3 downto 0);	
 			op				: OUT op_code_t;
 			f				: OUT f_code_t;
 			wrd				: OUT STD_LOGIC;
 			wrd_s			: OUT STD_LOGIC;
 			u_s				: OUT STD_LOGIC;
 			wr_m			: OUT STD_LOGIC;
+			ld_m			: OUT STD_LOGIC;
 			immed_x2		: OUT STD_LOGIC;
 			word_byte		: OUT STD_LOGIC;
 			immed_or_reg	: OUT STD_LOGIC;
@@ -74,11 +76,11 @@ BEGIN
 								and ir_interna(5 downto 0) /= "101100"							-- SPECIAL(RDS)
 								and ir_interna(5 downto 0) /= "110000"							-- SPECIAL(WRS)
 								and ir_interna(5 downto 0) /= "101000"							-- SPECIAL (GETIID)
-								and ir_interna(5 downto 0) /= "110100"						--wrpi (TLB)
-								and ir_interna(5 downto 0) /= "110101"						--wrvi (TLB)
-								and ir_interna(5 downto 0) /= "110110"						--wrpd (TLB)
-								and ir_interna(5 downto 0) /= "110111"						--wrvD (TLB)
-								and (ir_interna(5 downto 0) /= "111000" and ir_interna(11 downto 9) /= "000")--flush (TLB)
+								and ir_interna(5 downto 0) /= "110100"							-- wrpi (TLB)
+								and ir_interna(5 downto 0) /= "110101"							-- wrvi (TLB)
+								and ir_interna(5 downto 0) /= "110110"							-- wrpd (TLB)
+								and ir_interna(5 downto 0) /= "110111"							-- wrvD (TLB)
+								and (ir_interna(5 downto 0) /= "111000" and ir_interna(11 downto 9) /= "000")	-- flush (TLB)
 								)
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "010")       -- NOP en operaciones COMP pero F_CODE no implementado
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "110")        
@@ -134,7 +136,7 @@ BEGIN
 					JNZ_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "001") else
 					JMP_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "011") else
 					JAL_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "100") else
-					CALLS_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "111") else			--Cas CALLS --REVISAR Produce una excepciÃƒÂ³n de tipo Ã¢â‚¬Å“instrucciÃƒÂ³n ilegalÃ¢â‚¬Â si se ejecuta en modo sistema. Esta instrucciÃƒÂ³n solo debepoderse ejecutar en modo usuario.
+					CALLS_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "111") else			-- Cas CALLS Produce una excepcion de tipo ‚ instruccion ilegalgal‚si se ejecuta en modo sistema. Esta instruccion solo debepoderse ejecutar en modo usuario.
 
 					RDS_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "101100") else			-- Cas R/W Sysreg: F depen dels bits 5-0
 					WRS_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110000") else
@@ -144,11 +146,13 @@ BEGIN
 					DI_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"021") else
 					RETI_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"024") else
 					HALT_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"FFF") else
-					TLB_OP when (op_code_ir = HALT and ((ir_interna(5 downto 0) = "110100")or
-					(ir_interna(5 downto 0) = "110101")or
-					(ir_interna(5 downto 0) = "110110")or
-					(ir_interna(5 downto 0) = "110111")or 
-					(ir_interna(5 downto 0) = "111000"))) else
+					
+					TLB_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110100") else			-- Cas WRPI/WRPD/WRVI/WRVD: depen dels bits 5-0
+					TLB_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110101") else
+					TLB_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110110") else
+					TLB_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110111") else
+					TLB_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "111000") else
+					
 					NOP_OP when op_code_ir = NOP else
 
 				NOP_OP;																					-- Else 0
@@ -166,22 +170,22 @@ BEGIN
 				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = RETI_OP) else
 				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = EI_OP) else
 				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = DI_OP) else
-				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = TLB_OP) else--(TLB)
+				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = TLB_OP) else
 				'0';
 				-- Tecnicament, HALT, IN, OUT tambe pero ens deixen deixar-ho per fer els jocs de proba mes facils
 				-- las operaciones {RDS, WRS, EI, DI, RETI y GETIID} solo se pueden ejecutar en modo SISTEMA
-				--además de las operacions de control de la TLB
+				-- además de las operacions de control de la TLB
 				
-	--TLB_Com es pasarà a la TLB per executar aquelles instruccions pertinents al TLB
-	--Es in vector de 3 bits:
-	TLB_Com	<= "000" when ir_interna(5 downto 0) = "110100" else--wrpi (TLB)
-					"001" when ir_interna(5 downto 0) = "110101" else--wrvi (TLB)
-					"010" when ir_interna(5 downto 0) = "110110" else--wrpd (TLB)
-					"011" when ir_interna(5 downto 0) = "110111" else--wrvD (TLB)
-					"100" when ir_interna(5 downto 0) = "111000" else--flush (TLB)
-					"111";														 --NOP
+	-- TLB_Com es pasarà a la TLB per executar aquelles instruccions pertinents al TLB
+	-- Es in vector de 3 bits:
+	TLB_Com	<= 	"000" when op_code_ir = HALT and ir_interna(5 downto 0) = "110100" else	--	wrpi
+				"001" when op_code_ir = HALT and ir_interna(5 downto 0) = "110101" else	--	wrvi
+				"010" when op_code_ir = HALT and ir_interna(5 downto 0) = "110110" else	--	wrpd
+				"011" when op_code_ir = HALT and ir_interna(5 downto 0) = "110111" else	--	wrvd
+				"100" when op_code_ir = HALT and ir_interna(5 downto 0) = "111000" else	--	flush
+				"111";												--	NOP TLB
 
-	
+
 	--EXEPCION de instruccio ilegal si hem hagut de filtrar i posar un NOP o Call en Sysmode
 	ill_ins <= 	'1' when op_code_ir /= op_code_ir_pre else
 				'1' when (privilege_lvl_l = '1' and estat_multi = "01" and op_code_ir = JMP and f_temp = CALLS_OP) else -- INS que nomes es pot executar en mode user	
@@ -257,6 +261,12 @@ BEGIN
 	with op_code_ir select
 		wr_m <=	'1' when ST,
 				'1' when STB,
+				'0' when others;
+				
+	-- rd_m indica si llegim a memoria o no (1 si)
+	with op_code_ir select
+		ld_m <=	'1' when LD,
+				'1' when LDB,
 				'0' when others;
 					
 	-- in_d indica des d'on venen les dades que es guardaran a addr_d

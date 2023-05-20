@@ -128,7 +128,7 @@ BEGIN
 					JNZ_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "001") else
 					JMP_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "011") else
 					JAL_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "100") else
-					CALLS_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "111") else			--Cas CALLS --REVISAR Produce una excepciÃƒÂ³n de tipo Ã¢â‚¬Å“instrucciÃƒÂ³n ilegalÃ¢â‚¬Â si se ejecuta en modo sistema. Esta instrucciÃƒÂ³n solo debepoderse ejecutar en modo usuario.
+					CALLS_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "111") else			--Cas CALLS Produce una excepcion de tipo ‚ instruccion ilegalgal‚si se ejecuta en modo sistema. Esta instruccion solo debepoderse ejecutar en modo usuario.
 
 					RDS_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "101100") else			-- Cas R/W Sysreg: F depen dels bits 5-0
 					WRS_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110000") else

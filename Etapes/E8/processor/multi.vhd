@@ -10,6 +10,7 @@ entity multi is
 			wrd_s_l		: IN  STD_LOGIC;
 			u_s_l		: IN  STD_LOGIC;
 			wr_m_l		: IN  STD_LOGIC;
+			ld_m_l		: IN  STD_LOGIC;
 			w_b			: IN  STD_LOGIC;
 			halt_cont	: IN  STD_LOGIC;
 			rd_in_l		: IN  STD_LOGIC;
@@ -23,7 +24,7 @@ entity multi is
 			pp_tlb_d_l	: in  std_LOGIC; --exc signal
 			immed_x2_l	: IN  STD_LOGIC;
 			sys_priv_lvl: IN  std_logic;
-			EXC_info 	: IN  STD_LOGIC_Vector(15 downto 0); --VECTOR que indica les excepcions
+			exc_tlb		: IN  std_logic_vector(3 downto 0);	
 			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -32,6 +33,7 @@ entity multi is
 			wrd_s		: OUT STD_LOGIC;
 			u_s			: OUT STD_LOGIC;
 			wr_m		: OUT STD_LOGIC;
+			ld_m		: OUT STD_LOGIC;
 			ldir		: OUT STD_LOGIC;
 			ins_dad		: OUT STD_LOGIC;
 			word_byte	: OUT STD_LOGIC;
@@ -63,14 +65,16 @@ signal pp_tlb_b : std_logic;
 component exc is
 	port(	clk 		: IN  STD_LOGIC;
 			boot		: IN  STD_LOGIC;
-			no_al		: IN  STD_LOGIC;--
-			ill_ins		: IN  STD_LOGIC;--
-			interrupt	: IN  STD_LOGIC;--
-			div_z		: IN  STD_LOGIC;--
-			acces_mem	: IN  STD_LOGIC;--
-			pp_tlb_d : IN  STD_LOGIC;--
-			protect : IN  STD_LOGIC;		--
-			call	: IN  STD_LOGIC;		 --
+			no_al		: IN  STD_LOGIC;
+			ill_ins		: IN  STD_LOGIC;
+			interrupt	: IN  STD_LOGIC;
+			div_z		: IN  STD_LOGIC;
+			acces_mem	: IN  STD_LOGIC;
+			pp_tlb_d	: IN  STD_LOGIC;
+			protect		: IN  STD_LOGIC;
+			call		: IN  STD_LOGIC;
+			estat		: IN  STD_LOGIC_VECTOR(1 downto 0);
+			exc_tlb 	: IN  STD_LOGIC_VECTOR(3 downto 0);
 			exc_code	: OUT exc_code_t
 			);
 end component;
@@ -143,7 +147,13 @@ begin
 				'0' when "10",
 				'0' when "11",
 				wr_m_l when others;
-								
+				
+	with estat select
+		ld_m <=	'1' when "00",		-- Llegim memoria en FETCH
+				'0' when "10",
+				'0' when "11",
+				ld_m_l when others;	-- I en DECODE
+
 	with estat select
 		wrd <=  '0' when "00",
 				'0' when "10",
@@ -255,7 +265,9 @@ begin
 											pp_tlb_d => pp_tlb_b,			
 											protect => protect_l,
 											call	=> call_l,
-											exc_code	=> exc_code_b
+											exc_code	=> exc_code_b,
+											exc_tlb => exc_tlb,
+											estat => estat
 											);
 								
 								
