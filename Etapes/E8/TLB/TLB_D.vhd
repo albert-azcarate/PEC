@@ -102,8 +102,8 @@ BEGIN
 						PTags(1) <= x"0"; --usr
 						PTags(2) <= x"0"; --usr
 
-						PTags(3) <= x"8"; --sys
-						PTags(4) <= x"c"; --sys
+						PTags(3) <= x"0"; --sys
+						PTags(4) <= x"0"; --sys
 						PTags(5) <= x"0"; --sys
 						PTags(6) <= x"0"; --sys
 						PTags(7) <= x"0"; --sys
@@ -112,8 +112,8 @@ BEGIN
 						VTags(1) <= x"0"; --usr
 						VTags(2) <= x"0"; --usr
 
-						VTags(3) <= x"8"; --sys
-						VTags(4) <= x"c"; --sys
+						VTags(3) <= x"0"; --sys
+						VTags(4) <= x"0"; --sys
 						VTags(5) <= x"0"; --sys
 						VTags(6) <= x"0"; --sys
 						VTags(7) <= x"0"; --sys				

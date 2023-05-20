@@ -83,11 +83,13 @@ BEGIN
 	-- Fem servir el bit 1 de TLB_Com per codificar la instruccio a fer al TLB de dades o instruccions.
 	TLB_Command_To_data <=  "10" when TLB_Com = "100" else
 							"11" when TLB_Com = "111" else
-							TLB_Com(2)&TLB_Com(0) when TLB_Com(1) ='1';
+							TLB_Com(2)&TLB_Com(0) when TLB_Com(1) ='1' else
+							"11";
 
 	TLB_Command_To_inst <= 	"10" when TLB_Com = "100" else
 							"11" when TLB_Com = "111" else
-							TLB_Com(2)&TLB_Com(0) when TLB_Com(1) ='0';
+							TLB_Com(2)&TLB_Com(0) when TLB_Com(1) ='0'else
+							"11";
 
 	--diferencies entre ins i data TLB:
 	--data te una excepcio mes (READ ONLY PAGE when store)
