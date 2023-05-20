@@ -166,8 +166,6 @@ signal int_type_out			: std_logic_vector(1 downto 0);
 signal estat_conn			: std_logic_vector(1 downto 0);
 
 signal protect_conn: std_LOGIC := '0';
-signal protect_conn_b: std_LOGIC := '0';
-signal protect_pc:	std_logic := '0';
 signal call_conn: std_LOGIC := '0';
 signal privilege_lvl_conn : std_LOGIC := '0';
 
@@ -220,7 +218,7 @@ BEGIN
 							regPC <= regPC + 2;						
 						end if;
 					elsif load_pc_out = "100" then						-- Cas RET
-						if protect_conn_b = '0' then					
+						if protect_conn = '0' then					
 							regPC <= alu_out;				-- Si esten en mode systema	saltem
 						else
 							regPc <= regPC + 2;				-- Si estem en mode user no saltem ja que es protegida
@@ -239,21 +237,15 @@ BEGIN
 	
 	-- Process per decidir el seguent IR
 	process (clk, load_ins, boot, load_pc_out) begin		
-		protect_pc <= '0';
 		
 		if boot = '1' then 										--BOOT
 			new_ir <= x"5000";
 		else
 			if load_pc_out /= "011" then						-- Cas RUN
-			
-				if regPC < x"c000" then	-- excepcio de instruccio pocha REVISAR
-					protect_pc <= '1';
-				end if;
-			
 				-- DECODE or JMP carreguem el Seguent IR el que ens ve de memoria; En cas de CALL, nomes ho fem en el cycle de system o ens entra merda a IR
-				if protect_pc = '0' and (load_ins = '1' or (load_pc_out = "001" and (op_out /= JMP and f_out /= CALLS_OP)) or (op_out = JMP and f_out = CALLS_OP and load_pc_out = "101"))  then  
+				if load_ins = '1' or (load_pc_out = "001" and (op_out /= JMP and f_out /= CALLS_OP)) or (op_out = JMP and f_out = CALLS_OP and load_pc_out = "101")  then  
 					new_ir <= datard_m ;
-				elsif protect_pc = '0' then 	-- Cas FETCH, mantenim el IR per al DECODE 
+				else	-- Cas FETCH, mantenim el IR per al DECODE 
 					new_ir <= ir_reg;
 				end if;
 			else
@@ -275,7 +267,6 @@ BEGIN
 	-- Pasem les conexions de control a multi o asignem les sortides com toqui
 	ins_dad <= ins_dad_conn;
 	ir_connection <= ir_reg;
-	protect_conn <= protect_conn_b or protect_pc;
 	f <=  f_out;
 	op <= op_out;
 	int_type <= int_type_out;
@@ -305,7 +296,7 @@ BEGIN
 										estat_multi => estat_conn,
 										ill_ins => ill_ins_conn, --exc
 										call => call_conn, --exc
-										protect => protect_conn_b, --exc
+										protect => protect_conn, --exc
 										privilege_lvl_l => sys_priv_lvl,
 										immed_x2 => immed_x2_conn,
 										word_byte => word_byte_connection,

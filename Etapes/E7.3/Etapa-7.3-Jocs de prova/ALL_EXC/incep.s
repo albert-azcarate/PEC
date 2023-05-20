@@ -177,6 +177,19 @@ inici:
 		halt						; stf no implementat 0xB000
 		halt						; special no implementat 0xf004 (fake reti)
 		halt						; special no implementat 0xfe10 (fake wrd)
+		$MOVEI r0, 0x0000
+		$MOVEI r2, 0x1010
+		st 0(r0), r2
+		$MOVEI r2, 0x2000
+		st 2(r0), r2
+		$MOVEI r1, tornar
+		$MOVEI r2, 0xA043
+		st 4(r0), r2
+		jmp r0
+		
+		
+		
+tornar:
 		$MOVEI r0, 0					
 		div r0,r0,r0				; div 0
 		
