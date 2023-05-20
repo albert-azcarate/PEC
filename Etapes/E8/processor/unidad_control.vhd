@@ -16,32 +16,37 @@ ENTITY unidad_control IS
 			div_z			: IN  STD_LOGIC;
 			no_al			: IN  STD_LOGIC;
 			pp_tlb_dx		: IN  STD_LOGIC;
+			sys_priv_lvl	: IN  std_logic;
+			exc_tlb			: IN  std_logic_vector(3 downto 0);	
 			datard_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			alu_out			: IN  STD_LOGIC_VECTOR(15 downto 0);
 			op				: OUT op_code_t;
 			f				: OUT f_code_t;
+			exc_code		: OUT exc_code_t;
 			wrd				: OUT std_logic;
 			wrd_s			: OUT std_logic;
 			u_s				: OUT std_logic;
 			ins_dad			: OUT std_logic;
 			immed_x2		: OUT std_logic;
 			wr_m			: OUT std_logic;
+			ld_m			: OUT STD_LOGIC;
 			word_byte		: OUT std_logic;
 			immed_or_reg	: OUT std_logic;
 			rd_in			: OUT std_logic;
 			wr_out			: OUT std_logic;
 			inta			: OUT STD_LOGIC;
 			exca			: OUT STd_LOGIC;
+			privilege_lvlz	: out std_LOGIC;
+			estat_multi		: OUT std_logic_vector(1 downto 0);
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			TLB_Com			: out std_LOGIC_VECTOR(2 downto 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			exc_code		: OUT exc_code_t;
+			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			immed			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			pc				: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			privilege_lvlz	: out std_LOGIC;
-			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+			pc				: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 END unidad_control;
 
@@ -50,14 +55,17 @@ ARCHITECTURE Structure OF unidad_control IS
 	
 	component control_l is
 	PORT (	ir				: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			privilege_lvl_l : in std_LOGIC;
-			estat_multi		: IN std_logic_vector(1 downto 0);
+			privilege_lvl_l : in  std_LOGIC;
+			boot			: IN  STD_LOGIC;
+			clk				: IN  STD_LOGIC;
+			estat_multi		: IN  std_logic_vector(1 downto 0);
 			op				: OUT op_code_t;
 			f				: OUT f_code_t;
 			wrd				: OUT STD_LOGIC;
 			wrd_s			: OUT STD_LOGIC;
 			u_s				: OUT STD_LOGIC;
 			wr_m			: OUT STD_LOGIC;
+			ld_m			: OUT STD_LOGIC;
 			immed_x2		: OUT STD_LOGIC;
 			word_byte		: OUT STD_LOGIC;
 			immed_or_reg	: OUT STD_LOGIC;
@@ -72,6 +80,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			TLB_Com			: out std_LOGIC_VECTOR(2 downto 0);
 			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			immed			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -89,6 +98,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			wrd_s_l		: IN  STD_LOGIC;
 			u_s_l		: IN  STD_LOGIC;
 			wr_m_l		: IN  STD_LOGIC;
+			ld_m_l		: IN STD_LOGIC;
 			w_b			: IN  STD_LOGIC;
 			halt_cont	: IN  STD_LOGIC;
 			rd_in_l		: IN  STD_LOGIC;
@@ -97,20 +107,23 @@ ARCHITECTURE Structure OF unidad_control IS
 			div_z		: IN  STD_LOGIC; --exc signal
 			no_al		: IN  STD_LOGIC; --exc signal
 			ill_ins_l	: IN  STD_LOGIC; --exc signal
-			call_l			: IN std_LOGIC; --exc signal
-			protect_l 		: IN std_LOGIC; --exc signal
-			pp_tlb_d_l		: in std_LOGIC; --exc signal
+			call_l		: IN  std_LOGIC; --exc signal
+			protect_l 	: IN  std_LOGIC; --exc signal
+			pp_tlb_d_l	: in  std_LOGIC; --exc signal
+			sys_priv_lvl: IN  std_logic;
 			immed_x2_l	: IN  STD_LOGIC;
-			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			TLB_Com_l	: IN  std_LOGIC_VECTOR(2 downto 0);	
+			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			exc_tlb		: IN  std_logic_vector(3 downto 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
-			estat_out 	: OUT std_logic_vector(1 downto 0);
 			privilege_lvl : out std_LOGIC;
 			wrd			: OUT STD_LOGIC;
 			wrd_s		: OUT STD_LOGIC;
 			u_s			: OUT STD_LOGIC;
 			wr_m		: OUT STD_LOGIC;
+			ld_m		: OUT STD_LOGIC;
 			ldir		: OUT STD_LOGIC;
 			ins_dad		: OUT STD_LOGIC;
 			word_byte	: OUT STD_LOGIC;
@@ -118,10 +131,12 @@ ARCHITECTURE Structure OF unidad_control IS
 			wr_out		: OUT STD_LOGIC;
 			inta		: OUT STD_LOGIC;
 			exca		: OUT STd_LOGIC;
+			exc_code	: OUT exc_code_t;
+			estat_out 	: OUT std_logic_vector(1 downto 0);
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			TLB_Com		: OUT std_LOGIC_VECTOR(2 downto 0);
 			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_a		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			exc_code	: OUT exc_code_t;
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
 	end component;
@@ -132,6 +147,7 @@ signal enable				: std_logic;
 signal enable_sys			: std_logic;
 signal user_sys				: std_logic;
 signal word_mem				: std_logic;
+signal read_mem				: std_logic;
 signal word_byte_connection	: std_logic;
 signal load_ins				: std_logic;
 signal z_reg				: std_logic;
@@ -160,8 +176,11 @@ signal in_d_conn			: std_logic_vector(1 downto 0);
 signal int_type_conn		: std_logic_vector(1 downto 0);
 signal int_type_out			: std_logic_vector(1 downto 0);
 signal estat_conn			: std_logic_vector(1 downto 0);
+signal TLB_Com_conn			: std_logic_vector(2 downto 0);
 
 signal protect_conn: std_LOGIC := '0';
+signal protect_conn_b: std_LOGIC := '0';
+signal protect_pc:	std_logic := '0';
 signal call_conn: std_LOGIC := '0';
 signal privilege_lvl_conn : std_LOGIC := '0';
 
@@ -185,50 +204,44 @@ BEGIN
 				if load_pc_out = "011" then  -- HALT
 					regPC <= regPC;
 					
-				elsif load_pc_out = "101" then -- SYSTEM; Posem al PC el que en surt de la ALU(S5, @RSG)
+				elsif load_pc_out = "101" then -- SYSTEM; Posem al PC el que en surt de la ALU(S5, @RSG).
 					regPC <= alu_out;
 				else						-- RUN
 				
 					if load_pc_out = "000" and ins_dad_conn = '1' then		-- RUN; ins_dad_conn fa de proxy de l'estat del multi
-						if regPC < x"FFFE" then
-							regPC <= regPC + 2;
-						else 
-							regPC <= regPC;		-- REVISAR, aixo hauria de ser un HALT; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
-						end if;
+						regPC <= regPC + 2;
 					elsif load_pc_out = "001" then							-- Cas JMP's
-						if f_out = JMP_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 					-- JMP; alu_out >= x"C000" i alu_out < x"FFFE" per evitar que saltem a la ROM
-							regPC <= alu_out;																			-- alu_out < FFFE perque si no el seguent PC + 2 fa overflow
-						elsif z = '0' and f_out = JZ_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 		-- JZ i saltem
-							regPC <= alu_out;																			-- REVISAR s'ha de mira si la adressa es aligned? ; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
-						elsif z = '1' and f_out = JNZ_OP and alu_out >= x"C000" and alu_out < x"FFFE" then 	-- JNZ i saltem
-							regPC <= alu_out;	
-						elsif f_out = JAL_OP and alu_out >= x"C000" and alu_out < x"FFFE" then							-- JAL
+					
+						if f_out = JMP_OP then					-- JMP;
+							regPC <= alu_out;                   
+						elsif z = '0' and f_out = JZ_OP then    -- JZ i saltem
+							regPC <= alu_out;                   
+						elsif z = '1' and f_out = JNZ_OP then   -- JNZ i saltem
 							regPC <= alu_out;
-						else												-- Else no saltem (pc <= pc + 2)
-							if regPC < x"FFFE" then
-								regPC <= regPC + 2;
-							else 
-								regPC <= regPC;	-- REVISAR, aixo hauria de ser un HALT; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
-							end if;
-						end if;
-						
-					elsif load_pc_out = "010" then							-- Cas BZ's
-						if z = '0' and f_out = BZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) < x"FFFE" then 					-- BZ i saltem
-							regPC <= regPC + 2 + despla;																								-- @ < FFFE perque si no el seguent PC + 2 fa overflow
-						elsif z = '1' and f_out = BNZ_OP and (regPC + 2 + despla) >= x"C000" and (regPC + 2 + despla) < x"FFFE" then 				-- BNZ i saltem
-							regPC <= regPC + 2 +  despla;
-						elsif regPC + 2 < x"FFFE" then																									-- Else no saltem (pc <= pc + 2)
+						elsif f_out = JAL_OP then				-- JAL
+							regPC <= alu_out;
+						else									-- Else no saltem (pc <= pc + 2)
 							regPC <= regPC + 2;
-						else
-							regPC <= regPC; 	-- aixo ha de ser un HALT REVISAR; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
 						end if;
-							
-					elsif load_pc_out = "100" and alu_out >= x"C000" and alu_out < x"FFFE" then	-- Cas RET; alu_out < FFFE perque si no el seguent PC + 2 fa overflow
-						regPC <= alu_out;
-					elsif load_pc_out = "111" and alu_out >= x"C000" and alu_out < x"FFFE" then	-- Cas CALLS; alu_out < FFFE perque si no el seguent PC + 2 fa overflow
-						regPC <= alu_out;
-					else 
-						regPC <= regPC;	-- aixo ha de ser un HALT REVISAR; Si posem una adressa impar (e.g. ffff), hauria de saltar no_al i matar el programa
+					elsif load_pc_out = "010" then								-- Cas BZ's
+					
+						if z = '0' and f_out = BZ_OP then				-- BZ i saltem
+							regPC <= regPC + 2 + despla;
+						elsif z = '1' and f_out = BNZ_OP then				-- BNZ i saltem
+							regPC <= regPC + 2 + despla;
+						else											-- Else no saltem (pc <= pc + 2)
+							regPC <= regPC + 2;						
+						end if;
+					elsif load_pc_out = "100" then						-- Cas RET
+						if protect_conn = '0' then					
+							regPC <= alu_out;				-- Si esten en mode systema	saltem
+						else
+							regPc <= regPC + 2;				-- Si estem en mode user no saltem ja que es protegida
+						end if;
+					elsif load_pc_out = "111" then						-- Cas CALLS
+						regPC <= regPC;
+					else						--- REVISAR (Inception)
+						regPC <= regPC;
 					end if;
 				end if;
 			end if;
@@ -238,23 +251,23 @@ BEGIN
 	
 	
 	-- Process per decidir el seguent IR
-	process (clk, load_ins, boot) begin		
+	process (clk, load_ins, boot, load_pc_out) begin	
+		
 		if boot = '1' then 										--BOOT
 			new_ir <= x"5000";
 		else
-			if load_pc_out /= "011" then		-- Cas RUN
-				if load_ins = '1' or load_pc_out = "001" then  	-- DECODE or JMP carreguem a ir el que ens ve de memoria
+			if load_pc_out /= "011" then						-- Cas RUN
+			
+				-- DECODE or JMP carreguem el Seguent IR el que ens ve de memoria; En cas de CALL, nomes ho fem en el cycle de system o ens entra merda a IR
+				if load_ins = '1' or (load_pc_out = "001" and (op_out /= JMP and f_out /= CALLS_OP)) or (op_out = JMP and f_out = CALLS_OP and load_pc_out = "101")  then  
 					new_ir <= datard_m ;
-				else										
-					if regPC < x"fffe" then							-- Cas FETCH 
-						new_ir <= ir_reg;							-- Ens quedem igual
-					else
-						new_ir <= x"FFFF";							-- FETCH amb un PC invalid
-					end if;
+				else	-- Cas FETCH, mantenim el IR per al DECODE 
+					new_ir <= ir_reg;
 				end if;
 			else
 				new_ir <= x"FFFF";								-- Cas HALT, ens quedem a HALT
 			end if;
+			
 		end if;
 		
 		
@@ -273,6 +286,7 @@ BEGIN
 	int_type <= int_type_out;
 	inta <= int_a_conn;
 	immed_x2 <= immed_x2_conn;
+	estat_multi <= estat_conn;
 	
 	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL, CALL
 	pc <= old_2_Pc when (load_pc_out = "001" and f_out = JAL_OP) or (op_out = JMP and f_out = CALLS_OP) else
@@ -281,7 +295,9 @@ BEGIN
 	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
   	 
 	control_ins : control_l port map (	ir => ir_connection,
+										clk => clk, 
 										op => op_out,
+										boot => boot,
 										f => f_out,
 										ldpc=> load_pc_connection,
 										wrd => enable,
@@ -291,12 +307,14 @@ BEGIN
 										addr_d => addr_d,
 										immed => immed,
 										wr_m => word_mem,
+										ld_m => read_mem,
 										in_d => in_d,
 										estat_multi => estat_conn,
 										ill_ins => ill_ins_conn, --exc
 										call => call_conn, --exc
 										protect => protect_conn, --exc
-										privilege_lvl_l => privilege_lvl_conn,
+										TLB_Com => TLB_Com_conn,
+										privilege_lvl_l => sys_priv_lvl,
 										immed_x2 => immed_x2_conn,
 										word_byte => word_byte_connection,
 										halt_cont => halt_conn,
@@ -307,7 +325,6 @@ BEGIN
 										int_type => int_type_conn,
 										addr_a => addr_a_conn,
 										Instruccio => Instruction			--modelsim
-										
 										);
 
 	multi0 : multi port map (	clk => clk, 
@@ -324,16 +341,21 @@ BEGIN
 								no_al => no_al,			--exc
 								call_l => call_conn,    --exc
 								protect_l => protect_conn, --exc
+								TLB_Com_l => TLB_Com_conn,
+								exc_tlb => exc_tlb,
 								pp_tlb_d_l => pp_tlb_dx,
 								wr_m_l => word_mem,
+								ld_m_l => read_mem,
 								privilege_lvl => privilege_lvl_conn,
 								immed_x2_l => immed_x2_conn,
+								sys_priv_lvl => sys_priv_lvl,
 								addr_io_l => addr_io_conn,
 								rd_in_l => rd_in_conn,
 								wr_out_l => wr_out_conn,
 								addr_a_l => addr_a_conn,
 								int_type_l => int_type_conn,
 								w_b => word_byte_connection,
+								TLB_Com => TLB_Com,
 								ldpc => load_pc_out,
 								wrd => wrd,
 								wrd_s => wrd_s,
@@ -341,6 +363,7 @@ BEGIN
 								exca => exca,
 								u_s => u_s, 
 								wr_m => wr_m,
+								ld_m => ld_m,
 								ldir => load_ins,
 								ins_dad => ins_dad_conn,
 								word_byte => word_byte,
@@ -352,6 +375,6 @@ BEGIN
 								exc_code => exc_code,
 								int_type => int_type_out
 								);
-	privilege_lvlz <= privilege_lvl_conn;
+	privilege_lvlz <= sys_priv_lvl;
 
 END Structure;

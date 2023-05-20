@@ -168,24 +168,24 @@ __interrup_keyboard:
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 inici: 
         movi   r1, 0xF
-        out     9, r1				;activa todos los visores hexadecimales
-		halt						; cmp no implementat 0x1010 rev
-		halt						; mul no implementat 0x8018 rev
-		halt						; jmp no implementat 0xA002 OK
+        out     9, r1				; activa todos los visores hexadecimales
+		halt						; cmp no implementat 0x1010
+		halt						; mul no implementat 0x8018
+		halt						; jmp no implementat 0xA002
 		$MOVEI r0, end_all
 		halt						; jmp no implementat 0xA00f
 		halt						; stf no implementat 0xB000
 		halt						; special no implementat 0xf004 (fake reti)
 		halt						; special no implementat 0xfe10 (fake wrd)
-		$MOVEI r0, 0x0000
-		$MOVEI r2, 0x1010
-		st 0(r0), r2
-		$MOVEI r2, 0x2000
+		$MOVEI r0, 0x0000			; posem la adressa 0 a r0 
+		$MOVEI r2, 0x1010			; cmp no implementat 0x1010 i ho posem a 0x0000
+		st 0(r0), r2				
+		$MOVEI r2, 0x2000			; addi r0, r0, 0 i ho posem a 0x0002
 		st 2(r0), r2
-		$MOVEI r1, tornar
-		$MOVEI r2, 0xA043
+		$MOVEI r1, tornar			; posem a r1 la direccio de retorn
+		$MOVEI r2, 0xA043			; jmp r1 i ho posem a 0x0004
 		st 4(r0), r2
-		jmp r0
+		jmp r0						; saltem a 0x0000
 		
 		
 		

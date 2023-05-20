@@ -5,6 +5,7 @@
 **/output_files/
 **/simulation/
 **/eines-sisa/
+**/greybox_tmp/
 **/DE1/
 *.bak
 *.mti

@@ -34,10 +34,12 @@ ENTITY datapath IS
 			z				: OUT STD_LOGIC;
 			int_e			: OUT STD_LOGIC;
 			div_z			: OUT STD_LOGIC;
+			sys_priv_lvl	: OUT std_logic;
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			data_wr			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			alu_out_path	: out std_LOGIC_VECTOR(15 downto 0)
+			alu_out_path	: out std_LOGIC_VECTOR(15 downto 0);
+			a				: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 END datapath;
 
@@ -77,6 +79,7 @@ ARCHITECTURE Structure OF datapath IS
 			PCup		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			int_e		: OUT STD_LOGIC;
+			sys_priv_lvl: OUT std_logic;
 			a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			b			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
@@ -108,6 +111,7 @@ BEGIN
 											b => regbank_to_alu_b, 
 											int_type => int_type,
 											privilege_lvl => privilege_lvl,
+											sys_priv_lvl => sys_priv_lvl,
 											intr => intr,
 											inta => inta,
 											exca => exca,
@@ -142,9 +146,9 @@ BEGIN
 						pc when "10",
 						rd_io when others;
 						
-	with ins_dad select
-		addr_m_buffer <= 	alu_out when '1',
-							pc when others;
+
+	addr_m_buffer <= 	alu_out when ins_dad = '1' else
+						pc;
 								
 	addr_m <= addr_m_buffer;
 
@@ -153,6 +157,9 @@ BEGIN
 	alu_out_path <= regbank_to_alu_a when exca = '1' or inta = '1' else alu_out; 
 
 	wr_io <= regbank_to_alu_b;
+	a <= regbank_to_alu_a;
+	
+	
 	
 	
 END Structure;

@@ -7,16 +7,16 @@ start address 0x0000c000
 
 Program Header:
     LOAD off    0x00000000 vaddr 0x0000bf8c paddr 0x0000bf8c align 2**0
-         filesz 0x000001be memsz 0x000001be flags r-x
-    LOAD off    0x000001be vaddr 0x00008000 paddr 0x0000c14a align 2**0
+         filesz 0x0000019e memsz 0x0000019e flags r-x
+    LOAD off    0x0000019e vaddr 0x00008000 paddr 0x0000c12a align 2**0
          filesz 0x00000038 memsz 0x00000038 flags rw-
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn  Flags
-  0 .text         0000014a  0000c000  0000c000  00000074  2**0  CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000038  00008000  0000c14a  000001be  2**1  CONTENTS, ALLOC, LOAD, DATA
-  2 .stab         000005ac  00000000  00000000  000001f8  2**2  CONTENTS, READONLY, DEBUGGING
-  3 .stabstr      0000003f  00000000  00000000  000007a4  2**0  CONTENTS, READONLY, DEBUGGING
+  0 .text         0000012a  0000c000  0000c000  00000074  2**0  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000038  00008000  0000c12a  0000019e  2**1  CONTENTS, ALLOC, LOAD, DATA
+  2 .stab         00000540  00000000  00000000  000001d8  2**2  CONTENTS, READONLY, DEBUGGING
+  3 .stabstr      0000003d  00000000  00000000  00000718  2**0  CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 0000c000 l    d  .text	00000000 .text
 00008000 l    d  .data	00000000 .data
@@ -32,14 +32,14 @@ SYMBOL TABLE:
 0000c0a0 l       .text	00000000 __interrup_switch
 0000c0a6 l       .text	00000000 __interrup_keyboard
 00008008 l       .data	00000000 exceptions_vector
-0000c0ea l       .text	00000000 __ilegal_ins
-0000c10a l       .text	00000000 __no_align
+0000c0cc l       .text	00000000 __ilegal_ins
+0000c0ec l       .text	00000000 __no_align
 0000c090 l       .text	00000000 RSE_default_halt
-0000c0fa l       .text	00000000 __div_zero
+0000c0dc l       .text	00000000 __div_zero
 0000c08e l       .text	00000000 RSE_default_resume
-0000c13a l       .text	00000000 __pp_tlb_dat
-0000c11a l       .text	00000000 __protect
-0000c12a l       .text	00000000 __calls
+0000c11a l       .text	00000000 __pp_tlb_dat
+0000c0fa l       .text	00000000 __protect
+0000c10a l       .text	00000000 __calls
 00008028 l       .data	00000000 call_sys_vector
 0000c012 l       .text	00000000 RSG
 0000c0ac l       .text	00000000 inici
@@ -48,17 +48,16 @@ SYMBOL TABLE:
 0000c03e l       .text	00000000 __excepcion
 0000c06e l       .text	00000000 __finRSG
 0000c092 l       .text	00000000 RSE_excepcion_TLB
-0000c0b8 l       .text	00000000 bucle_inf
-0000c0c8 l       .text	00000000 bucle_inf_2
-0000c0dc l       .text	00000000 bucle_inf_3
+0000c0ca l       .text	00000000 end_jmp
+0000c0f8 l       .text	00000000 end_no_al
 0000c000 g       .text	00000000 __entry_point
-0000c14a g       .text	00000000 _etext
-0000c182 g       *ABS*	00000000 __data_load_end
-0000c14a g       *ABS*	00000000 __data_load_start
-0000c14a g       .text	00000000 __dtors_end
-0000c14a g       .text	00000000 __ctors_start
-0000c14a g       .text	00000000 __dtors_start
-0000c14a g       .text	00000000 __ctors_end
+0000c12a g       .text	00000000 _etext
+0000c162 g       *ABS*	00000000 __data_load_end
+0000c12a g       *ABS*	00000000 __data_load_start
+0000c12a g       .text	00000000 __dtors_end
+0000c12a g       .text	00000000 __ctors_start
+0000c12a g       .text	00000000 __dtors_start
+0000c12a g       .text	00000000 __ctors_end
 00008038 g       .data	00000000 _edata
 00008038 g       *ABS*	00000000 _end
 
@@ -67,9 +66,9 @@ SYMBOL TABLE:
 reti.exe:     file format elf32-sisa
 
 Contents of section .data:
- 8000 94c09ac0 a0c0a6c0 eac00ac1 90c090c0  ................
- 8010 fac08ec0 90c090c0 90c090c0 90c03ac1  ..............:.
- 8020 90c01ac1 2ac18ec0 90c02ac1 90c090c0  ....*.....*.....
+ 8000 94c09ac0 a0c0a6c0 ccc0ecc0 90c090c0  ................
+ 8010 dcc08ec0 90c090c0 90c090c0 90c01ac1  ................
+ 8020 90c0fac0 0ac18ec0 90c00ac1 90c090c0  ................
  8030 90c090c0 90c090c0                    ........        
 
 reti.exe:     file format elf32-sisa
@@ -191,54 +190,56 @@ Disassembly of section .text:
 0000c0ac <inici>:
     c0ac:	520f 	movi	r1, 15
     c0ae:	7309 	out	9, r1
-    c0b0:	5000 	movi	r0, 0
-    c0b2:	5100 	movhi	r0, 0
-    c0b4:	52ff 	movi	r1, -1
-    c0b6:	53ff 	movhi	r1, -1
-
-0000c0b8 <bucle_inf>:
-    c0b8:	2001 	addi	r0, r0, 1
-    c0ba:	1419 	cmpeq	r2, r0, r1
-    c0bc:	64fd 	bz	r2, -4
-    c0be:	f4b0 	wrs	s2, r2
-    c0c0:	5000 	movi	r0, 0
-    c0c2:	5100 	movhi	r0, 0
-    c0c4:	52ff 	movi	r1, -1
-    c0c6:	53ff 	movhi	r1, -1
-
-0000c0c8 <bucle_inf_2>:
+    c0b0:	ffff 	halt	
+    c0b2:	5000 	movi	r0, 0
+    c0b4:	5100 	movhi	r0, 0
+    c0b6:	8020 	div	r0, r0, r0
+    c0b8:	5001 	movi	r0, 1
+    c0ba:	5100 	movhi	r0, 0
+    c0bc:	4000 	st	0(r0), r0
+    c0be:	3000 	ld	r0, 0(r0)
+    c0c0:	50ca 	movi	r0, -54
+    c0c2:	51c0 	movhi	r0, -64
+    c0c4:	2001 	addi	r0, r0, 1
+    c0c6:	a003 	jmp	r0
     c0c8:	2001 	addi	r0, r0, 1
-    c0ca:	1419 	cmpeq	r2, r0, r1
-    c0cc:	64fd 	bz	r2, -4
-    c0ce:	5401 	movi	r2, 1
-    c0d0:	5500 	movhi	r2, 0
-    c0d2:	a087 	calls	r2
-    c0d4:	5000 	movi	r0, 0
-    c0d6:	5100 	movhi	r0, 0
-    c0d8:	52ff 	movi	r1, -1
-    c0da:	53ff 	movhi	r1, -1
 
-0000c0dc <bucle_inf_3>:
-    c0dc:	2001 	addi	r0, r0, 1
-    c0de:	1419 	cmpeq	r2, r0, r1
-    c0e0:	64fd 	bz	r2, -4
-    c0e2:	5402 	movi	r2, 2
-    c0e4:	5580 	movhi	r2, -128
-    c0e6:	4480 	st	0(r2), r2
-    c0e8:	ffff 	halt	
+0000c0ca <end_jmp>:
+    c0ca:	ffff 	halt	
 
-0000c0ea <__ilegal_ins>:
-    c0ea:	52ad 	movi	r1, -83
-    c0ec:	53de 	movhi	r1, -34
-    c0ee:	540f 	movi	r2, 15
-    c0f0:	7509 	out	9, r2
-    c0f2:	730a 	out	10, r1
-    c0f4:	5c6e 	movi	r6, 110
-    c0f6:	5dc0 	movhi	r6, -64
+0000c0cc <__ilegal_ins>:
+    c0cc:	52ad 	movi	r1, -83
+    c0ce:	53de 	movhi	r1, -34
+    c0d0:	540f 	movi	r2, 15
+    c0d2:	7509 	out	9, r2
+    c0d4:	730a 	out	10, r1
+    c0d6:	5c6e 	movi	r6, 110
+    c0d8:	5dc0 	movhi	r6, -64
+    c0da:	a183 	jmp	r6
+
+0000c0dc <__div_zero>:
+    c0dc:	52ad 	movi	r1, -83
+    c0de:	53de 	movhi	r1, -34
+    c0e0:	540f 	movi	r2, 15
+    c0e2:	7509 	out	9, r2
+    c0e4:	730a 	out	10, r1
+    c0e6:	5c6e 	movi	r6, 110
+    c0e8:	5dc0 	movhi	r6, -64
+    c0ea:	a183 	jmp	r6
+
+0000c0ec <__no_align>:
+    c0ec:	faec 	rds	r5, s3
+    c0ee:	f86c 	rds	r4, s1
+    c0f0:	195c 	cmpeq	r4, r5, r4
+    c0f2:	6802 	bz	r4, 6
+    c0f4:	2b7f 	addi	r5, r5, -1
+    c0f6:	4bc1 	st	2(r7), r5
+
+0000c0f8 <end_no_al>:
     c0f8:	a183 	jmp	r6
 
-0000c0fa <__div_zero>:
-    c0fa:	52ad 	movi	r1, -83
+0000c0fa <__protect>:
+    c0fa:	520d 	movi	r1, 13
     c0fc:	53de 	movhi	r1, -34
     c0fe:	540f 	movi	r2, 15
     c100:	7509 	out	9, r2
@@ -247,9 +248,9 @@ Disassembly of section .text:
     c106:	5dc0 	movhi	r6, -64
     c108:	a183 	jmp	r6
 
-0000c10a <__no_align>:
-    c10a:	52ad 	movi	r1, -83
-    c10c:	53de 	movhi	r1, -34
+0000c10a <__calls>:
+    c10a:	520d 	movi	r1, 13
+    c10c:	53d0 	movhi	r1, -48
     c10e:	540f 	movi	r2, 15
     c110:	7509 	out	9, r2
     c112:	730a 	out	10, r1
@@ -257,32 +258,12 @@ Disassembly of section .text:
     c116:	5dc0 	movhi	r6, -64
     c118:	a183 	jmp	r6
 
-0000c11a <__protect>:
-    c11a:	520d 	movi	r1, 13
-    c11c:	53de 	movhi	r1, -34
+0000c11a <__pp_tlb_dat>:
+    c11a:	52dd 	movi	r1, -35
+    c11c:	53dd 	movhi	r1, -35
     c11e:	540f 	movi	r2, 15
     c120:	7509 	out	9, r2
     c122:	730a 	out	10, r1
     c124:	5c6e 	movi	r6, 110
     c126:	5dc0 	movhi	r6, -64
     c128:	a183 	jmp	r6
-
-0000c12a <__calls>:
-    c12a:	520d 	movi	r1, 13
-    c12c:	53d0 	movhi	r1, -48
-    c12e:	540f 	movi	r2, 15
-    c130:	7509 	out	9, r2
-    c132:	730a 	out	10, r1
-    c134:	5c6e 	movi	r6, 110
-    c136:	5dc0 	movhi	r6, -64
-    c138:	a183 	jmp	r6
-
-0000c13a <__pp_tlb_dat>:
-    c13a:	52dd 	movi	r1, -35
-    c13c:	53dd 	movhi	r1, -35
-    c13e:	540f 	movi	r2, 15
-    c140:	7509 	out	9, r2
-    c142:	730a 	out	10, r1
-    c144:	5c6e 	movi	r6, 110
-    c146:	5dc0 	movhi	r6, -64
-    c148:	a183 	jmp	r6

@@ -10,19 +10,24 @@ ENTITY proc IS
 			boot		: IN  STD_LOGIC;
 			intr		: IN  std_logic;
 			no_al		: IN  std_logic;
-			pp_tlb_dx	: in std_logic; --exc
+			pp_tlb_dx	: in  std_logic; --exc
+			exc_tlb		: IN  std_logic_vector(3 downto 0);	
 			datard_m	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			rd_io 		: in  std_logic_vector(15 downto 0);
 			wr_m		: OUT STD_LOGIC;
+			ld_m		: OUT STD_LOGIC;
 			word_byte	: OUT STD_LOGIC;
 			wr_out 		: out std_logic;
 			rd_in 		: out std_logic;
 			inta		: out std_logic;
 			privilege_lvlx : out std_logic;
+			estat_multi	: OUT std_logic_vector(1 downto 0);
+			TLB_Com		: out std_LOGIC_VECTOR(2 downto 0);
 			addr_io 	: out std_logic_vector(7 downto 0);
 			wr_io 		: out std_logic_vector(15 downto 0);
 			addr_m		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			data_wr		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+			data_wr		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 END proc;
 
@@ -36,7 +41,9 @@ ARCHITECTURE Structure OF proc IS
 			int_e			: IN  STD_LOGIC;
 			div_z			: IN  STD_LOGIC;
 			no_al			: IN  STD_LOGIC;
-			pp_tlb_dx		: in std_logic; --exc
+			pp_tlb_dx		: in  std_logic; --exc
+			sys_priv_lvl	: IN  std_logic;
+			exc_tlb			: IN  std_logic_vector(3 downto 0);	
 			datard_m		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			alu_out			: IN  STD_LOGIC_VECTOR(15 downto 0);
 			op				: out op_code_t;
@@ -48,20 +55,23 @@ ARCHITECTURE Structure OF proc IS
 			ins_dad			: OUT STD_LOGIC;
 			immed_x2		: OUT STD_LOGIC;
 			wr_m			: OUT STD_LOGIC;
+			ld_m			: OUT STD_LOGIC;
 			word_byte		: OUT STD_LOGIC;
 			immed_or_reg	: OUT STD_LOGIC;
 			rd_in			: OUT STD_LOGIC;
 			wr_out			: OUT STD_LOGIC;
 			inta			: OUT STD_LOGIC;
 			exca			: OUT STd_LOGIC;
+			privilege_lvlz	: out std_LOGIC;
+			estat_multi		: OUT std_logic_vector(1 downto 0);
 			in_d			: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			int_type		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			TLB_Com			: out std_LOGIC_VECTOR(2 downto 0);
 			addr_a			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d			: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io			: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			immed			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			privilege_lvlz	: out std_LOGIC;
 			pc				: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 	END component;
@@ -94,10 +104,12 @@ ARCHITECTURE Structure OF proc IS
 			z				: OUT STD_LOGIC;
 			int_e			: OUT STD_LOGIC;
 			div_z			: OUT STD_LOGIC;
+			sys_priv_lvl	: OUT  std_logic;
 			wr_io			: OUT std_LOGIC_VECTOR(15 DOWNTO 0);
 			addr_m			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			data_wr			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			alu_out_path	: out std_LOGIC_VECTOR(15 downto 0)
+			alu_out_path	: out std_LOGIC_VECTOR(15 downto 0);
+			a				: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 			 
 	END component;
@@ -118,6 +130,7 @@ signal div_z_conn			: STD_LOGIC;
 signal inta_conn			: STD_LOGIC;
 signal priv_conn			: STD_LOGIC;
 signal exca_conn			: STD_LOGIC;
+signal sys_priv_lvl_conn	: STD_LOGIC;
 signal in_d_conn			: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal int_type_conn		: STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal addr_a_conn			: STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -131,7 +144,7 @@ BEGIN
 	
 	
 	inta <= inta_conn;
-	privilege_lvlx <= priv_conn;
+	privilege_lvlx <= sys_priv_lvl_conn;
 	
 	UC: unidad_control port map(boot => boot,
 								clk => clk,
@@ -150,9 +163,14 @@ BEGIN
 								int_e => int_e_conn,
 								ins_dad => ins_dad_conn,
 								in_d => in_d_conn,
+								exc_tlb => exc_tlb,
 								immed_x2 => immed_x2_conn,
+								TLB_Com => TLB_Com,
+								sys_priv_lvl => sys_priv_lvl_conn,
 								wr_m => wr_m,
 								word_byte => word_byte,
+								ld_m => ld_m,
+								estat_multi => estat_multi,
 								immed_or_reg => immed_or_reg_conn,
 								pp_tlb_dx => pp_tlb_dx,
 								z => z_conn,
@@ -189,6 +207,7 @@ BEGIN
 							exca => exca_conn,
 							ins_dad => ins_dad_conn, 
 							in_d => in_d_conn, 
+							sys_priv_lvl => sys_priv_lvl_conn,
 							immed_x2 => immed_x2_conn,
 							privilege_lvl => priv_conn,
 							data_wr => data_wr, 
@@ -200,7 +219,8 @@ BEGIN
 							wr_io => wr_io,
 							int_type => int_type_conn,	
 							exc_code => exc_code_conn,
-							intr => intr
+							intr => intr,
+							a => a
 							);
 
 END Structure;

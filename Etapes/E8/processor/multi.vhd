@@ -10,6 +10,7 @@ entity multi is
 			wrd_s_l		: IN  STD_LOGIC;
 			u_s_l		: IN  STD_LOGIC;
 			wr_m_l		: IN  STD_LOGIC;
+			ld_m_l		: IN  STD_LOGIC;
 			w_b			: IN  STD_LOGIC;
 			halt_cont	: IN  STD_LOGIC;
 			rd_in_l		: IN  STD_LOGIC;
@@ -22,15 +23,18 @@ entity multi is
 			protect_l 	: IN  std_LOGIC; --exc signal	
 			pp_tlb_d_l	: in  std_LOGIC; --exc signal
 			immed_x2_l	: IN  STD_LOGIC;
-			EXC_info 	: IN  STD_LOGIC_Vector(15 downto 0); --VECTOR que indica les excepcions
-			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			sys_priv_lvl: IN  std_logic;
 			int_type_l	: IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+			TLB_Com_l	: IN  std_LOGIC_VECTOR(2 downto 0);
+			ldpc_l		: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			exc_tlb		: IN  std_logic_vector(3 downto 0);	
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
 			wrd			: OUT STD_LOGIC;
 			wrd_s		: OUT STD_LOGIC;
 			u_s			: OUT STD_LOGIC;
 			wr_m		: OUT STD_LOGIC;
+			ld_m		: OUT STD_LOGIC;
 			ldir		: OUT STD_LOGIC;
 			ins_dad		: OUT STD_LOGIC;
 			word_byte	: OUT STD_LOGIC;
@@ -38,12 +42,13 @@ entity multi is
 			wr_out		: OUT STD_LOGIC;
 			inta		: OUT STd_LOGIC;
 			exca		: OUT STd_LOGIC;
-			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-			addr_a		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-			estat_out	: OUT std_logic_vector(1 downto 0);
 			exc_code	: OUT exc_code_t;
 			privilege_lvl : out std_logic;
+			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			estat_out	: OUT std_logic_vector(1 downto 0);
+			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			TLB_Com		: OUT std_LOGIC_VECTOR(2 downto 0);
+			addr_a		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_io		: OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
 			);
 end entity;
@@ -53,21 +58,25 @@ architecture Structure of multi is
 signal estat : std_logic_vector(1 downto 0) := "00";
 signal exc_code_b : exc_code_t := no_exc_c;
 signal exc_code_reg : exc_code_t;
+signal priv_level : std_logic;
+signal privilege_lvl_b : std_logic;
 signal acces_mem_b : std_logic;
-signal protect_b : std_logic;
+signal ill_ins_b : std_logic;
 signal pp_tlb_b : std_logic;
 
 component exc is
 	port(	clk 		: IN  STD_LOGIC;
 			boot		: IN  STD_LOGIC;
-			no_al		: IN  STD_LOGIC;--
-			ill_ins		: IN  STD_LOGIC;--
-			interrupt	: IN  STD_LOGIC;--
-			div_z		: IN  STD_LOGIC;--
-			acces_mem	: IN  STD_LOGIC;--
-			pp_tlb_d : IN  STD_LOGIC;--
-			protect : IN  STD_LOGIC;		--
-			call	: IN  STD_LOGIC;		 --
+			no_al		: IN  STD_LOGIC;
+			ill_ins		: IN  STD_LOGIC;
+			interrupt	: IN  STD_LOGIC;
+			div_z		: IN  STD_LOGIC;
+			acces_mem	: IN  STD_LOGIC;
+			pp_tlb_d	: IN  STD_LOGIC;
+			protect		: IN  STD_LOGIC;
+			call		: IN  STD_LOGIC;
+			estat		: IN  STD_LOGIC_VECTOR(1 downto 0);
+			exc_tlb 	: IN  STD_LOGIC_VECTOR(3 downto 0);
 			exc_code	: OUT exc_code_t
 			);
 end component;
@@ -81,20 +90,21 @@ begin
 				inta <= '0';
 				exca <= '0';
 				
-				-- if exc_code_b = no_al_c and estat = "00" then	-- Rutina addr_m si pertany a ins fem pc-1 i jmp pc
-				--	estat <= "10";
-				--	exca <= '1';
-				-- elsif
+				if halt_cont = '1' then	-- Si HALT -> HALT
+						estat <= "11";
 				
-				if exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01" then	-- Si salta una excepcio en Decode(sense comptar interrupcions anem a estat SYSTEM) -- REVISAR Execpcio no alineat en FETCH, saltar directe a excepcio, no esperar al decODE
+				-- excepcio de instruccio pocha REVISAR
+				elsif (exc_code_b = no_al_c or exc_code_b = protec_c) and estat = "00" then			-- A la Rutina de no_al si es una instruccio fem pc-1 i reexecutem
 					estat <= "10";
 					exca <= '1';
-					
+				elsif exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01" then	-- Si salta una excepcio en Decode
+					estat <= "10";
+					exca <= '1';
 				elsif interrupt = '1' and estat = "01" and int_e = '1' then	-- Si hi ha interrup en Decode i estan enable ens podem en estat SYSTEM
 					estat <= "10"; 
 					inta <= '1';
 				else
-					if halt_cont = '1' then
+					if halt_cont = '1' then	-- Si HALT -> HALT
 						estat <= "11";
 					elsif estat = "00" then -- Si estem a FETCH -> DECODE
 						estat <= "01";
@@ -105,17 +115,19 @@ begin
 					end if;
 				end if;
 			else 						-- Si estem a BOOT
-				if halt_cont = '1' then	-- REVISAR aixo
-					estat <= "01";		
-				else					
-					estat <= "00";
-				end if;
+				--halt_cont <= '0';
+				estat <= "00";
+				--if halt_cont = '1' then	-- REVISAR aixo
+				--	estat <= "01";		
+				--else					
+				--	estat <= "00";
+				--end if;
 			end if;
 		end if;
 	end process;
 	
 	-- HALT quan ens diuen de parar, ldpc_l quan estem a DECODE, else RUN
-	ldpc <= "011" when estat = "00" and halt_cont = '1' else 
+	ldpc <= "011" when estat = "00" and halt_cont = '1' else -- pot ser estat 01?
 			ldpc_l when estat = "01" else 
 			"101" when estat = "10" else -- SYSTEM
 			"011" when estat = "11" else
@@ -133,11 +145,17 @@ begin
 						w_b when others;
 						
 	with estat select
-		wr_m <=  '0' when "00",
-					'0' when "10",
-					'0' when "11",
-					wr_m_l when others;
-								
+		wr_m <=	'0' when "00",
+				'0' when "10",
+				'0' when "11",
+				wr_m_l when others;
+				
+	with estat select
+		ld_m <=	'1' when "00",		-- Llegim memoria en FETCH
+				'0' when "10",
+				'0' when "11",
+				ld_m_l when others;	-- I en DECODE
+
 	with estat select
 		wrd <=  '0' when "00",
 				'0' when "10",
@@ -195,6 +213,8 @@ begin
 				'1' when estat = "11" else
 				'1';
 	
+	TLB_Com <= 	TLB_Com_l when estat = "01" else -- En decode posem el codi de TLB, si no, NOP_TLB(111)
+				"111";
 	
 	
 	
@@ -203,39 +223,45 @@ begin
 	----- Control Excecions -----
 	-----------------------------
 	
-	
+	privilege_lvl <= sys_priv_lvl;
+	-- privilege_lvl <= priv_level;
 	-- Ens guardem el codi d'excepcio quan no sigui No_exception i no estiguem a Boot per evitar un ill_ins al bootar
 	process (exc_code_b, boot, ldpc_l, clk) begin
 		if rising_edge(clk) then
 			if boot = '1' then						-- Boot
 				exc_code <= no_exc_c;
-				privilege_lvl <= '1';
-			elsif exc_code_b /= no_exc_c then		-- Exc /= no_exc
+				priv_level <= '1';
+			--elsif (exc_code_b /= no_exc_c and sys_priv_lvl = '0') or exc_code_b = call_c then		-- Exc /= no_exc
+			elsif exc_code_b /= no_exc_c  then		-- Exc /= no_exc
 				exc_code <= exc_code_b;
-				if exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01" then -- Si hi ha excepci i li fem cas posem priv_level = 1
-					privilege_lvl <= '1';
+				
+				-- Si hi ha excepcio i li fem cas posem priv_level = 1. En cas de no_al o protec(REVISAR) pot saltar en estat 00
+				if (exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01") or ((exc_code_b = no_al_c or exc_code_b = protec_c) and estat = "00") then 
+					priv_level <= '1';
 				end if;
-			elsif ldpc_l = "100" then 		-- Si es un RETI borrem la el codi de interupcio i priv_level = 0
-				privilege_lvl <= '0';
+				
+			elsif ldpc_l = "100" then 		-- Si es un RETI borrem la el codi de interupcio i priv_level = 0 
+				priv_level <= '0';
 				exc_code <= no_exc_c;
 			elsif interrupt = '1' and estat = "01" and int_e = '1' then		-- Si entrem a una interrupcio priv_level = 1
-				privilege_lvl <= '1';
+				priv_level <= '1';
 			end if;
 			
 		end if;
 	end process;
 	
-	
+	ill_ins_b <= '1' when call_l = '1' and sys_priv_lvl = '1' else ill_ins_l;
+	--ill_ins_b <= '1' when call_l = '1' and priv_lvl = '1' else ill_ins_l;
 	-- Marquem que accedim a memoria en FETCH, en immed_x2 = 1 en ST i LB
 	acces_mem_b <= '1' when estat = "00" or (estat = "01" and immed_x2_l = '1') else '0';
 	
 	-- Marquem que accedim a pagina protegida en DECODE, ST/B i LB/B
 	pp_tlb_b <= pp_tlb_d_l when estat = "01" and (immed_x2_l = '1' or w_b = '1') else '0';
-	--exc_code <= exc_code_reg;
+
 				
 	exception_controller : exc port map(	clk			=> clk,
 											boot 		=> boot,
-											ill_ins 	=> ill_ins_l,
+											ill_ins 	=> ill_ins_b,
 											no_al		=> no_al,
 											div_z		=> div_z,
 											interrupt	=> interrupt,
@@ -243,7 +269,9 @@ begin
 											pp_tlb_d => pp_tlb_b,			
 											protect => protect_l,
 											call	=> call_l,
-											exc_code	=> exc_code_b
+											exc_code	=> exc_code_b,
+											exc_tlb => exc_tlb,
+											estat => estat
 											);
 								
 								

@@ -157,30 +157,23 @@ __interrup_keyboard:
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 inici: 
         movi   r1, 0xF
-        out     9, r1              ;activa todos los visores hexadecimales
-		$MOVEI r0, 0
-		$MOVEI r1 , 0xffff
-bucle_inf:	
-		addi	r0, r0, 1
-		cmpeq 	r2,r0,r1
-		bz		r2, bucle_inf
-		wrs 	s2,r2
-		$MOVEI r0, 0
-		$MOVEI r1 , 0xffff
-bucle_inf_2:	
-		addi	r0, r0, 1
-		cmpeq 	r2,r0,r1
-		bz		r2, bucle_inf_2
-		$MOVEI  r2, 1
-		calls 	r2
-		$MOVEI r0, 0
-		$MOVEI r1 , 0xffff
-bucle_inf_3:	
-		addi	r0, r0, 1
-		cmpeq 	r2,r0,r1
-		bz		r2, bucle_inf_3
-		$MOVEI 	r2, 0x8002
-		st 	 0(r2), r2
+        out     9, r1              	; activa todos los visores hexadecimales
+		
+		halt						; cmp no implementat 0x1010
+		
+		$MOVEI r0,0
+		div r0, r0, r0				; Div 0
+		
+		$MOVEI r0, 0x01
+		st  0(r0), r0				; no alineado
+		ld  r0, 0(r0)				; no alineado
+		
+		$MOVEI r0, end_jmp
+		addi r0,r0,1
+		jmp r0						; no alineado, fetch
+		
+		addi r0,r0,1
+end_jmp:
         halt
 
 __ilegal_ins:
@@ -201,11 +194,13 @@ __div_zero:
         jmp    r6
 		
 __no_align:
-		$MOVEI r1, 0xdead
-		movi 	r2, 0xF
-		out 9, r2
-		out 10, r1
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+		rds		r5, s3				; mirem si s3 i s1 son iguals, si no ho son, es una fallada en fetch
+		rds		r4, s1
+		cmpeq r4, r5, r4			
+		bz	r4, end_no_al			; si son iguals restem 1 al pc i ho posem a la pila
+		addi r5, r5, -1
+		st		2(r7), r5
+end_no_al:							; else no cal fer res
         jmp    r6
 		
 __protect:

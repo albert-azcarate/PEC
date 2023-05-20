@@ -15,7 +15,7 @@ ENTITY sisa IS
 			SRAM_OE_N 	: out 	std_logic := '1';
 			SRAM_WE_N 	: out 	std_logic := '1';
 			LEDG		: OUT 	std_logic_vector(7 DOWNTO 0);
-			LEDR		: OUT 	std_logic_vector(7 DOWNTO 0);
+			LEDR		: OUT 	std_logic_vector(8 DOWNTO 0);
 			HEX0		: OUT 	std_logic_vector(6 DOWNTO 0);
 			HEX1		: OUT 	std_logic_vector(6 DOWNTO 0);
 			HEX2		: OUT 	std_logic_vector(6 DOWNTO 0);
@@ -67,18 +67,23 @@ ARCHITECTURE Structure OF sisa IS
 			intr		: IN  std_logic;
 			no_al		: IN  std_logic;
 			pp_tlb_dx	: in std_logic; --exc
+			exc_tlb		: IN  std_logic_vector(3 downto 0);	
 			datard_m	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			rd_io 		: in  std_logic_vector(15 downto 0);
 			wr_m		: OUT STD_LOGIC;
+			ld_m		: OUT STD_LOGIC;
 			word_byte	: OUT STD_LOGIC;
 			wr_out 		: out std_logic;
 			rd_in 		: out std_logic;
 			inta		: out std_logic;
+			estat_multi	: OUT std_logic_vector(1 downto 0);
+			TLB_Com			: out std_LOGIC_VECTOR(2 downto 0);
 			addr_io 	: out std_logic_vector(7 downto 0);
 			wr_io 		: out std_logic_vector(15 downto 0);
 			addr_m		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			privilege_lvlx : out std_logic;
-			data_wr		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+			data_wr		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			a			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 			);
 	END component;
 
@@ -96,7 +101,7 @@ ARCHITECTURE Structure OF sisa IS
 			ps2_clk 	: inout std_logic;
 			ps2_data 	: inout std_logic;
 			led_verdes	: OUT	std_logic_vector(7 DOWNTO 0);
-			led_rojos 	: OUT	std_logic_vector(7 DOWNTO 0);
+			led_rojos 	: OUT	std_logic_vector(8 DOWNTO 0);
 			HEX0 		: OUT	std_logic_vector(6 DOWNTO 0);
 			HEX1 		: OUT	std_logic_vector(6 DOWNTO 0);
 			HEX2 		: OUT	std_logic_vector(6 DOWNTO 0);
@@ -127,13 +132,39 @@ ARCHITECTURE Structure OF sisa IS
 			vga_cursor        	: in  std_logic_vector(15 downto 0);		-- simplemente lo ignoramos, este controlador no lo tiene implementado
 			vga_cursor_enable	: in  std_logic);						-- simplemente lo ignoramos, este controlador no lo tiene implementado
 	end component;
+	
+	
+	component TLB IS
+	PORT ( 	boot 		: in  std_logic;
+			CLOCK 	 	: in  std_logic;
+			priv_lvl	: in  std_logic;
+			wre			: in  std_logic; 						-- write enabled de memoria (store)
+			ld_m		: in  STD_LOGIC;
+			state		: in  std_logic_vector(1 downto 0);        
+			TLB_com		: in  std_logic_vector(2 downto 0);		-- en ordre{WRPI, WRVI, WRPD, WRVD, FLUSH}
+			std_input 	: in  std_logic_vector(15 downto 0); 	-- acces normal
+			Ra			: in  std_logic_vector(15 downto 0);       
+			Rb			: in  std_logic_vector(15 downto 0);   
+			we_mem		: out std_logic;     
+			exc_tlb		: out std_logic_vector(3 downto 0);		-- revisar
+			std_output 	: out std_logic_vector(15 downto 0) 	-- acces normal
+			);
+	end component;
 
 	signal privilege_lvl_to_mem : std_LOGIC;
 	signal pp_tlb_d_to_proc: std_LOGIC;
+	signal estat_multi_to_tlb : std_logic_vector(1 downto 0);
+	signal TLB_Com_to_tlb : std_logic_vector(2 downto 0);
+	signal exc_tlb_to_proc : std_logic_vector(3 downto 0);
+	signal a_proc_to_tlb : std_logic_vector(15 downto 0);
+	signal we_tlb_to_mem : std_LOGIC;
+	signal ld_m_to_tlb : std_LOGIC;
 
-	signal addr_proc_to_mem	: std_logic_vector(15 DOWNTO 0);
+	signal addr_proc_to_tlb	: std_logic_vector(15 DOWNTO 0);
+	signal addr_tlb_to_mem	: std_logic_vector(15 DOWNTO 0);
+	
 	signal word_byte_to_mem	: std_logic;
-	signal wr_m_to_mem		: std_logic;
+	signal wr_m_to_tlb		: std_logic;
 	signal data_wr_to_mem	: std_logic_vector(15 DOWNTO 0);
 	signal rd_data_to_proc	: std_logic_vector(15 DOWNTO 0);
 	signal intr_to_proc		: std_logic;
@@ -169,10 +200,10 @@ BEGIN
 	
 	MUC: memoryController port map(
 		cloCK_50 	=> CLOCK_50,
-		addr 		=> addr_proc_to_mem,
+		addr 		=> addr_tlb_to_mem,
 		wr_data 	=> data_wr_to_mem,
 		rd_data		=> rd_data_to_proc,
-		we 			=> wr_m_to_mem,
+		we 			=> we_tlb_to_mem,
 		no_al		=> no_al_to_proc,
 		pp_tlb_d 	=> pp_tlb_d_to_proc,
 		privilege_lvl => privilege_lvl_to_mem,
@@ -195,20 +226,25 @@ BEGIN
 		clk 		=> clk(2),
 		boot 		=> sw(9),
 		datard_m 	=> rd_data_to_proc,
-		addr_m 		=> addr_proc_to_mem,
+		addr_m 		=> addr_proc_to_tlb,
 		data_wr		=> data_wr_to_mem,
-		wr_m 		=> wr_m_to_mem,
+		wr_m 		=> wr_m_to_tlb,
+		ld_m		=> ld_m_to_tlb,
 		word_byte	=> word_byte_to_mem,
 		addr_io 	=> addr_io_to_io,
 		wr_io 		=> wr_io_to_io,
 		rd_io 		=> rd_io_to_io,
+		TLB_Com		=> TLB_Com_to_tlb,
+		exc_tlb 	=> exc_tlb_to_proc,
 		wr_out 		=> wr_out_to_io,
+		estat_multi => estat_multi_to_tlb,
 		rd_in 		=> rd_in_to_io,
 		intr		=> intr_to_proc,
 		inta		=> inta_to_io,
 		privilege_lvlx => privilege_lvl_to_mem,
 		pp_tlb_dx 	=> pp_tlb_d_to_proc,
-		no_al		=> no_al_to_proc
+		no_al		=> no_al_to_proc,
+		a			=> a_proc_to_tlb
 		);
 		
 	CIO : controladores_IO port map (
@@ -252,5 +288,20 @@ BEGIN
 		vga_cursor      	=> vga_cursor_dummy,
 		vga_cursor_enable	=> vga_cursor_enable_dummy
 		);
+		
+	TLBs : tlb port map(	boot => sw(9),
+							clock => clk(2),
+							priv_lvl => privilege_lvl_to_mem,
+							wre => wr_m_to_tlb,
+							ld_m => ld_m_to_tlb,
+							state => estat_multi_to_tlb,
+							TLB_com => TLB_Com_to_tlb,
+							std_input => addr_proc_to_tlb,
+							Ra => a_proc_to_tlb,
+							Rb => wr_io_to_io,	--wr_io_to_io porta Rb
+							exc_tlb => exc_tlb_to_proc,
+							std_output => addr_tlb_to_mem,
+							we_mem => we_tlb_to_mem
+							);
 
 END Structure;
