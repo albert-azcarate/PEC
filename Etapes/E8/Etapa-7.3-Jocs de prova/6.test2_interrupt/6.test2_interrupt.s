@@ -37,6 +37,7 @@
 			.word __interrup_key ; 1 Pulsadores (KEY)
 			.word __interrup_switch ; 2 Interruptores (SWITCH)
 			.word __interrup_keyboard ; 3 Teclado PS/2
+			
 		exceptions_vector:
 			.word __ilegal_ins 			; 0 Instrucción ilegal
 			.word __no_align 			; 1 Acceso a memoria no alineado
@@ -49,12 +50,21 @@
 			.word RSE_default_halt 		; 8 Pagina invalida TLB ins
 			.word RSE_default_halt 		; 9 Pagina invalida TLB dat
 			.word RSE_default_halt 		; A Pagina protegida TLB ins
-			.word RSE_default_halt 		; B Pagina protegida TLB dat
+			.word __pp_tlb_dat 			; B Pagina protegida TLB dat
 			.word RSE_default_halt 		; C Pagina de solo lectura
-			.word RSE_default_halt 		; D Proteccion IO o user
-			.word RSE_default_halt	 	; E Call
+			.word __protect 			; D Proteccion IO o user
+			.word __calls	 			; E Call
 			.word RSE_default_resume 	; F Interrupcion
-
+			
+		call_sys_vector:
+			.word RSE_default_halt		; 0 Hay que definirla en el S.O.
+			.word __calls				; 1 Hay que definirla en el S.O.
+			.word RSE_default_halt		; 2 Hay que definirla en el S.O.
+			.word RSE_default_halt		; 3 Hay que definirla en el S.O.
+			.word RSE_default_halt		; 4 Hay que definirla en el S.O.
+			.word RSE_default_halt		; 5 Hay que definirla en el S.O.
+			.word RSE_default_halt		; 6 Hay que definirla en el S.O.
+			.word RSE_default_halt		; 7 Hay que definirla en el S.O.
 
 ; seccion de codigo
 .text
@@ -295,6 +305,19 @@ __no_align:
         addi  r1, r1, 1
 		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
+
+__protect:
+		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+        jmp    r6
+
+__calls:
+		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+        jmp    r6
+		
+__pp_tlb_dat:
+		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+        jmp    r6
+		
 
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         ; Subrutina para limpiar la pantalla

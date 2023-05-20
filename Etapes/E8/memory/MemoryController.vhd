@@ -60,9 +60,11 @@ begin
 	-- Permetem escriure a memoria en zona d'usuari
 	enable <= we when addr < x"c000" else '0';
 	
-	-- exception only when privilege lvl is no system's and accede in sys section
-	pp_tlb_d <= '1' when (addr >= x"8000" and privilege_lvl = '0') else '0'; 
 	
+	--revisar
+	-- exception only when privilege lvl is no system's and accede in sys section i no toquem VGA
+	pp_tlb_d <= '1' when (addr >= x"8000" and privilege_lvl = '0' and (addr < x"A000" or addr >= x"c000")) else '0'; 
+
 	no_al <= addr(0);
 	
 	-----------------------------
