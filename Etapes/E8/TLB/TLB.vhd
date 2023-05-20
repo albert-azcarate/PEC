@@ -98,7 +98,8 @@ BEGIN
 				exc_D when state = "01" else		--decode
 				"0000";
 				
-	we_mem <= wre when exc_I = "000" and exc_D = "0000" else '0';
+	-- Habilitem la escriptura a memoria quan no hi ha excepcio en el estat actual
+	we_mem <= wre when (exc_I = "000" and state = "00") or (exc_D = "0000" and state = "01") else '0';
 
 
 	std_output <= 	translation_I when state = "00" else

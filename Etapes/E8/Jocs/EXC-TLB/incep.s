@@ -52,12 +52,30 @@
         $MOVEI r1, RSG
         wrs    s5, r1      ;inicializamos en S5 la direccion de la rutina de antencion a la interrupcion
         $MOVEI r7, PILA    ;inicializamos R7 como puntero a la pila
+		
+		; cambien la TLB per adaptar la pila que apunti a 2000 cap avall
+		movi	r1, 3		
+		movi 	r2, 1		
+		wrvd	r2, r1		; TLBd(1) 3 -> 1
+		
+		; posem a la TLB el vga
+		;movi	r1, 2A		
+		;movi 	r2, 2		
+		;wrvd	r2, r1		; TLBd(2) A -> 2
+		;wrpd	r2, r1		; TLBd(2) A -> A v = 1 r = 0
+		
+		;posem a la TLB el vga
+		movi	r1, 28
+		movi 	r2, 2		
+		wrvd	r2, r1		; TLBd(2) A -> 2
+		wrpd	r2, r1		; TLBd(2) A -> A v = 1 r = 0
+		
         $MOVEI r6, inici   ;direccion de la rutina principal
         wrs	s1, r6 
-	ei
-	$MOVEI 	r6, 0x02
-	wrs 	s0, r6
-	reti	; saltem a mode user c016
+		ei
+		$MOVEI 	r6, 0x02
+		wrs 	s0, r6
+		reti	; saltem a mode user c016
 		;jmp    r6
 
 
@@ -179,11 +197,11 @@ inici:
 		halt						; special no implementat 0xfe10 (fake wrs)
 		$MOVEI r0, 0x0000
 		$MOVEI r2, 0x1010
-		st 0(r0), r2
+		st 0(r0), r2				; guardem a 0x0000 la ins ilegal 1010
 		$MOVEI r2, 0x2000
-		st 2(r0), r2
+		st 2(r0), r2				; guardem a 0x0002 la ins ADDI r0,r0,0
 		$MOVEI r1, tornar
-		$MOVEI r2, 0xA043
+		$MOVEI r2, 0xA043			; guardem a 0x0004 la ins JMP r1 (etiqueta tornar)
 		st 4(r0), r2
 		jmp r0
 		
