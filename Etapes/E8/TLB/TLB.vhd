@@ -91,9 +91,9 @@ BEGIN
 							TLB_Com(2)&TLB_Com(0) when TLB_Com(1) ='0'else
 							"11";
 
+
 	--diferencies entre ins i data TLB:
 	--data te una excepcio mes (READ ONLY PAGE when store)
-
 	exc_tlb <=	'0'&exc_I when state = "00" else	--fetch
 				exc_D when state = "01" else		--decode
 				"0000";

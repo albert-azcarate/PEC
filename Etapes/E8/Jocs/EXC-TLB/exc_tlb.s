@@ -64,12 +64,6 @@
 		;wrvd	r2, r1		; TLBd(2) A -> 2
 		;wrpd	r2, r1		; TLBd(2) A -> A v = 1 r = 0
 		
-		;posem a la TLB el vga
-		movi	r1, 28
-		movi 	r2, 2		
-		wrvd	r2, r1		; TLBd(2) A -> 2
-		wrpd	r2, r1		; TLBd(2) A -> A v = 1 r = 0
-		
         $MOVEI r6, inici   ;direccion de la rutina principal
         wrs	s1, r6 
 		ei
@@ -269,10 +263,12 @@ end_all:
 		
 __tlb_exc:
 		rds r0,s2
-		movhi r0, 0xf0
-		movi r1, 0xF
-		out 10, r1
-		out 9, r0
+		movi r2, 12
+		shl r0, r0, r2
+		rds r1, s4
+		or  r0, r0, r1
+		wrs s4, r0
+		out 10, r0
 		jmp r6
 		
 		halt

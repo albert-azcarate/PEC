@@ -44,10 +44,10 @@ BEGIN
 					7 when std_input(15 downto 12) = VTags(7) else	-- sys
 					-1;
 	
-	exc_tlb_D(0) <= '1' when adress_reg = -1 and (ld_m = '1' or wre = '1') else '0';									-- MISS_TLB_D
-	exc_tlb_D(1) <= '1' when Valid_bits(adress_reg) = '0' and (ld_m = '1' or wre = '1') else '0';						--Pagina Invalida 
-	exc_tlb_D(2) <= '1' when adress_reg > 2 and priv_lvl = '0' and (ld_m = '1' or wre = '1') else '0';					--Pagina protegida
-	exc_tlb_D(3) <= '1' when adress_reg /= -1 and Read_bits(adress_reg) = '1' and wre = '1' else '0';					--Pagina solo lectura
+	exc_tlb_D(0) <= '1' when adress_reg = -1 and (ld_m = '1' or wre = '1') else '0';									-- MISS_TLB_D en LD/B i ST/B
+	exc_tlb_D(1) <= '1' when Valid_bits(adress_reg) = '0' and (ld_m = '1' or wre = '1') else '0';						-- Pagina Invalida 
+	exc_tlb_D(2) <= '1' when adress_reg > 2 and priv_lvl = '0' and (ld_m = '1' or wre = '1') else '0';					-- Pagina protegida
+	exc_tlb_D(3) <= '1' when adress_reg /= -1 and Read_bits(adress_reg) = '1' and wre = '1' else '0';					-- Pagina solo lectura
 
 	--read asincron TLB, treball standard de la TLB
 	std_output <= PTags(adress_reg)&std_input(11 downto 0) when adress_reg /= -1 and Valid_bits(adress_reg) = '1' else x"0FFE";
@@ -80,7 +80,7 @@ BEGIN
 				
 				Valid_bits <= (others => '1');
 				Read_bits(2 downto 0) <= (others => '0');
-				Read_bits(7 downto 3) <= (others => '1'); -- Les pagines de systema nomes en mode lectura
+				Read_bits(7 downto 3) <= (others => '1'); -- Les pagines de systema poden ser escriptura i lectura en mode sistema REVISAR
 			else 
 				if command = "00" then -- WRrite Phisical address into Data TLB
 				

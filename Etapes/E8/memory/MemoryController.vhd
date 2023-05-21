@@ -56,7 +56,8 @@ architecture comportament of MemoryController is
 	signal rd_data_mem : std_logic_vector(15 downto 0);
 	
 begin
-
+	
+	-- revisar si no es pot treure ara amb la tlb
 	-- Permetem escriure a memoria en zona d'usuari
 	enable <= we when addr < x"c000" else '0';
 	
@@ -73,7 +74,7 @@ begin
 	
 	-- Calculem el offset entre la nostre memoria i la direccio real de la VGA
 	-- si no es el cas posem direccio 0x0 pero no pasa res perque tindrem el enable a 0 ; REV, aixo podria ser directe sempre addr(12 downto 0)
-	vga_addr <= addr(12 downto 0); -- when addr >= x"A000" and addr < x"c000" else (others => '0');
+	vga_addr <= addr(12 downto 0);
 	
 	-- Nomes escribim quan son les addreces correctes
 	vga_we <= we when addr >= x"A000" and addr < x"c000" else '0';

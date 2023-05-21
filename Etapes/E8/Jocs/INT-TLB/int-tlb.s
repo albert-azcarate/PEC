@@ -45,13 +45,13 @@
 			.word RSE_default_halt 		; 3 División por cero flotante
 			.word __div_zero	 		; 4 División por cero
 			.word RSE_default_resume 	; 5 No excepcion
-			.word RSE_default_halt	 	; 6 Miss TLB pag ins
-			.word RSE_default_halt 		; 7 Miss TLB pag dat
-			.word RSE_default_halt 		; 8 Pagina invalida TLB ins
-			.word RSE_default_halt 		; 9 Pagina invalida TLB dat
-			.word RSE_default_halt 		; A Pagina protegida TLB ins
-			.word __pp_tlb_dat 			; B Pagina protegida TLB dat
-			.word RSE_default_halt 		; C Pagina de solo lectura
+			.word __tlb_exc	 			; 6 Miss TLB pag ins
+			.word __tlb_exc 			; 7 Miss TLB pag dat
+			.word __tlb_exc 			; 8 Pagina invalida TLB ins
+			.word __tlb_exc 			; 9 Pagina invalida TLB dat
+			.word __tlb_exc 			; A Pagina protegida TLB ins
+			.word __tlb_exc				; B Pagina protegida TLB dat
+			.word __tlb_exc 			; C Pagina de solo lectura
 			.word __protect 			; D Proteccion IO o user
 			.word __calls	 			; E Call
 			.word RSE_default_resume 	; F Interrupcion
@@ -74,47 +74,88 @@
         $MOVEI r1, RSG
         wrs    s5, r1      ;inicializamos en S5 la direccion de la rutina de antencion a la interrupcion
         $MOVEI r7, PILA    ;inicializamos R7 como puntero a la pila
+		
+		; cambien la TLB per adaptar la pila que apunti a 4000 cap avall
+		movi	r1, 0x23		
+		movi 	r2, 1		
+		wrvd	r2, r1		; TLBd(2) 3 -> 1
+		;wrpd	r2, r1		; TLBd(2) 3 -> 3 v = 1 r = 0
+		
+		; posem a la TLB el vga
+		movi 	r1, 0x2A		
+		movi 	r2, 2		
+		wrvd 	r2, r1		; TLBd(2) A -> 2
+		wrpd 	r2, r1		; TLBd(2) A -> A v = 1 r = 0
+		
+		
+		movi   r1, 0xF
+        out     9, r1              ;activa todos los visores hexadecimales
+        movi   r1, 0x00
+        out    10, r1              ;muestra el valor 0x0000 en los visores
+        out     5, r1              ;apaga los leds verdes
+        in     r1, 8               ;leemos el valor de los interruptores
+        out     6, r1              ;activa los leds rojos con el valor de los interruptores
+		$MOVEI r1, 0x0000
+		wrs		s4,r1
+		
         $MOVEI r6, inici   ;direccion de la rutina principal
-        jmp    r6
-		; wrs s5, inici
-		;reti saltem a mode user 
+		wrs	s1, r6 
+		ei
+		$MOVEI 	r6, 0x02
+		wrs 	s0, r6
+		reti	; saltem a mode user 
 
 
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         ; Rutina de servicio de interrupcion
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-RSG:    $push R0, R1, R2, R3, R4, R5, R6
-		rds R1, S0
-		rds R2, S1
-		rds R3, S3
-		$push R1, R2, R3
-		rds R1, S2 				;consultamos el contenido de S2
-		movi R2, 15
-		cmplt R3, R1, R2 		;si es menor a 15 es una excepción C032
-		bz R3, __interrupcion 	;saltamos a las interrupciones si S2 es igual a 15
-__excepcion:
-		movi R2, lo(exceptions_vector)
-		movhi R2, hi(exceptions_vector)
-		add R1, R1, R1 			;R1 contiene el identificador de excepción
-		add R2, R2, R1
-		ld R2, 0(R2)
-		jal R6, R2
-		bnz R3, __finRSG
-__interrupcion:
-		getiid R1
-		add R1, R1, R1
-		movi R2, lo(interrupts_vector)
-		movhi R2, hi(interrupts_vector)
-		add R2, R2, R1
-		ld R2, 0(R2)
-		jal R6, R2
-__finRSG: 						;Restaurar el estado
-		$pop R3, R2, R1
-		wrs S3, R3
-		wrs S1, R2
-		wrs S0, R1
-		$pop R6, R5, R4, R3, R2, R1, R0
-		reti
+RSG: ; Salvar el estado
+			$push R0, R1, R2, R3, R4, R5, R6
+			rds R1, S0
+			rds R2, S1
+			rds R3, S3
+			$push R1, R2, R3
+			rds R1, S2 ;consultamos el contenido de S2
+			movi R2, 14
+			cmpeq R3, R1, R2 ;si es igual a 14 es una llamada a sistema
+			bnz R3, __call_sistema ;saltamos a las llamadas a sistema si S2 es igual a 14
+			movi R2, 15
+			cmpeq R3, R1, R2 ;si es igual a 15 es una interrupción
+			bnz R3, __interrupcion ;saltamos a las interrupciones si S2 es igual a 15
+	__excepcion:
+			movi R2, lo(exceptions_vector)
+			movhi R2, hi(exceptions_vector)
+			add R1, R1, R1 ;R1 contiene el identificador de excepción
+			add R2, R2, R1
+			ld R2, 0(R2)
+			jal R6, R2
+			bz R3, __finRSG
+	__call_sistema:
+			rds R1, S3 ;S3 contiene el identificador de la llamada a sistema
+			movi R2,7
+			and R1, R1, R2 ;nos quedamos con los 3 bits de menor peso limitar el número de servicios definidos en el S.O.
+			add R1, R1, R1
+			movi R2, lo(call_sys_vector)
+			movhi R2, hi(call_sys_vector)
+			add R2, R2, R1
+			ld R2, 0(R2)
+			jal R6, R2
+			bnz R3, __finRSG
+	__interrupcion:
+			getiid R1
+			add R1, R1, R1
+			movi R2, lo(interrupts_vector)
+			movhi R2, hi(interrupts_vector)
+			add R2, R2, R1
+			ld R2, 0(R2)
+			jal R6, R2
+	__finRSG: ;Restaurar el estado
+			$pop R3, R2, R1
+			wrs S3, R3
+			wrs S1, R2
+			wrs S0, R1
+			$pop R6, R5, R4, R3, R2, R1, R0
+			reti 
 		
 RSE_default_resume: JMP R6
 RSE_default_halt: HALT
@@ -221,17 +262,7 @@ __fin_keyboard:
         ; Rutina principal
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 inici: 
-        movi   r1, 0xF
-        out     9, r1              ;activa todos los visores hexadecimales
-        movi   r1, 0x00
-        out    10, r1              ;muestra el valor 0x0000 en los visores
-        out     5, r1              ;apaga los leds verdes
-        in     r1, 8               ;leemos el valor de los interruptores
-        out     6, r1              ;activa los leds rojos con el valor de los interruptores
-        $CALL  r6, __clear_screen  ;borra la pantalla (en R6 se almacena la direccion de retorno de la subrutina)
-		$MOVEI r1, 0x0000
-		wrs		s4,r1
-        ei                         ;activa las interrupciones	;C12C
+		$CALL  r6, __clear_screen  ;borra la pantalla (en R6 se almacena la direccion de retorno de la subrutina)
 
 binf:   
         $MOVEI r1, 0xA000          ;fila 0; columna 0
@@ -286,38 +317,71 @@ binf:
 
 
 __ilegal_ins:
-		
-		rds   r1, s4
-        addi  r1, r1, 1
-		wrs	  s4 ,r1
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
 __div_zero:
-		rds   r1, s4
-        addi  r1, r1, 1
-		wrs	  s4 ,r1
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
 __no_align:
-		rds   r1, s4
-        addi  r1, r1, 1
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
+		rds		r5, s3				; mirem si s3 i s1 son iguals, si no ho son, es una fallada en fetch
+		rds		r4, s1
+		cmpeq r4, r5, r4			
+		bz	r4, end_no_al			; si son iguals restem 1 al pc i ho posem a la pila
+		addi r5, r5, -1
+		st		2(r7), r5
+		
+end_no_al:							; else no cal fer res
         jmp    r6
 
 __protect:
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 
 __calls:
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
 __pp_tlb_dat:
-		$MOVEI r6, __finRSG         ;direccion del fin del servicio de interrupcion
         jmp    r6
 		
+__tlb_exc:
+		rds r0, s3		; llegim quina adressa ha fallat
+		movi r1, 0x0A
+		movi r2, 12
+		shl r2, r1, r2	; posem 0xA000
+		xor r2, r2, r0	; r2 <- 0x1XXX si BXXX or 0x0XXX si AXXX
+		movi r0, -12
+		shl r2, r2 ,r0	; r2 <- 1 si BXXX, 0 si AXXX
+		bz r2, miss_A
+		movi r0, 0x01
+		cmpeq r0,r2,r0
+		bnz r0, miss_B
+		rds r0, s3
+		movi r1, -4
+		shl r0, r0, r1	; posem 0x0X00
+		shl r0, r0, r1	; posem 0x00X0
+		movhi r0, 0x02	; 0x02X0
+		shl r1, r0, r1	; posem 0x002X	
+		movi r2, 0                      ; TLBd(0) X -> X v = 1 r = 0
+		bnz r1, end_miss_tlb
+		
+miss_B:
+		movi 	r1, 0x2B		; TLBd(2) B -> 2
+		movi 	r2, 2	        ; TLBd(2) B -> B v = 1 r = 0
+		bnz 	r2, end_miss_tlb
+		
+miss_A:
+		movi 	r1, 0x2A	; TLBd(2) A -> 2
+		movi 	r2, 2	    ; TLBd(2) A -> A v = 1 r = 0
+		
+end_miss_tlb:			
+		wrvd 	r2, r1		
+		wrpd 	r2, r1		
+		
+		ld 	r5, 2(r7)
+		;rds		r5, s1
+		addi r5, r5, -2
+		st		2(r7), r5	; pc = pc - 2
+		
+		jmp r6
 
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         ; Subrutina para limpiar la pantalla
@@ -350,6 +414,7 @@ bucle_cad: ldb   r4, 0(r2)
            bnz   r4, bucle_cad
 fin_bucle_cad:
            jmp r6    ; retornar de la subrutina
+		   
 
 
 
