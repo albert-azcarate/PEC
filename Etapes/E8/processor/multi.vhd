@@ -94,7 +94,7 @@ begin
 						estat <= "11";
 				
 				-- excepcio de instruccio pocha REVISAR
-				elsif (exc_code_b = no_al_c or exc_code_b = protec_c) and estat = "00" then			-- A la Rutina de no_al si es una instruccio fem pc-1 i reexecutem
+				elsif (exc_code_b = no_al_c or exc_code_b = m_tlb_i_c or exc_code_b = i_tlb_i_c or exc_code_b = pp_tlb_i_c) and estat = "00" then			-- A la Rutina de no_al si es una instruccio fem pc-1 i reexecutem
 					estat <= "10";
 					exca <= '1';
 				elsif exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01" then	-- Si salta una excepcio en Decode
@@ -115,13 +115,7 @@ begin
 					end if;
 				end if;
 			else 						-- Si estem a BOOT
-				--halt_cont <= '0';
 				estat <= "00";
-				--if halt_cont = '1' then	-- REVISAR aixo
-				--	estat <= "01";		
-				--else					
-				--	estat <= "00";
-				--end if;
 			end if;
 		end if;
 	end process;
@@ -224,19 +218,18 @@ begin
 	-----------------------------
 	
 	privilege_lvl <= sys_priv_lvl;
-	-- privilege_lvl <= priv_level;
 	-- Ens guardem el codi d'excepcio quan no sigui No_exception i no estiguem a Boot per evitar un ill_ins al bootar
 	process (exc_code_b, boot, ldpc_l, clk) begin
 		if rising_edge(clk) then
 			if boot = '1' then						-- Boot
 				exc_code <= no_exc_c;
 				priv_level <= '1';
-			--elsif (exc_code_b /= no_exc_c and sys_priv_lvl = '0') or exc_code_b = call_c then		-- Exc /= no_exc
+				
 			elsif exc_code_b /= no_exc_c  then		-- Exc /= no_exc
 				exc_code <= exc_code_b;
 				
-				-- Si hi ha excepcio i li fem cas posem priv_level = 1. En cas de no_al o protec(REVISAR) pot saltar en estat 00
-				if (exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01") or ((exc_code_b = no_al_c or exc_code_b = protec_c) and estat = "00") then 
+				-- Si hi ha excepcio i li fem cas posem priv_level = 1. En cas de exc en fetch nomes els pertinents
+				if (exc_code_b /= no_exc_c and exc_code_b /= interrupt_c and estat = "01") or ((exc_code_b = no_al_c or exc_code_b = m_tlb_i_c or exc_code_b = i_tlb_i_c or exc_code_b = pp_tlb_i_c) and estat = "00") then 
 					priv_level <= '1';
 				end if;
 				
@@ -251,7 +244,7 @@ begin
 	end process;
 	
 	ill_ins_b <= '1' when call_l = '1' and sys_priv_lvl = '1' else ill_ins_l;
-	--ill_ins_b <= '1' when call_l = '1' and priv_lvl = '1' else ill_ins_l;
+	
 	-- Marquem que accedim a memoria en FETCH, en immed_x2 = 1 en ST i LB
 	acces_mem_b <= '1' when estat = "00" or (estat = "01" and immed_x2_l = '1') else '0';
 	

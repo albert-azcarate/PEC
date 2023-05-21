@@ -10,38 +10,38 @@
 
 		
 		interrupts_vector:
-			.word __interrup_timer ; 0 Interval Timer
-			.word __interrup_key ; 1 Pulsadores (KEY)
-			.word __interrup_switch ; 2 Interruptores (SWITCH)
-			.word __interrup_keyboard ; 3 Teclado PS/2
+			.word __interrup_timer 				; 0 Interval Timer
+			.word __interrup_key 				; 1 Pulsadores (KEY)
+			.word __interrup_switch 			; 2 Interruptores (SWITCH)
+			.word __interrup_keyboard 			; 3 Teclado PS/2
 			
 		exceptions_vector:
-			.word RSE_default_resume	; 0 Instrucción ilegal
-			.word __no_align	; 1 Acceso a memoria no alineado
-			.word RSE_default_resume	; 2 Overflow en coma flotante
-			.word RSE_default_resume	; 3 División por cero flotante
-			.word RSE_default_resume	; 4 División por cero
-			.word RSE_default_resume 	; 5 No excepcion
-			.word __tlb_exc	 			; 6 Miss TLB pag ins
-			.word __tlb_exc 			; 7 Miss TLB pag dat
-			.word __tlb_exc 			; 8 Pagina invalida TLB ins
-			.word __tlb_exc 			; 9 Pagina invalida TLB dat
-			.word __tlb_exc 			; A Pagina protegida TLB ins
-			.word __tlb_exc				; B Pagina protegida TLB dat
-			.word __tlb_exc				; C Pagina de solo lectura
-			.word RSE_default_resume	; D Proteccion IO o user
-			.word __calls	 			; E Call
-			.word RSE_default_resume 	; F Interrupcion
-			
-		call_sys_vector:
-			.word RSE_default_halt		; 0 Hay que definirla en el S.O.
-			.word __calls				; 1 Hay que definirla en el S.O.
-			.word RSE_default_halt		; 2 Hay que definirla en el S.O.
-			.word RSE_default_halt		; 3 Hay que definirla en el S.O.
-			.word RSE_default_halt		; 4 Hay que definirla en el S.O.
-			.word RSE_default_halt		; 5 Hay que definirla en el S.O.
-			.word RSE_default_halt		; 6 Hay que definirla en el S.O.
-			.word RSE_default_halt		; 7 Hay que definirla en el S.O.
+			.word __ilegal_ins					; 0 Instrucción ilegal
+			.word __no_align					; 1 Acceso a memoria no alineado
+			.word RSE_default_halt				; 2 Overflow en coma flotante
+			.word RSE_default_halt				; 3 División por cero flotante
+			.word __div_zero					; 4 División por cero
+			.word RSE_default_resume 			; 5 No excepcion
+			.word __tlb_exc_m_i	 				; 6 Miss TLB pag ins
+			.word __tlb_exc_m_d 				; 7 Miss TLB pag dat
+			.word __tlb_exc_i_i 				; 8 Pagina invalida TLB ins
+			.word __tlb_exc_i_d					; 9 Pagina invalida TLB dat
+			.word __tlb_exc_pp_i				; A Pagina protegida TLB ins
+			.word __tlb_exc_pp_d				; B Pagina protegida TLB dat
+			.word __tlb_exc_ro_d				; C Pagina de solo lectura
+			.word __protect						; D Proteccion IO o user
+			.word __calls	 					; E Call
+			.word RSE_default_resume 			; F Interrupcion
+	
+		call_sys_vector:		
+			.word RSE_default_halt				; 0 Hay que definirla en el S.O.
+			.word __calls						; 1 Hay que definirla en el S.O.
+			.word RSE_default_halt				; 2 Hay que definirla en el S.O.
+			.word RSE_default_halt				; 3 Hay que definirla en el S.O.
+			.word RSE_default_halt				; 4 Hay que definirla en el S.O.
+			.word RSE_default_halt				; 5 Hay que definirla en el S.O.
+			.word RSE_default_halt				; 6 Hay que definirla en el S.O.
+			.word RSE_default_halt				; 7 Hay que definirla en el S.O.
 
 
 ; seccion de codigo
@@ -58,11 +58,11 @@
 		movi 	r2, 1		
 		wrvd	r2, r1		; TLBd(1) 3 -> 1
 		
-		; posem a la TLB el vga
-		;movi	r1, 2A		
-		;movi 	r2, 2		
-		;wrvd	r2, r1		; TLBd(2) A -> 2
-		;wrpd	r2, r1		; TLBd(2) A -> A v = 1 r = 0
+		; borrem la entrada D de TLBi
+		movi	r1, 3		
+		movi 	r2, 5		
+		wrvi	r2, r1		; TLBd(5) 3 -> d
+		
 		
         $MOVEI r6, inici   ;direccion de la rutina principal
         wrs	s1, r6 
@@ -135,9 +135,7 @@ RSG: ; Salvar el estado
 		
 RSE_default_resume: JMP R6
 RSE_default_halt: HALT
-RSE_excepcion_TLB: JMP R6; fragmento de código
- ; falta el código de la tarea a hacer
- ;rds R2, S1 ; hay que volver a ejecutar la instrucción que ha fallado
+RSE_excepcion_TLB: JMP R6
 
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         ; Rutina interrupcion reloj
@@ -175,10 +173,30 @@ __interrup_keyboard:
         jmp    r6
 
 
-        ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+
+end_all:	
+		halt
+		
+		
+		; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         ; Rutina principal
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+		
+		
 inici: 
+		$MOVEI r1, post_inici
+		$MOVEI r2, 0x1000
+		add r1, r1, r2
+		jmp r1				; saltem a 0xD0XX, saltara miss i i farem TLBi D -> C
+post_inici:
+		$MOVEI	r0, 0x4000	; Aqui han de saltar excepcions de miss TLBi i invalid TLBi
+		st		0(r0), r0	; Aqui ha de saltar miss TLBd, invalid TLBd i READ_ONLY TLBd
+		$MOVEI	r0, 0xC000	
+		ld		r0, 0(r0)	; pp_TLB_i
+		
+		
+		
         movi   r1, 0xF
         out     9, r1				;activa todos los visores hexadecimales
 		halt						; cmp no implementat 0x1010 rev
@@ -225,10 +243,17 @@ end_jmp:
 		reti
 		getiid r0
 		ei
-		di							; instruccio protegida
-		$MOVEI r2, 1
-		calls r2					; calls ; calls recursive 
-									; en ppi posara 0x15
+		di							; instruccions protegides
+		wrpd	r0, r0
+		wrpi 	r0, r0
+		wrvi	r0, r0
+		wrvd	r0, r0
+		
+		$MOVEI r2, 1				; calls ; calls recursive 
+		calls r2					; en ppi posara 31 0x1F
+		
+									; exc de TLB
+		
 		halt
 
 __ilegal_ins:
@@ -253,23 +278,82 @@ __protect:
 
 __calls:
 		calls 	r1
-        jmp    r6
+        jmp    r6	
 		
-__pp_tlb_dat:
-        jmp    r6		
+ __tlb_exc_m_i:
+		; posem a TLB
+		; entra un pc d006
+		
+		rds r0,s3	; llegim quina adressa ha fallat
+		movi r1, -12
+		shl r1, r0, r1	; posem 0x000X
+		movi r2, 7
+		movi r3, 0x0C
+		wrpi r2, r3		; TLBi(7) 7 -> C v = 0, r = 0	; POSEM INVALIDA per que salti la seguent excepcio de invalida
+		wrvi r2, r1 	; TLBi(7) X -> C v = 0, r = 0
+		
+		movi r3, 0 			; posem r3 a 0 que si no al BZ de tornada no salta; En exc en Instruccio no cal fer pc - 2 perque no hem fet pc + 2
+		jmp r6
+ 
+ __tlb_exc_m_d: 
+		; posem a TLB i rexecutem
+		; entra una @ 0x4000
+		
+		rds r0,s3	; llegim quina adressa ha fallat
+		movi r1, -12
+		shl r1, r0, r1	; posem 0x000X
+		movi r2, 2
+		movi r3, 0x0A
+		wrpd r2, r3		; TLBi(2) 2 -> A v = 0, r = 0	; POSEM INVALIDA per que salti la seguent excepcio de invalida
+		wrvd r2, r1 	; TLBi(2) X -> A v = 0, r = 0
+		movi r0, 0
+		bz r0, __tlb_reexecute
+ 
+ __tlb_exc_i_i: 
+		; posem a valida 
+		; entra un pc d006
+		
+		rds r0,s3	; llegim quina adressa ha fallat
+		movi r1, -12
+		shl r1, r0, r1	; posem 0x000X
+		movi r2, 7
+		movi r3, 0x2C
+		wrpi r2, r3		; TLBi(7) 7 -> C v = 1, r = 0
+		wrvi r2, r1 	; TLBi(7) X -> C v = 1, r = 0
 
-end_all:	
-		halt
+		movi r3, 0 			; posem r3 a 0 que si no al BZ de tornada no salta; En exc en Instruccio no cal fer pc - 2 perque no hem fet pc + 2
+		jmp r6
+ 
+ 
+ __tlb_exc_i_d:	
+		; posem a valida i rexecutem
+		; entra una @ 0xA000 en invalida
 		
-__tlb_exc:
-		rds r0,s2
-		movi r2, 12
-		shl r0, r0, r2
-		rds r1, s4
-		or  r0, r0, r1
-		wrs s4, r0
-		out 10, r0
+		rds r0,s3	; llegim quina adressa ha fallat
+		movi r1, -12
+		shl r1, r0, r1	; posem 0x000X
+		movi r2, 2
+		movi r3, 0x3A
+		wrpd r2, r3		; TLBi(2) 2 -> A v = 1, r = 1	; POSEM READ_ONLY per que salti la seguent excepcio
+		wrvd r2, r1 	; TLBi(2) X -> A v = 1, r = 1
+		movi r0, 0
+		bz r0, __tlb_reexecute
+		
+ __tlb_exc_pp_i:
+		jmp r6
+ 
+ __tlb_exc_pp_d:
+		jmp r6
+ 
+ __tlb_exc_ro_d:
 		jmp r6
 		
-		halt
+__tlb_reexecute:
+		ld 	r5, 2(r7)		; ld del pc antic
+		addi r5, r5, -2
+		st	2(r7), r5	; pc = pc - 2
+		movi r3, 0 			; posem r3 a 0 que si no al BZ de tornada no salta
+		jmp r6
+		
+		
 		

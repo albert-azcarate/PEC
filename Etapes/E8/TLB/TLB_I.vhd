@@ -46,7 +46,7 @@ BEGIN
 	-- Excepcions
 	exc_tlb_I(0) <= '1' when adress_reg = -1 and (ld_m = '1' or wre = '1') else '0';			-- MISS_TLB_I
 	exc_tlb_I(1) <= '1' when Valid_bits(adress_reg) = '0' else '0';								-- Pagina Invalida 
-	exc_tlb_I(2) <= '1' when adress_reg > 2 and (priv_lvl = '0' and estat = "01") else '0';		-- Pagina Protegida 
+	exc_tlb_I(2) <= '1' when adress_reg > 2 and (priv_lvl = '0' and estat = "01") else '0';		-- Pagina Protegida ; mai saltara en els nostres tests
 	
 	--read asincron TLB, treball standard de la TLB
 	std_output <= PTags(adress_reg)&std_input(11 downto 0) when adress_reg /= -1 and Valid_bits(adress_reg) = '1' else x"0FFE";
