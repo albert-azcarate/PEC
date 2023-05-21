@@ -252,8 +252,6 @@ end_jmp:
 		$MOVEI r2, 1				; calls ; calls recursive 
 		calls r2					; en ppi posara 31 0x1F
 		
-									; exc de TLB
-		
 		halt
 
 __ilegal_ins:
@@ -351,7 +349,7 @@ __calls:
 __tlb_reexecute:
 		ld 	r5, 2(r7)		; ld del pc antic
 		addi r5, r5, -2
-		st	2(r7), r5	; pc = pc - 2
+		st	2(r7), r5		; pc = pc - 2
 		movi r3, 0 			; posem r3 a 0 que si no al BZ de tornada no salta
 		jmp r6
 		
