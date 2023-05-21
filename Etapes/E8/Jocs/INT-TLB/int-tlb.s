@@ -75,13 +75,14 @@
         wrs    s5, r1      ;inicializamos en S5 la direccion de la rutina de antencion a la interrupcion
         $MOVEI r7, PILA    ;inicializamos R7 como puntero a la pila
 		
-		; cambien la TLB per adaptar la pila que apunti a 4000 cap avall
-		movi	r1, 0x23		
-		movi 	r2, 1		
-		wrvd	r2, r1		; TLBd(2) 3 -> 1
-		;wrpd	r2, r1		; TLBd(2) 3 -> 3 v = 1 r = 0
 		
-		; posem a la TLB el vga
+		; cambiem la TLB per adaptar la pila que apunti a 4000 cap avall							; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=* ;
+		movi	r1, 0x23			                                                                ; TLBd(1) Pila 															    ;
+		movi 	r2, 1															                    ; TLBd(2) VGA; En fallada de pagina per la 0xBXXX es modifica el TLBd(2)    ;
+		wrvd	r2, r1		; TLBd(1) 3 -> 1														; TLBd(0) Fallades de pagina random                                         ;
+		;wrpd	r2, r1		; TLBd(1) 3 -> 3 v = 1 r = 0											;                                                                           ;
+																									; TLB instruccions no la toquem                                             ;
+		; posem a la TLB el vga																		; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=* ;
 		movi 	r1, 0x2A		
 		movi 	r2, 2		
 		wrvd 	r2, r1		; TLBd(2) A -> 2
@@ -322,7 +323,7 @@ __ilegal_ins:
 __div_zero:
         jmp    r6
 		
-__no_align:
+__no_align:							; AIXO ESTA AQUI PERO EN AQUEST TEST NO PASSA
 		rds		r5, s3				; mirem si s3 i s1 son iguals, si no ho son, es una fallada en fetch
 		rds		r4, s1
 		cmpeq r4, r5, r4			
@@ -347,39 +348,38 @@ __tlb_exc:
 		movi r1, 0x0A
 		movi r2, 12
 		shl r2, r1, r2	; posem 0xA000
-		xor r2, r2, r0	; r2 <- 0x1XXX si BXXX or 0x0XXX si AXXX
+		xor r2, r2, r0	; r2 <- 0x0XXX si AXXX
 		movi r0, -12
-		shl r2, r2 ,r0	; r2 <- 1 si BXXX, 0 si AXXX
-		bz r2, miss_A
+		shl r2, r2 ,r0	; r2 <- 0 si AXXX
+		bz r2, miss_A	; Saltem en cas que hagi fallat VGA en adressa 0xA
 		movi r0, 0x01
 		cmpeq r0,r2,r0
-		bnz r0, miss_B
+		bnz r0, miss_B	; Saltem en cas que hagi fallat VGA en adressa 0xB
 		rds r0, s3
 		movi r1, -4
 		shl r0, r0, r1	; posem 0x0X00
 		shl r0, r0, r1	; posem 0x00X0
 		movhi r0, 0x02	; 0x02X0
 		shl r1, r0, r1	; posem 0x002X	
-		movi r2, 0                      ; TLBd(0) X -> X v = 1 r = 0
+		movi r2, 0				; TLBd(0) X -> X v = 1 r = 0
 		bnz r1, end_miss_tlb
 		
 miss_B:
-		movi 	r1, 0x2B		; TLBd(2) B -> 2
+		movi 	r1, 0x2B
 		movi 	r2, 2	        ; TLBd(2) B -> B v = 1 r = 0
 		bnz 	r2, end_miss_tlb
 		
 miss_A:
-		movi 	r1, 0x2A	; TLBd(2) A -> 2
-		movi 	r2, 2	    ; TLBd(2) A -> A v = 1 r = 0
+		movi 	r1, 0x2A
+		movi 	r2, 2	    	; TLBd(2) A -> A v = 1 r = 0
 		
 end_miss_tlb:			
 		wrvd 	r2, r1		
 		wrpd 	r2, r1		
 		
-		ld 	r5, 2(r7)
-		;rds		r5, s1
+		ld 	r5, 2(r7)		; ld del pc antic
 		addi r5, r5, -2
-		st		2(r7), r5	; pc = pc - 2
+		st	2(r7), r5	; pc = pc - 2
 		
 		jmp r6
 
