@@ -79,7 +79,7 @@ BEGIN
 								and ir_interna(5 downto 0) /= "110100"							-- wrpi (TLB)
 								and ir_interna(5 downto 0) /= "110101"							-- wrvi (TLB)
 								and ir_interna(5 downto 0) /= "110110"							-- wrpd (TLB)
-								and ir_interna(5 downto 0) /= "110111"							-- wrvD (TLB)
+								and ir_interna(5 downto 0) /= "110111"							-- wrvd (TLB)
 								and (ir_interna(5 downto 0) /= "111000" and ir_interna(11 downto 9) /= "000")	-- flush (TLB)
 								)
 							or (op_code_ir_pre = COMP and ir_interna(5 downto 3) = "010")       -- NOP en operaciones COMP pero F_CODE no implementado
@@ -136,7 +136,7 @@ BEGIN
 					JNZ_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "001") else
 					JMP_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "011") else
 					JAL_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "100") else
-					CALLS_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "111") else			-- Cas CALLS Produce una excepcion de tipo ‚ instruccion ilegalgal‚si se ejecuta en modo sistema. Esta instruccion solo debepoderse ejecutar en modo usuario.
+					CALLS_OP when (op_code_ir = JMP and ir_interna(5 downto 3) = "000" and ir_interna(2 downto 0) =  "111") else			-- Cas CALLS Produce una excepcion de tipo ‚ instruccion ilegal‚si se ejecuta en modo sistema. Esta instruccion solo debepoderse ejecutar en modo usuario.
 
 					RDS_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "101100") else			-- Cas R/W Sysreg: F depen dels bits 5-0
 					WRS_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110000") else
@@ -147,7 +147,7 @@ BEGIN
 					RETI_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"024") else
 					HALT_OP when (op_code_ir = HALT and ir_interna(11 downto 0) = x"FFF") else
 					
-					TLB_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110100") else			-- Cas WRPI/WRPD/WRVI/WRVD: depen dels bits 5-0
+					TLB_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110100") else			-- Cas WRPI/WRPD/WRVI/WRVD/FLUSH: depen dels bits 5-0
 					TLB_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110101") else
 					TLB_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110110") else
 					TLB_OP when (op_code_ir = HALT and ir_interna(5 downto 0) = "110111") else
@@ -173,17 +173,16 @@ BEGIN
 				'1' when (privilege_lvl_l = '0' and estat_multi = "01" and op_code_ir = HALT and f_temp = TLB_OP) else
 				'0';
 				-- Tecnicament, HALT, IN, OUT tambe pero ens deixen deixar-ho per fer els jocs de proba mes facils
-				-- las operaciones {RDS, WRS, EI, DI, RETI y GETIID} solo se pueden ejecutar en modo SISTEMA
-				-- además de las operacions de control de la TLB
+				-- las operaciones {RDS, WRS, EI, DI, RETI, GETIID i las del TLB} solo se pueden ejecutar en modo SISTEMA
 				
-	-- TLB_Com es pasarà a la TLB per executar aquelles instruccions pertinents al TLB
-	-- Es in vector de 3 bits:
+	-- Indica a la TLB que ha d'executar (proxy de OP_CODE a la ALU)
 	TLB_Com	<= 	"000" when op_code_ir = HALT and privilege_lvl_l = '1' and ir_interna(5 downto 0) = "110100" else	--	wrpi
 				"001" when op_code_ir = HALT and privilege_lvl_l = '1' and ir_interna(5 downto 0) = "110101" else	--	wrvi
 				"010" when op_code_ir = HALT and privilege_lvl_l = '1' and ir_interna(5 downto 0) = "110110" else	--	wrpd
 				"011" when op_code_ir = HALT and privilege_lvl_l = '1' and ir_interna(5 downto 0) = "110111" else	--	wrvd
-				"100" when op_code_ir = HALT and privilege_lvl_l = '1' and ir_interna(5 downto 0) = "111000" else	--	flush
-				"111";												--	NOP TLB
+				"100" when op_code_ir = HALT and privilege_lvl_l = '1' and ir_interna(5 downto 0) = "111000" else	--	flush	--No cal mirar <11..9> perque si no fos 000, op_code_ir = NOP
+				
+				"111";																								--	NOP TLB
 
 
 	--EXEPCION de instruccio ilegal si hem hagut de filtrar i posar un NOP o Call en Sysmode
@@ -203,7 +202,7 @@ BEGIN
 				"000" ; 			 													-- 000 RUN;
 
 	-- wrd habilita l'escriptura al banc de registres
-	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL), BRANCHES, OUT, NOP, EI, DI, RETI, WRS, CALLS, WRPD/I, WRVD/I
+	-- Sempre escrivim a reg_d excepte a HALT, STORES, JMPS(menys JAL), BRANCHES, OUT, NOP, EI, DI, RETI, WRS, CALLS, WRPD/I, WRVD/I, FETCH
 	wrd <= '0' when (op_code_ir = HALT and ir_interna(11 downto 0) = x"fff")
 					or op_code_ir = ST 
 					or op_code_ir = STB 
@@ -312,17 +311,18 @@ BEGIN
 
 
 	process (clk) begin
-	-- halt_cont indica si estem en HALT; REVISAR US
+	-- halt_cont indica si estem en HALT; En quan es posa a 1, parem tot
 		if boot = '1' then
 			halt_cont <= '0';
 			halt_cont_b <= '0';
 		else
 			if rising_edge(clk) then
 				if halt_cont_b = '0' then
-					if op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" and estat_multi = "01" then
+					if op_code_ir = HALT and ir_interna(11 downto 0) = x"fff" and estat_multi = "01" then	-- si executem un HALT en DECODE, parem. 
+						-- Parem nomes en DECODE perque si no al fer un FECTH d'un HALT i a la ins previa hi ha hagut una excp/int, ja estariem detectant un HALT en fecth i parariem, sense tractar la excp/int
 						halt_cont_b <= '1';
 						halt_cont <= '1';
-					else
+					else																					-- Else RUN
 						halt_cont_b <= '0';
 						halt_cont <= '0';
 					end if;

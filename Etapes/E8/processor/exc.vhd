@@ -10,7 +10,6 @@ entity exc is
 			interrupt	: IN  STD_LOGIC;--
 			div_z		: IN  STD_LOGIC;--
 			acces_mem	: IN  STD_LOGIC;--
-			pp_tlb_d 	: IN  STD_LOGIC;--
 			protect 	: IN  STD_LOGIC;		--
 			call		: IN  STD_LOGIC;
 			estat		: IN  STD_LOGIC_VECTOR(1 downto 0);
@@ -40,7 +39,7 @@ begin
 				lec_tlb_c 		when exc_tlb(3)	= '1' and estat = "01" else		--12
 				protec_c		when protect 	= '1' else 						--13
 				call_c 			when call 		= '1' else 						--14
-				--interrupt_c		when interrupt 	= '1' else					--15
+				--interrupt_c		when interrupt 	= '1' else					--15	-- Interrupt_c esta capada perque detectem les interrupcions per un altre banda
 				no_exc_c;
 
 

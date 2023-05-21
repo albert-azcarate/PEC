@@ -92,10 +92,7 @@ BEGIN
 					VTags(wr_addr) <= Rb(3 downto 0);
 					
 				elsif command = "10" then -- Flush 
-					-- FLUSH: 	if ( Ra & 1 ) { flush dcache; }
-					-- 			if ( Ra & 2 ) { flush dtlb; }
-					-- 			if ( Ra & 4 ) { flush icache; }
-					-- 			if ( Ra & 8 ) { flush itlb; }
+					-- FLUSH: 	if ( Ra & 4 ) { flush icache; }
 					
 					if Ra = x"0002" then
 						PTags(0) <= x"0"; --usr

@@ -118,7 +118,6 @@ ARCHITECTURE Structure OF unidad_control IS
 			addr_a_l	: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			exc_tlb		: IN  std_logic_vector(3 downto 0);
 			addr_io_l	: IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
-			privilege_lvl : out std_LOGIC;
 			wrd			: OUT STD_LOGIC;
 			wrd_s		: OUT STD_LOGIC;
 			u_s			: OUT STD_LOGIC;
@@ -150,7 +149,6 @@ signal word_mem				: std_logic;
 signal read_mem				: std_logic;
 signal word_byte_connection	: std_logic;
 signal load_ins				: std_logic;
-signal z_reg				: std_logic;
 signal halt_conn			: std_logic;
 signal ins_dad_conn			: std_logic;
 signal wr_out_conn			: std_logic;
@@ -240,7 +238,7 @@ BEGIN
 						end if;
 					elsif load_pc_out = "111" then						-- Cas CALLS
 						regPC <= regPC;
-					else						--- REVISAR (Inception)
+					else						--- REVISAR (Inception), funciona, aquest cas en ppi no sarriba mai
 						regPC <= regPC;
 					end if;
 				end if;
@@ -258,7 +256,7 @@ BEGIN
 		else
 			if load_pc_out /= "011" then						-- Cas RUN
 			
-				-- DECODE or JMP carreguem el Seguent IR el que ens ve de memoria; En cas de CALL, nomes ho fem en el cycle de system o ens entra merda a IR
+				-- DECODE or JMP carreguem el Seguent IR el que ens ve de memoria; En cas de CALL, nomes ho fem en el cycle de SYSTEM(ld_pc = 101) o si no ens entra merda a IR
 				if load_ins = '1' or (load_pc_out = "001" and (op_out /= JMP and f_out /= CALLS_OP)) or (op_out = JMP and f_out = CALLS_OP and load_pc_out = "101")  then  
 					new_ir <= datard_m ;
 				else	-- Cas FETCH, mantenim el IR per al DECODE 
@@ -274,7 +272,6 @@ BEGIN
 		-- Actualitzem if rising edge
 		if rising_edge(clk) then
 			ir_reg <= new_ir;
-			z_reg <= z; 
 		end if;
 	end process;
 	
@@ -290,9 +287,9 @@ BEGIN
 	
 	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL, CALL
 	pc <= old_2_Pc when (load_pc_out = "001" and f_out = JAL_OP) or (op_out = JMP and f_out = CALLS_OP) else
-		  regPC;-- RETI pilla el seguent regPC per despres torar
+		  regPC; -- RETI pilla el seguent regPC per despres torar
 
-	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
+	--pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
   	 
 	control_ins : control_l port map (	ir => ir_connection,
 										clk => clk, 
@@ -346,7 +343,6 @@ BEGIN
 								pp_tlb_d_l => pp_tlb_dx,
 								wr_m_l => word_mem,
 								ld_m_l => read_mem,
-								privilege_lvl => privilege_lvl_conn,
 								immed_x2_l => immed_x2_conn,
 								sys_priv_lvl => sys_priv_lvl,
 								addr_io_l => addr_io_conn,

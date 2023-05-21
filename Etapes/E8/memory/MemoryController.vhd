@@ -62,7 +62,7 @@ begin
 	enable <= we when addr < x"c000" else '0';
 	
 	
-	--revisar
+	-- No es fa serir; REVISAR o TREURE tots els cables del mig, en ppi ja ho treu el compilador
 	-- exception only when privilege lvl is no system's and accede in sys section i no toquem VGA
 	pp_tlb_d <= '1' when (addr >= x"8000" and privilege_lvl = '0' and (addr < x"A000" or addr >= x"c000")) else '0'; 
 

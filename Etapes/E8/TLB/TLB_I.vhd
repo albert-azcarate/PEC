@@ -26,7 +26,7 @@ ARCHITECTURE Structure OF TLB_I IS
 	signal VTags : TLB_array_t:= (others => (others => '0'));
 	signal PTags : TLB_array_t:= (others => (others => '0'));
 	signal Valid_bits : std_logic_vector(7 downto 0):= (others => '0');
-	signal Read_bits  : std_logic_vector(7 downto 0):= (others => '0');
+	signal Read_bits  : std_logic_vector(7 downto 0):= (others => '0'); -- No es fa servir? REVISAR
 	signal adress_reg	: integer;
 	signal wr_addr		: integer;
 BEGIN
@@ -46,7 +46,7 @@ BEGIN
 	-- Excepcions
 	exc_tlb_I(0) <= '1' when adress_reg = -1 and (ld_m = '1' or wre = '1') else '0';			-- MISS_TLB_I
 	exc_tlb_I(1) <= '1' when Valid_bits(adress_reg) = '0' else '0';								-- Pagina Invalida 
-	exc_tlb_I(2) <= '1' when adress_reg > 2 and (priv_lvl = '0' and estat = "01") else '0';		-- Pagina Protegida ; mai saltara en els nostres tests
+	exc_tlb_I(2) <= '1' when adress_reg > 2 and (priv_lvl = '0' and estat = "01") else '0';		-- Pagina Protegida ; mai saltara en els nostres tests REVISAR
 	
 	--read asincron TLB, treball standard de la TLB
 	std_output <= PTags(adress_reg)&std_input(11 downto 0) when adress_reg /= -1 and Valid_bits(adress_reg) = '1' else x"0FFE";
@@ -90,10 +90,7 @@ BEGIN
 					VTags(wr_addr) <= Rb(3 downto 0);
 					
 				elsif command = "10" then -- Flush 
-					-- FLUSH: 	if ( Ra & 1 ) { flush dcache; }
-					-- 			if ( Ra & 2 ) { flush dtlb; }
-					-- 			if ( Ra & 4 ) { flush icache; }
-					-- 			if ( Ra & 8 ) { flush itlb; }
+					-- FLUSH: 	if ( Ra & 8 ) { flush itlb; }
 					
 					if Ra = x"0008" then
 						PTags(0) <= x"0"; --usr
