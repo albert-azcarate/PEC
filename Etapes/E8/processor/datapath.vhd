@@ -142,14 +142,15 @@ BEGIN
 			
 	with in_d select
 		input_d <= 	alu_out when "00",
-						datard_m when "01",
-						pc when "10",
-						rd_io when others;
+					datard_m when "01",
+					pc when "10",
+					rd_io when others;
 						
-
+	
+	-- Que entra a memoria, @pc o @ld/st
 	addr_m_buffer <= 	alu_out when ins_dad = '1' else
 						pc;
-								
+		
 	addr_m <= addr_m_buffer;
 
 	data_wr <= regbank_to_alu_b;

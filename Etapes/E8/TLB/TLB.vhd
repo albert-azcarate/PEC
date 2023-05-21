@@ -81,15 +81,15 @@ BEGIN
 	-- "100" when flush (TLB)
 	-- "111" when NOP (TLB)		
 	-- Fem servir el bit 1 de TLB_Com per codificar la instruccio a fer al TLB de dades o instruccions.
-	TLB_Command_To_data <=  "10" when TLB_Com = "100" else
-							"11" when TLB_Com = "111" else
-							TLB_Com(2)&TLB_Com(0) when TLB_Com(1) ='1' else
-							"11";
+	TLB_Command_To_data <=  "10" when TLB_Com = "100" else						-- FLUSH
+							"11" when TLB_Com = "111" else						-- NOP
+							TLB_Com(2)&TLB_Com(0) when TLB_Com(1) ='1' else		-- Instruccio
+							"11";												-- NOP
 
-	TLB_Command_To_inst <= 	"10" when TLB_Com = "100" else
-							"11" when TLB_Com = "111" else
-							TLB_Com(2)&TLB_Com(0) when TLB_Com(1) ='0'else
-							"11";
+	TLB_Command_To_inst <= 	"10" when TLB_Com = "100" else						-- FLUSH
+							"11" when TLB_Com = "111" else                     	-- NOP
+							TLB_Com(2)&TLB_Com(0) when TLB_Com(1) ='0'else     	-- Instruccio
+							"11";                                              	-- NOP
 
 
 	--diferencies entre ins i data TLB:
@@ -97,7 +97,7 @@ BEGIN
 	exc_tlb <=	'0'&exc_I when state = "00" else	--fetch
 				exc_D when state = "01" else		--decode
 				"0000";
-				
+
 	-- Habilitem la escriptura a memoria quan no hi ha excepcio en el estat actual
 	we_mem <= wre when (exc_I = "000" and state = "00") or (exc_D = "0000" and state = "01") else '0';
 

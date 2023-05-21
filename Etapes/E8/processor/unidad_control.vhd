@@ -240,7 +240,7 @@ BEGIN
 						end if;
 					elsif load_pc_out = "111" then						-- Cas CALLS
 						regPC <= regPC;
-					else						--- REVISAR (Inception)
+					else						--- REVISAR (Inception), funciona, aquest cas en ppi no sarriba mai
 						regPC <= regPC;
 					end if;
 				end if;
@@ -258,7 +258,7 @@ BEGIN
 		else
 			if load_pc_out /= "011" then						-- Cas RUN
 			
-				-- DECODE or JMP carreguem el Seguent IR el que ens ve de memoria; En cas de CALL, nomes ho fem en el cycle de system o ens entra merda a IR
+				-- DECODE or JMP carreguem el Seguent IR el que ens ve de memoria; En cas de CALL, nomes ho fem en el cycle de SYSTEM(ld_pc = 101) o si no ens entra merda a IR
 				if load_ins = '1' or (load_pc_out = "001" and (op_out /= JMP and f_out /= CALLS_OP)) or (op_out = JMP and f_out = CALLS_OP and load_pc_out = "101")  then  
 					new_ir <= datard_m ;
 				else	-- Cas FETCH, mantenim el IR per al DECODE 
@@ -290,7 +290,7 @@ BEGIN
 	
 	-- pc es el signal que va al mux d'entrada del banc de registres. Sempre enviem regPC excepte quan es un JAL, CALL
 	pc <= old_2_Pc when (load_pc_out = "001" and f_out = JAL_OP) or (op_out = JMP and f_out = CALLS_OP) else
-		  regPC;-- RETI pilla el seguent regPC per despres torar
+		  regPC; -- RETI pilla el seguent regPC per despres torar
 
 	pc_mem <= '0'&regPC(15 downto 1); --MODELSIM
   	 

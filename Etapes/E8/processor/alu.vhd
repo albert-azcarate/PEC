@@ -107,7 +107,7 @@ BEGIN
 					
 					(others => 'Z');
 					
-	-- En RETI treurem X, ens entra el Pc antic
+	-- En RETI treurem X, ens entra el Pc antic -- Es podria treureu pero no molesta tampoc
 	w <= w_temporal when int = '0' else x;
 	
 END Structure;
