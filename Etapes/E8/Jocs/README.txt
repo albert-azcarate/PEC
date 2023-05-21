@@ -7,7 +7,12 @@ Aquest directori conté els seguents jocs de proves:
 	- EXC-TLB:
 		- Joc que verifica el correcte funcionament de totes les excepcions amb el TLB integrat
 		  Per cada excepcio suma 1 a una variable i la mostra pel 7 segments. Un correcte funcionament
-		  son 21 excepcions(0x15)
+		  son 21 excepcions(0x15). En cas de les excepctions de instruccio no implementada hi ha el fitxer
+		  illegal_ins.txt que conte les instruccions ilegals. Es pot fer daltre manera, escribint a posicions
+		  de memoria de user i saltant alla a executar(com es demostra en el test despres de les comprovacions
+		  de instruccions ilegals). En cas que es canvii el codi s'ha de tenir en compte els dos MOVI i MOVHI
+		  de enmig de les instruccions ilegals, no fos cas que s'hagin modificat ja que pertanyen a un salt
+		  global.
 
 	- INT-TLB:
 		- Joc de proves de la etapa 7.2 que mostra per pantalla el nombre de ticks, els pulsadors, PS2 i
