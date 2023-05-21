@@ -43,7 +43,6 @@ entity multi is
 			inta		: OUT STd_LOGIC;
 			exca		: OUT STd_LOGIC;
 			exc_code	: OUT exc_code_t;
-			privilege_lvl : out std_logic;
 			int_type	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			estat_out	: OUT std_logic_vector(1 downto 0);
 			ldpc		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -58,7 +57,6 @@ architecture Structure of multi is
 signal estat : std_logic_vector(1 downto 0) := "00";
 signal exc_code_b : exc_code_t := no_exc_c;
 signal exc_code_reg : exc_code_t;
-signal privilege_lvl_b : std_logic;
 signal acces_mem_b : std_logic;
 signal ill_ins_b : std_logic;
 signal pp_tlb_b : std_logic;
@@ -217,8 +215,6 @@ begin
 	----- Control Excecions -----
 	-----------------------------
 	
-	-- LEGACY code de quan el priv_level es decidia aqui abaix, es pot comencar a treure cables pero millor no tocar, ja que funciona. Si sobra temps mira de treure.
-	privilege_lvl <= sys_priv_lvl;
 	
 	-- Ens guardem el codi d'excepcio quan no sigui No_exception i no estiguem a Boot per evitar un ill_ins al bootar
 	process (exc_code_b, boot, ldpc_l, clk) begin

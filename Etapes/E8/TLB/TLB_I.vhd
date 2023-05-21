@@ -26,7 +26,7 @@ ARCHITECTURE Structure OF TLB_I IS
 	signal VTags : TLB_array_t:= (others => (others => '0'));
 	signal PTags : TLB_array_t:= (others => (others => '0'));
 	signal Valid_bits : std_logic_vector(7 downto 0):= (others => '0');
-	signal Read_bits  : std_logic_vector(7 downto 0):= (others => '0');
+	signal Read_bits  : std_logic_vector(7 downto 0):= (others => '0'); -- No es fa servir? REVISAR
 	signal adress_reg	: integer;
 	signal wr_addr		: integer;
 BEGIN
