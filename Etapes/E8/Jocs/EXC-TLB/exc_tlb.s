@@ -193,7 +193,7 @@ post_inici:
 		$MOVEI	r0, 0x4000	; Aqui han de saltar excepcions de miss TLBi i invalid TLBi
 		st		0(r0), r0	; Aqui ha de saltar miss TLBd, invalid TLBd i READ_ONLY TLBd
 		$MOVEI	r0, 0xC000	
-		ld		r0, 0(r0)	; pp_TLB_i
+		ld		r0, 0(r0)	; pp_TLB_d
 		
 		
 		

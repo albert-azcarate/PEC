@@ -104,7 +104,7 @@ BEGIN
 
 	std_output <= 	translation_I when state = "00" else
 					translation_D when state = "01" else
-					translation_I; -- En systema necesitem la adressa de instruccions
+					translation_I; -- En systema necesitem la adressa de instruccions REVISAR, en sys no accedim a memoria
 	
 	
 	ins_TLB: TLB_I port map(	boot		=> boot,
