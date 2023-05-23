@@ -508,7 +508,6 @@ set_global_assignment -name FITTER_EFFORT "FAST FIT"
 set_global_assignment -name VHDL_FILE TLB/TLB_I.vhd
 set_global_assignment -name VHDL_FILE TLB/TLB_D.vhd
 set_global_assignment -name VHDL_FILE TLB/TLB.vhd
-set_global_assignment -name SIGNALTAP_FILE stp22.stp
 set_global_assignment -name SIGNALTAP_FILE stp2.stp
 set_global_assignment -name VHDL_FILE io/ps2_keyboard.vhd
 set_global_assignment -name VHDL_FILE io/ControladorIO.vhd
