@@ -15,5 +15,4 @@ DE1_Control_Panel.exe.lnk
 DE1_Control_Panel.exe
 *.tmp
 *.hex
-*.rom
 *.dis
