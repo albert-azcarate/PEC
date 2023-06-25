@@ -1,0 +1,19 @@
+El joc de proves de les instruccions de coma flotant esta dividit en sumes i restes.
+
+Per a cada una de les operacions executem dos casos de operació normal i un que aixequi la excepció de overflow.
+
+Suma
+  Sumem els valors 233.75 (0x4DA7) i -240.5 (0xCDC2) el resultat ha de ser -6.75 (0xC360)
+
+  Sumem els valors 64.625 (0x4A05) i 169.25 (0x4CA5) el resultat ha de ser 233.75 (0x4DA7)
+
+  Sumem els valors 4290772992 (0x7DFF) i 4290772992 (0x5655) el resultat ha de ser overflow perque superem el màxim valor representable, efectivament podem observar amb els simuladors que s'activa la senyal de overflow.
+
+
+Resta
+  Restem els valors 5.2421875 (0x429F) i 3.859375 (0x41DC) el resultat ha de ser 1.3828125 (0x3EC4)
+
+  Restem els valors 9.84375 (0x4476) i -19.75 (0xC678) el resultat ha de ser 29.59375 (0x47B3)
+
+  Restem els valors 4290772992 (0x7DFF) i -4290772992 (0xFDFF) el resultat ha de ser overflow perque superem el màxim valor representable, efectivament podem observar amb els simuladors que s'activa la senyal de overflow.
+
